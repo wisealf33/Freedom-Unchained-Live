@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Foundation Freedom • Garrett</title>
+  <meta name="description" content="An incubator for building trusts, private membership associations, decentralized organizations, and other parallel structures outside centralized control." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f4f6f5;
+      --surface: rgba(255,255,255,0.92);
+      --line: rgba(42, 58, 64, 0.10);
+      --text: #1d2730;
+      --muted: #5c6970;
+      --accent: #4ec7d3;
+      --accent-soft: rgba(78, 199, 211, 0.14);
+      --accent-deep: #2d4b57;
+      --shadow: 0 18px 50px rgba(38, 55, 63, 0.10);
+      --radius-xl: 30px;
+      --radius-lg: 22px;
+      --container: 900px;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: "Instrument Sans", system-ui, sans-serif; color: var(--text); background: radial-gradient(circle at top left, rgba(78,199,211,0.14), transparent 28%), radial-gradient(circle at top right, rgba(45,75,87,0.08), transparent 24%), linear-gradient(180deg, #fbfcfb 0%, var(--bg) 100%); min-height: 100vh; }
+    a { color: inherit; text-decoration: none; }
+    .page { max-width: var(--container); margin: 0 auto; padding: 24px 18px 56px; }
+    .nav, .hero, .section, .cta { border: 1px solid var(--line); background: var(--surface); box-shadow: var(--shadow); backdrop-filter: blur(12px); }
+    .nav { display: flex; justify-content: space-between; align-items: center; gap: 14px; padding: 14px 18px; border-radius: 999px; position: sticky; top: 16px; z-index: 10; }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .brand-mark { width: 42px; height: 42px; border-radius: 14px; display: grid; place-items: center; background: linear-gradient(135deg, var(--accent), #7dd9df); color: #fff; font-family: "Space Grotesk", sans-serif; font-weight: 700; }
+    .brand h1, .hero h2, .section h3 { font-family: "Space Grotesk", sans-serif; letter-spacing: -0.04em; }
+    .brand h1 { margin: 0; font-size: 1rem; }
+    .brand p { margin: 2px 0 0; font-size: 0.92rem; color: var(--muted); }
+    .back-link { padding: 10px 14px; border-radius: 999px; color: var(--muted); font-size: 0.95rem; font-weight: 600; background: rgba(255,255,255,0.84); }
+    .hero { margin-top: 28px; border-radius: var(--radius-xl); padding: 40px; background: radial-gradient(circle at top right, rgba(78,199,211,0.18), transparent 26%), radial-gradient(circle at bottom left, rgba(45,75,87,0.10), transparent 24%), linear-gradient(135deg, rgba(255,255,255,0.98), rgba(246,250,250,0.9)); }
+    .eyebrow { display: inline-flex; align-items: center; padding: 8px 12px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); font-size: 0.82rem; font-weight: 600; margin-bottom: 18px; }
+    .hero h2 { margin: 0; font-size: clamp(2.3rem, 6vw, 4.2rem); color: var(--accent-deep); line-height: .95; }
+    .hero p { margin: 18px 0 0; color: var(--muted); line-height: 1.8; font-size: 1.02rem; max-width: 42rem; }
+    .section { margin-top: 20px; border-radius: var(--radius-xl); padding: 28px; }
+    .section h3 { margin: 0 0 12px; font-size: clamp(1.35rem, 3vw, 1.85rem); }
+    .section p { margin: 0; color: var(--muted); line-height: 1.8; }
+    .grid { display: grid; gap: 18px; margin-top: 20px; }
+    .cta { margin-top: 20px; border-radius: var(--radius-lg); padding: 22px; }
+    .cta strong { display: block; font-family: "Space Grotesk", sans-serif; font-size: 1.1rem; margin-bottom: 8px; }
+    .cta p { margin: 0 0 14px; color: var(--muted); line-height: 1.7; }
+    .cta a { display: inline-flex; align-items: center; padding: 10px 14px; border-radius: 999px; background: var(--accent-deep); color: #fff; font-weight: 600; }
+    @media (min-width: 760px) { .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    @media (max-width: 720px) { .page { padding: 16px 14px 40px; } .nav { border-radius: 24px; padding: 14px; flex-direction: column; align-items: flex-start; } .hero, .section { padding: 24px; } }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="nav">
+      <div class="brand">
+        <div class="brand-mark">G</div>
+        <div>
+          <h1>Garrett J Grubbs</h1>
+          <p>Freedom Unchained and parallel projects</p>
+        </div>
+      </div>
+      <a class="back-link" href="../index.html#projects">← Back to projects</a>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="eyebrow">Institutional / organizational build</div>
+        <h2>Foundation Freedom</h2>
+        <p>An incubator for building trusts, private membership associations, decentralized organizations, and other parallel structures outside centralized control.</p>
+      </section>
+
+      <div class="grid">
+        <section class="section">
+          <h3>What it is</h3>
+          <p>Foundation Freedom is about building the organizational and legal containers that freer communities and independent systems will need if they are going to endure in practice.</p>
+        </section>
+
+        <section class="section">
+          <h3>Current planning focus</h3>
+          <p>The planning work here is about clarifying the structure, purpose, and first useful forms this incubator should take so it becomes durable and real.</p>
+        </section>
+      </div>
+
+      <section class="section">
+        <h3>Why it matters</h3>
+        <p>This matters because parallel systems eventually need legitimate containers, governance, and continuity, not just energy and ideas.</p>
+      </section>
+
+      <section class="cta">
+        <strong>Stay connected to the larger mission</strong>
+        <p>This project supports the larger Freedom Unchained mission by helping build the structures that can hold freedom over time.</p>
+        <a href="../index.html#freedom-unchained">Return to Freedom Unchained</a>
+      </section>
+    </main>
+  </div>
+</body>
+</html>

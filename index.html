@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Garrett</title>
+  <meta name="description" content="Garrett's simple home base for Freedom Unchained, projects, and public work." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f4f6f5;
+      --surface: rgba(255,255,255,0.9);
+      --surface-strong: rgba(255,255,255,0.97);
+      --line: rgba(42, 58, 64, 0.10);
+      --text: #1d2730;
+      --muted: #5c6970;
+      --accent: #4ec7d3;
+      --accent-soft: rgba(78, 199, 211, 0.14);
+      --accent-deep: #2d4b57;
+      --shadow: 0 18px 50px rgba(38, 55, 63, 0.10);
+      --radius-xl: 30px;
+      --radius-lg: 22px;
+      --radius-md: 16px;
+      --container: 980px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: "Instrument Sans", system-ui, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(78,199,211,0.14), transparent 28%),
+        radial-gradient(circle at top right, rgba(45,75,87,0.08), transparent 24%),
+        linear-gradient(180deg, #fbfcfb 0%, var(--bg) 100%);
+      min-height: 100vh;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    .page {
+      max-width: var(--container);
+      margin: 0 auto;
+      padding: 24px 18px 56px;
+    }
+
+    .nav,
+    .hero,
+    .section,
+    .link-card,
+    .project-card {
+      border: 1px solid var(--line);
+      background: var(--surface);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(12px);
+    }
+
+    .nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 18px;
+      border-radius: 999px;
+      position: sticky;
+      top: 16px;
+      z-index: 10;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-mark {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, var(--accent), #7dd9df);
+      color: #fff;
+      font-family: "Space Grotesk", sans-serif;
+      font-weight: 700;
+    }
+
+    .brand h1,
+    .hero h2,
+    .section h3,
+    .project-card h4,
+    .link-card strong {
+      font-family: "Space Grotesk", sans-serif;
+      letter-spacing: -0.04em;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 1rem;
+    }
+
+    .brand p {
+      margin: 2px 0 0;
+      font-size: 0.92rem;
+      color: var(--muted);
+    }
+
+    .nav-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .nav-links a {
+      padding: 10px 14px;
+      border-radius: 999px;
+      color: var(--muted);
+      font-size: 0.95rem;
+      font-weight: 600;
+      transition: 180ms ease;
+    }
+
+    .nav-links a:hover {
+      background: rgba(255,255,255,0.84);
+      color: var(--text);
+    }
+
+    .hero {
+      margin-top: 28px;
+      border-radius: var(--radius-xl);
+      padding: 42px;
+      background:
+        radial-gradient(circle at top right, rgba(78,199,211,0.18), transparent 26%),
+        radial-gradient(circle at bottom left, rgba(45,75,87,0.10), transparent 24%),
+        linear-gradient(135deg, rgba(255,255,255,0.98), rgba(246,250,250,0.9));
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: auto -80px -80px auto;
+      width: 240px;
+      height: 240px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(78,199,211,0.16), transparent 70%);
+      pointer-events: none;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 0.82rem;
+      font-weight: 600;
+      margin-bottom: 18px;
+    }
+
+    .hero-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 22px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-title {
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      line-height: 0.95;
+      position: relative;
+      z-index: 1;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .hero-avatar {
+      width: clamp(108px, 16vw, 150px);
+      aspect-ratio: 1 / 1;
+      border-radius: 50%;
+      overflow: hidden;
+      flex-shrink: 0;
+      border: 5px solid rgba(255,255,255,0.92);
+      box-shadow: 0 18px 40px rgba(30, 40, 58, 0.18);
+      background: linear-gradient(135deg, rgba(78,199,211,0.2), rgba(45,75,87,0.16));
+    }
+
+    .hero-avatar img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .hero-name {
+      font-family: "Space Grotesk", sans-serif;
+      font-size: clamp(2.9rem, 7vw, 5.2rem);
+      font-weight: 700;
+      letter-spacing: -0.06em;
+      color: var(--accent-deep);
+    }
+
+    .hero-of {
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(1.7rem, 3vw, 2.45rem);
+      font-style: italic;
+      font-weight: 500;
+      letter-spacing: -0.03em;
+      color: var(--accent);
+    }
+
+    .hero-sections {
+      margin-top: 26px;
+      display: grid;
+      gap: 18px;
+      max-width: 54rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-section {
+      display: grid;
+      gap: 8px;
+    }
+
+    .hero-label {
+      display: inline-flex;
+      width: fit-content;
+      font-size: 0.94rem;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent-deep);
+      background: rgba(78, 199, 211, 0.14);
+      border-radius: 999px;
+      padding: 8px 12px;
+    }
+
+    .hero-text {
+      margin: 0;
+      font-size: 1.05rem;
+      line-height: 1.82;
+      color: #516069;
+    }
+
+    .section-grid {
+      display: grid;
+      gap: 20px;
+      margin-top: 20px;
+    }
+
+    .section {
+      border-radius: var(--radius-xl);
+      padding: 30px;
+      box-shadow: 10px 16px 26px rgba(78, 199, 211, 0.20);
+    }
+
+    .section h3 {
+      margin: 0 0 10px;
+      font-size: clamp(1.5rem, 2.5vw, 2rem);
+    }
+
+    .section-banner {
+      width: 100%;
+      margin: 0 0 22px;
+      border-radius: 20px;
+      overflow: hidden;
+      border: 1px solid rgba(20, 24, 31, 0.08);
+      box-shadow: 0 16px 36px rgba(30, 40, 58, 0.14);
+      background: rgba(255,255,255,0.9);
+    }
+
+    .section-banner img {
+      display: block;
+      width: 100%;
+      height: auto;
+      object-fit: cover;
+    }
+
+    .section-intro {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.65;
+      max-width: 42rem;
+    }
+
+    .links-grid,
+    .projects {
+      display: grid;
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .link-card,
+    .project-card {
+      border-radius: var(--radius-lg);
+      padding: 18px;
+      background: var(--surface-strong);
+      transition: 180ms ease;
+    }
+
+    .link-card {
+      box-shadow: 0 6px 14px rgba(78, 199, 211, 0.18);
+      border-color: rgba(78, 199, 211, 0.22);
+    }
+
+    .link-card:hover,
+    .project-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 20px 36px rgba(30, 40, 58, 0.12);
+    }
+
+    .link-card:hover {
+      box-shadow: 0 8px 18px rgba(78, 199, 211, 0.24);
+    }
+
+    .link-card {
+      display: grid;
+      gap: 6px;
+    }
+
+    .link-card strong {
+      font-size: 1.15rem;
+    }
+
+    .link-card span,
+    .project-card p,
+    .simple-copy p {
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    .project-tag {
+      display: inline-flex;
+      padding: 6px 9px;
+      border-radius: 999px;
+      background: rgba(21,27,36,0.06);
+      color: var(--muted);
+      font-size: 0.74rem;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+
+    .project-card h4 {
+      margin: 0;
+      font-size: 1.08rem;
+      line-height: 1.15;
+    }
+
+    .project-card p {
+      margin: 10px 0 0;
+      font-size: 0.93rem;
+      line-height: 1.48;
+    }
+
+    .project-card {
+      box-shadow: 0 8px 18px rgba(192, 106, 126, 0.18);
+      border-color: rgba(192, 106, 126, 0.2);
+      width: 100%;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .simple-copy {
+      display: grid;
+      gap: 14px;
+      margin-top: 20px;
+    }
+
+    .simple-copy p {
+      margin: 0;
+    }
+
+    .footer {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      padding: 18px 4px 0;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    @media (min-width: 760px) {
+      .links-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .projects {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 720px) {
+      .page {
+        padding: 16px 14px 40px;
+      }
+
+      .nav {
+        border-radius: 24px;
+        padding: 14px;
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .hero,
+      .section {
+        padding: 24px;
+      }
+
+      .hero-header {
+        flex-direction: column-reverse;
+        align-items: flex-start;
+      }
+
+      .hero-avatar {
+        width: 110px;
+      }
+
+      .hero h2 {
+        font-size: 2.6rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="nav">
+      <div class="brand">
+        <div class="brand-mark">G</div>
+        <div>
+          <h1>Garrett J Grubbs</h1>
+          <p>Freedom Unchained and parallel projects</p>
+        </div>
+      </div>
+      <nav class="nav-links" aria-label="Primary">
+        <a href="#freedom-unchained">Start Here</a>
+        <a href="#projects">Projects</a>
+        <a href="#about">Connect</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="hero-header">
+          <h2 class="hero-title">
+            <span class="hero-name">Garrett J Grubbs</span>
+            <span class="hero-of">of Freedom Unchained</span>
+          </h2>
+
+          <div class="hero-avatar">
+            <img src="assets/Hero-Freedom-Unchained.jpeg" alt="Freedom Unchained profile image" />
+          </div>
+        </div>
+
+        <div class="hero-sections">
+          <div class="hero-section">
+            <div class="hero-label">Who I Am</div>
+            <p class="hero-text">I’m Garrett J Grubbs, the man behind Freedom Unchained. I’m focused on bringing together ideas, people, and projects that can help build a more free, decentralized, and community-driven future through real work, real participation, and practical action.</p>
+          </div>
+
+          <div class="hero-section">
+            <div class="hero-label">Purpose</div>
+            <p class="hero-text">The purpose of this work is to help redirect our energy away from endless attention on broken systems and toward building something better. Not just criticizing what is failing, but creating parallel structures people can actually rely on, structures rooted in freedom, free will, self-governance, voluntary cooperation, and stronger local communities.</p>
+          </div>
+
+          <div class="hero-section">
+            <div class="hero-label">Mission</div>
+            <p class="hero-text">My mission is to help build real-world alternatives that can take the place of centralized systems without losing the functions people still need. That means building toward stronger communities, decentralized collaboration, parallel economies, fair arbitration and dispute resolution, community-based security and support systems, better coordination between people and places, and new ways for communities to work together, build infrastructure, solve problems, and create value without depending on coercive control.</p>
+          </div>
+
+          <div class="hero-section">
+            <div class="hero-label">Call to Action</div>
+            <p class="hero-text">This is for builders, creators, organizers, contributors, problem-solvers, and people who know we need something more. If you are here to connect, collaborate, contribute skills, share ideas, follow the work, explore the projects, or help build what comes next, you are in the right place. And if you are here first to watch and learn, you are welcome too, follow along, share what matters, and step in when you are ready.</p>
+          </div>
+        </div>
+      </section>
+
+      <div class="section-grid">
+        <section class="section" id="freedom-unchained">
+          <div class="section-banner">
+            <img src="assets/Freedom-Unchained-Banner.jpeg" alt="Freedom Unchained banner" />
+          </div>
+          <h3>Freedom Unchained</h3>
+          <p class="section-intro">This is the main place I want people to find first. Watch the content, follow the page, and join the community.</p>
+
+          <div class="links-grid">
+            <a class="link-card" href="https://www.youtube.com/c/FreedomUnchained" target="_blank" rel="noreferrer">
+              <strong>YouTube</strong>
+              <span>Main Freedom Unchained channel. Start here.</span>
+            </a>
+
+            <a class="link-card" href="https://www.facebook.com/freedomunchained" target="_blank" rel="noreferrer">
+              <strong>Facebook Page</strong>
+              <span>Follow the main Freedom Unchained page.</span>
+            </a>
+
+            <a class="link-card" href="https://www.facebook.com/groups/130379380983406" target="_blank" rel="noreferrer">
+              <strong>Facebook Group</strong>
+              <span>Join the Freedom Unchained group and get involved.</span>
+            </a>
+          </div>
+        </section>
+
+        <section class="section" id="projects">
+          <h3>Projects in Planning</h3>
+          <p class="section-intro">These are some of the projects, communities, and future builds growing out of the larger mission behind Freedom Unchained. Each one represents a different part of the parallel structures, tools, relationships, and places I want to help bring into reality.</p>
+
+          <div class="projects">
+            <a class="project-card" href="projects/foundation-freedom.html">
+              <div class="project-tag">Institutional / organizational build</div>
+              <h4>Foundation Freedom</h4>
+              <p>An incubator for building trusts, private membership associations, decentralized organizations, and other parallel structures outside centralized control.</p>
+            </a>
+
+            <a class="project-card" href="projects/pactum.html">
+              <div class="project-tag">Home / community systems project</div>
+              <h4>Pactum</h4>
+              <p>A home-first system for organizing the individual, the household, and the community through practical coordination, local exchange, and voluntary cooperation.</p>
+            </a>
+
+            <a class="project-card" href="projects/bitcoin-gameshow.html">
+              <div class="project-tag">Interactive media project</div>
+              <h4>Bitcoin Gameshow</h4>
+              <p>An interactive media concept that blends entertainment, financial ideas, and audience participation to make markets and value more engaging.</p>
+            </a>
+
+            <a class="project-card" href="projects/founders-circle.html">
+              <div class="project-tag">Collaborative community</div>
+              <h4>Founders Circle</h4>
+              <p>A collaborative circle for builders, thinkers, organizers, and contributors to connect, support meaningful work, and move ideas into action.</p>
+            </a>
+
+            <a class="project-card" href="projects/the-grove.html">
+              <div class="project-tag">Land / gathering place</div>
+              <h4>The Grove</h4>
+              <p>A land-based gathering place for stewardship, food, mentorship, spiritual connection, and healthier community life through shared land and shared work.</p>
+            </a>
+
+            <a class="project-card" href="projects/your-vision.html">
+              <div class="project-tag">Shared future / invitation</div>
+              <h4>Your Vision</h4>
+              <p>An invitation to bring your own ideas, projects, and dreams into the conversation and explore where they might connect with this larger mission.</p>
+            </a>
+          </div>
+        </section>
+
+        <section class="section" id="about">
+          <h3>Why this page exists</h3>
+          <p class="section-intro">This page is a simple starting point. It brings together my work, the larger direction behind Freedom Unchained, and the projects and communities growing out of it.</p>
+
+          <div class="simple-copy">
+            <p>Freedom Unchained is the front door for the mission. From here, you can follow the work, explore the projects, and find the places where ideas, people, and parallel structures are beginning to take shape.</p>
+            <p>Over time, this page will continue to grow as the work becomes more active, more public, and more connected. For now, it is here to keep the path simple: one place to start, one place to connect, and one place to follow what comes next.</p>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <footer class="footer">
+      <span>Garrett</span>
+      <span>Simple home base, focused on Freedom Unchained.</span>
+    </footer>
+  </div>
+
+</body>
+</html>
