@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Pactum • Garrett</title>
+  <title>Pactum • Freedom Unchained</title>
   <meta name="description" content="A home-first system for organizing the individual, the household, and the community through practical coordination, local exchange, and voluntary cooperation." />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -43,12 +43,39 @@
     .section h3 { margin: 0 0 12px; font-size: clamp(1.35rem, 3vw, 1.85rem); }
     .section p { margin: 0; color: var(--muted); line-height: 1.8; }
     .grid { display: grid; gap: 18px; margin-top: 20px; }
+    .interest-card { margin-top: 20px; border: 1px solid rgba(78, 199, 211, 0.22); background: rgba(255,255,255,0.96); border-radius: var(--radius-lg); padding: 22px; box-shadow: 0 10px 24px rgba(30, 40, 58, 0.10); }
+    .interest-card h3 { margin: 0 0 10px; font-size: clamp(1.2rem, 3vw, 1.55rem); }
+    .interest-card p { margin: 0; color: var(--muted); line-height: 1.75; }
+    .interest-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+    .pill-button, .ghost-button { display: inline-flex; align-items: center; padding: 10px 14px; border-radius: 999px; font-weight: 600; }
+    .pill-button { background: var(--accent-deep); color: #fff; }
+    .ghost-button { background: rgba(78, 199, 211, 0.12); color: var(--accent-deep); }
     .cta { margin-top: 20px; border-radius: var(--radius-lg); padding: 22px; }
     .cta strong { display: block; font-family: "Space Grotesk", sans-serif; font-size: 1.1rem; margin-bottom: 8px; }
     .cta p { margin: 0 0 14px; color: var(--muted); line-height: 1.7; }
     .cta a { display: inline-flex; align-items: center; padding: 10px 14px; border-radius: 999px; background: var(--accent-deep); color: #fff; font-weight: 600; }
-    @media (min-width: 760px) { .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    @media (min-width: 760px) { .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .footer-links { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
     @media (max-width: 720px) { .page { padding: 16px 14px 40px; } .nav { border-radius: 24px; padding: 14px; flex-direction: column; align-items: flex-start; } .hero, .section { padding: 24px; } }
+
+    .footer {
+      margin-top: 26px;
+      border: 1px solid rgba(45, 75, 87, 0.16);
+      background: linear-gradient(135deg, rgba(230, 239, 242, 0.96), rgba(243, 248, 249, 0.98));
+      box-shadow: 0 22px 48px rgba(35, 52, 60, 0.10);
+      backdrop-filter: blur(12px);
+      border-radius: var(--radius-xl);
+      padding: 28px;
+      display: grid;
+      gap: 22px;
+    }
+    .footer-top { display: grid; gap: 10px; }
+    .footer-title { margin: 0; font-family: "Space Grotesk", sans-serif; font-size: 1.25rem; letter-spacing: -0.03em; color: #203943; }
+    .footer-copy { margin: 0; color: #4f646c; line-height: 1.7; max-width: 46rem; }
+    .footer-links { display: grid; gap: 18px; padding-top: 8px; border-top: 1px solid rgba(45, 75, 87, 0.10); }
+    .footer-group h4 { margin: 0 0 10px; font-family: "Space Grotesk", sans-serif; font-size: 1rem; color: #203943; }
+    .footer-group a { display: block; color: #556870; margin-bottom: 8px; font-size: 0.95rem; }
+    .footer-group a:hover { color: var(--text); }
+
   </style>
 </head>
 <body>
@@ -61,7 +88,7 @@
           <p>Freedom Unchained and parallel projects</p>
         </div>
       </div>
-      <a class="back-link" href="../index.html#projects">← Back to projects</a>
+      <a class="back-link" href="../index.html#projects">← Back to Freedom Unchained</a>
     </header>
 
     <main>
@@ -88,12 +115,56 @@
         <p>This matters because freer households and healthier communities need practical tools for coordination, exchange, trust, and shared action, not just good intentions.</p>
       </section>
 
+      <section class="interest-card">
+        <h3>Join the Pactum interest list</h3>
+        <p>If Pactum is the part of this larger mission you care about, join the project-specific list to hear when updates, previews, testing opportunities, or early involvement paths open up.</p>
+        <div class="interest-actions">
+          <a class="pill-button" href="https://sendfox.com/lp/1r0p7x" target="_blank" rel="noreferrer">Join the Pactum interest list</a>
+          <a class="ghost-button" href="https://sendfox.com/lp/1y7ygy" target="_blank" rel="noreferrer">Main Freedom Unchained list</a>
+        </div>
+      </section>
+
       <section class="cta">
         <strong>Stay connected to the larger mission</strong>
         <p>Pactum is one part of the broader Freedom Unchained direction, a move toward structures people can actually live inside.</p>
         <a href="../index.html#freedom-unchained">Return to Freedom Unchained</a>
       </section>
     </main>
+
+
+    <footer class="footer">
+      <div class="footer-top">
+        <h3 class="footer-title">Freedom Unchained</h3>
+        <p class="footer-copy">A place to follow the mission, explore connected projects, stay in touch, and find the paths that are beginning to take shape through this work.</p>
+      </div>
+
+      <div class="footer-links">
+        <div class="footer-group">
+          <h4>Explore</h4>
+          <a href="../index.html#freedom-unchained">Freedom Unchained</a>
+          <a href="../index.html#projects">Projects</a>
+        </div>
+
+        <div class="footer-group">
+          <h4>Projects</h4>
+          <a href="pactum.html">Pactum</a>
+          <a href="bitcoin-gameshow.html">Bitcoin Gameshow</a>
+          <a href="foundation-freedom.html">Foundation Freedom</a>
+          <a href="founders-circle.html">Founders Circle</a>
+          <a href="the-grove.html">The Grove</a>
+          <a href="your-vision.html">Your Vision</a>
+        </div>
+
+        <div class="footer-group">
+          <h4>Connect</h4>
+          <a href="https://sendfox.com/lp/1y7ygy" target="_blank" rel="noreferrer">Join the Freedom Unchained list</a>
+          <a href="contact.html">Contact Garrett</a>
+          <a href="https://www.youtube.com/c/FreedomUnchained" target="_blank" rel="noreferrer">YouTube</a>
+          <a href="https://www.facebook.com/freedomunchained" target="_blank" rel="noreferrer">Facebook</a>
+        </div>
+      </div>
+    </footer>
+
   </div>
 </body>
 </html>

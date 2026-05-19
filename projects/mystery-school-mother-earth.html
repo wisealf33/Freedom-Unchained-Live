@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Bitcoin Gameshow • Freedom Unchained</title>
-  <meta name="description" content="An interactive media concept that blends entertainment, financial ideas, and audience participation to make markets and value more engaging." />
+  <title>Mystery School of Mother Earth Foundation • Freedom Unchained</title>
+  <meta name="description" content="A PMA branch under Foundation Freedom for an online-first spiritual-centered community, local Mother Earth Circles, aligned vendors, practitioners, and events." />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
@@ -27,35 +27,35 @@
     body { margin: 0; font-family: "Instrument Sans", system-ui, sans-serif; color: var(--text); background: radial-gradient(circle at top left, rgba(78,199,211,0.14), transparent 28%), radial-gradient(circle at top right, rgba(45,75,87,0.08), transparent 24%), linear-gradient(180deg, #fbfcfb 0%, var(--bg) 100%); min-height: 100vh; }
     a { color: inherit; text-decoration: none; }
     .page { max-width: var(--container); margin: 0 auto; padding: 24px 18px 56px; }
-    .nav, .hero, .section, .cta { border: 1px solid var(--line); background: var(--surface); box-shadow: var(--shadow); backdrop-filter: blur(12px); }
+    .nav, .hero, .section, .cta, .construction-banner, .detail-card { border: 1px solid var(--line); background: var(--surface); box-shadow: var(--shadow); backdrop-filter: blur(12px); }
     .nav { display: flex; justify-content: space-between; align-items: center; gap: 14px; padding: 14px 18px; border-radius: 999px; position: sticky; top: 16px; z-index: 10; }
     .brand { display: flex; align-items: center; gap: 12px; }
     .brand-mark { width: 42px; height: 42px; border-radius: 14px; display: grid; place-items: center; background: linear-gradient(135deg, var(--accent), #7dd9df); color: #fff; font-family: "Space Grotesk", sans-serif; font-weight: 700; }
-    .brand h1, .hero h2, .section h3 { font-family: "Space Grotesk", sans-serif; letter-spacing: -0.04em; }
+    .brand h1, .hero h2, .section h3, .detail-card h4 { font-family: "Space Grotesk", sans-serif; letter-spacing: -0.04em; }
     .brand h1 { margin: 0; font-size: 1rem; }
     .brand p { margin: 2px 0 0; font-size: 0.92rem; color: var(--muted); }
     .back-link { padding: 10px 14px; border-radius: 999px; color: var(--muted); font-size: 0.95rem; font-weight: 600; background: rgba(255,255,255,0.84); }
-    .hero { margin-top: 28px; border-radius: var(--radius-xl); padding: 40px; background: radial-gradient(circle at top right, rgba(78,199,211,0.18), transparent 26%), radial-gradient(circle at bottom left, rgba(45,75,87,0.10), transparent 24%), linear-gradient(135deg, rgba(255,255,255,0.98), rgba(246,250,250,0.9)); }
+    .construction-banner { margin-top: 28px; border-radius: var(--radius-lg); padding: 16px 18px; background: linear-gradient(135deg, rgba(255, 244, 214, 0.98), rgba(255, 250, 236, 0.95)); border-color: rgba(196, 145, 31, 0.22); }
+    .construction-banner strong { display: block; font-family: "Space Grotesk", sans-serif; font-size: 1rem; margin-bottom: 6px; color: #7a5a00; }
+    .construction-banner p { margin: 0; color: #735d22; line-height: 1.6; }
+    .hero { margin-top: 20px; border-radius: var(--radius-xl); padding: 40px; background: radial-gradient(circle at top right, rgba(78,199,211,0.18), transparent 26%), radial-gradient(circle at bottom left, rgba(45,75,87,0.10), transparent 24%), linear-gradient(135deg, rgba(255,255,255,0.98), rgba(246,250,250,0.9)); }
     .eyebrow { display: inline-flex; align-items: center; padding: 8px 12px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); font-size: 0.82rem; font-weight: 600; margin-bottom: 18px; }
-    .hero h2 { margin: 0; font-size: clamp(2.3rem, 6vw, 4.2rem); color: var(--accent-deep); line-height: .95; }
+    .hero h2 { margin: 0; font-size: clamp(2.25rem, 6vw, 4rem); color: var(--accent-deep); line-height: .95; }
     .hero p { margin: 18px 0 0; color: var(--muted); line-height: 1.8; font-size: 1.02rem; max-width: 42rem; }
     .section { margin-top: 20px; border-radius: var(--radius-xl); padding: 28px; }
     .section h3 { margin: 0 0 12px; font-size: clamp(1.35rem, 3vw, 1.85rem); }
     .section p { margin: 0; color: var(--muted); line-height: 1.8; }
     .grid { display: grid; gap: 18px; margin-top: 20px; }
-    .interest-card { margin-top: 20px; border: 1px solid rgba(78, 199, 211, 0.22); background: rgba(255,255,255,0.96); border-radius: var(--radius-lg); padding: 22px; box-shadow: 0 10px 24px rgba(30, 40, 58, 0.10); }
-    .interest-card h3 { margin: 0 0 10px; font-size: clamp(1.2rem, 3vw, 1.55rem); }
-    .interest-card p { margin: 0; color: var(--muted); line-height: 1.75; }
-    .interest-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
-    .pill-button, .ghost-button { display: inline-flex; align-items: center; padding: 10px 14px; border-radius: 999px; font-weight: 600; }
-    .pill-button { background: var(--accent-deep); color: #fff; }
-    .ghost-button { background: rgba(78, 199, 211, 0.12); color: var(--accent-deep); }
+    .detail-card { display: block; border-radius: var(--radius-lg); padding: 22px; }
+    .detail-card h4 { margin: 0 0 8px; font-size: 1.08rem; }
+    .detail-card p { margin: 0; color: var(--muted); line-height: 1.7; }
+    .detail-card ul { margin: 12px 0 0; padding-left: 18px; color: var(--muted); line-height: 1.7; }
     .cta { margin-top: 20px; border-radius: var(--radius-lg); padding: 22px; }
     .cta strong { display: block; font-family: "Space Grotesk", sans-serif; font-size: 1.1rem; margin-bottom: 8px; }
     .cta p { margin: 0 0 14px; color: var(--muted); line-height: 1.7; }
     .cta a { display: inline-flex; align-items: center; padding: 10px 14px; border-radius: 999px; background: var(--accent-deep); color: #fff; font-weight: 600; }
     @media (min-width: 760px) { .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .footer-links { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
-    @media (max-width: 720px) { .page { padding: 16px 14px 40px; } .nav { border-radius: 24px; padding: 14px; flex-direction: column; align-items: flex-start; } .hero, .section { padding: 24px; } }
+    @media (max-width: 720px) { .page { padding: 16px 14px 40px; } .nav { border-radius: 24px; padding: 14px; flex-direction: column; align-items: flex-start; } .hero, .section, .detail-card { padding: 24px; } }
 
     .footer {
       margin-top: 26px;
@@ -75,7 +75,6 @@
     .footer-group h4 { margin: 0 0 10px; font-family: "Space Grotesk", sans-serif; font-size: 1rem; color: #203943; }
     .footer-group a { display: block; color: #556870; margin-bottom: 8px; font-size: 0.95rem; }
     .footer-group a:hover { color: var(--text); }
-
   </style>
 </head>
 <body>
@@ -88,49 +87,84 @@
           <p>Freedom Unchained and parallel projects</p>
         </div>
       </div>
-      <a class="back-link" href="../index.html#projects">← Back to Freedom Unchained</a>
+      <a class="back-link" href="foundation-freedom.html">← Back to Foundation Freedom</a>
     </header>
 
     <main>
+      <section class="construction-banner">
+        <strong>Under construction</strong>
+        <p>This PMA branch is being shaped under Foundation Freedom. The direction is real, while the final public invitation, membership language, and launch flow still need review.</p>
+      </section>
+
       <section class="hero">
-        <div class="eyebrow">Interactive media project</div>
-        <h2>Bitcoin Gameshow</h2>
-        <p>An interactive media concept that blends entertainment, financial ideas, and audience participation to make markets and value more engaging.</p>
+        <div class="eyebrow">PMA branch under Foundation Freedom</div>
+        <h2>Mystery School of Mother Earth Foundation</h2>
+        <p>A private membership association being developed as an online-first, spiritual-centered community with practical member value, local circles, aligned vendors and practitioners, and real-world Mother Earth Market events.</p>
       </section>
 
       <div class="grid">
         <section class="section">
           <h3>What it is</h3>
-          <p>Bitcoin Gameshow is about making economic ideas more alive, memorable, and participatory through something people would genuinely want to watch and interact with.</p>
+          <p>Mystery School of Mother Earth Foundation is not the umbrella itself. It is one PMA branch that Foundation Freedom can help structure, incubate, and steward into a real membership ecosystem.</p>
         </section>
 
         <section class="section">
           <h3>Current planning focus</h3>
-          <p>The current stage is sharpening the concept into a real product direction so it can move beyond an interesting idea into an actual build path.</p>
+          <p>The current work is to define the PMA front door, member entry path, vendor and practitioner upgrade model, local-circle pathway, event model, newsletter, directory, and first-step launch plan.</p>
         </section>
       </div>
 
-      <section class="section">
-        <h3>Why it matters</h3>
-        <p>This matters because culture, attention, and learning shape what people can understand and participate in, and media can open doors that lectures never will.</p>
-      </section>
+      <div class="grid">
+        <section class="detail-card">
+          <h4>Core structure</h4>
+          <p>The launch model starts with a simple PMA front door. People enter as Basic Members, with deeper opportunities opening inside the membership container.</p>
+          <ul>
+            <li>Basic Member entry point at $33 per year</li>
+            <li>Vendor / Practitioner Member Upgrade as the first major upgrade path</li>
+            <li>Member opportunities framed inside the PMA, not as public direct-sale services</li>
+          </ul>
+        </section>
 
-      <section class="interest-card">
-        <h3>Join the Bitcoin Gameshow interest list</h3>
-        <p>If this project is the part you want to follow, join the project-specific list for updates, previews, future participation opportunities, and ways people may be able to earn tokens as the project develops.</p>
-        <div class="interest-actions">
-          <a class="pill-button" href="https://sendfox.com/lp/3ox7ld" target="_blank" rel="noreferrer">Join the Bitcoin Gameshow interest list</a>
-          <a class="ghost-button" href="https://sendfox.com/lp/1y7ygy" target="_blank" rel="noreferrer">Main Freedom Unchained list</a>
-        </div>
-      </section>
+        <section class="detail-card">
+          <h4>Ecosystem pieces</h4>
+          <p>The project is designed as a connected umbrella for online community, local chapters, promotion, and gathering.</p>
+          <ul>
+            <li>Online Mystery School community</li>
+            <li>Mother Earth Circles as local chapters</li>
+            <li>Mother Earth Market as a local vendor and community event model</li>
+            <li>Newsletter, directory, and promotional placements for members</li>
+          </ul>
+        </section>
+
+        <section class="detail-card">
+          <h4>Launch path</h4>
+          <p>The online ecosystem is the now-stage product and audience engine. The local work grows from that foundation instead of waiting for a physical event to prove the concept first.</p>
+          <ul>
+            <li>Build the PMA umbrella and public invitation</li>
+            <li>Attract members, vendors, practitioners, and supporters online</li>
+            <li>Promote aligned people through newsletter, directory, and community channels</li>
+            <li>Use that momentum to form the first local circle around Peotone / South Chicagoland</li>
+          </ul>
+        </section>
+
+        <section class="detail-card">
+          <h4>Mother Earth Market</h4>
+          <p>The first practical event model gathers local vendors, growers, makers, healers, teachers, green businesses, and community members in real life.</p>
+          <ul>
+            <li>Possible pilot entry: $5</li>
+            <li>Guests receive five $1 Spirit Bucks</li>
+            <li>Spirit Bucks can encourage multiple vendor purchases while vendors keep their sales</li>
+            <li>Rules and PMA/event wording still need careful review before public launch</li>
+          </ul>
+        </section>
+      </div>
 
       <section class="cta">
-        <strong>Stay connected to the larger mission</strong>
-        <p>This is one of the more experimental branches of the larger mission, where education, participation, and entertainment can reinforce each other.</p>
-        <a href="../index.html#freedom-unchained">Return to Freedom Unchained</a>
+        <strong>How it relates to Foundation Freedom</strong>
+        <p>Foundation Freedom is the incubator and institutional-building lane. Mystery School of Mother Earth Foundation is one specific PMA being built under that umbrella.</p>
+        <a href="foundation-freedom.html">Return to Foundation Freedom</a>
       </section>
     </main>
-
 
     <footer class="footer">
       <div class="footer-top">
@@ -150,6 +184,7 @@
           <a href="pactum.html">Pactum</a>
           <a href="bitcoin-gameshow.html">Bitcoin Gameshow</a>
           <a href="foundation-freedom.html">Foundation Freedom</a>
+          <a href="mystery-school-mother-earth.html">Mystery School of Mother Earth</a>
           <a href="founders-circle.html">Founders Circle</a>
           <a href="the-grove.html">The Grove</a>
           <a href="your-vision.html">Your Vision</a>
@@ -164,7 +199,6 @@
         </div>
       </div>
     </footer>
-
   </div>
 </body>
 </html>

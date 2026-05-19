@@ -23,7 +23,7 @@
       --radius-xl: 30px;
       --radius-lg: 22px;
       --radius-md: 16px;
-      --container: 980px;
+      --container: min(1380px, calc(100vw - 40px));
     }
 
     * { box-sizing: border-box; }
@@ -42,6 +42,7 @@
     a { color: inherit; text-decoration: none; }
 
     .page {
+      width: var(--container);
       max-width: var(--container);
       margin: 0 auto;
       padding: 24px 18px 56px;
@@ -62,7 +63,8 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      gap: 14px;
+      gap: 24px;
+      width: 100%;
       padding: 14px 18px;
       border-radius: 999px;
       position: sticky;
@@ -113,6 +115,8 @@
       flex-wrap: wrap;
       gap: 10px;
       align-items: center;
+      justify-content: flex-end;
+      margin-left: auto;
     }
 
     .nav-links a {
@@ -127,6 +131,35 @@
     .nav-links a:hover {
       background: rgba(255,255,255,0.84);
       color: var(--text);
+    }
+
+    .menu-toggle {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      width: 48px;
+      height: 48px;
+      border: 1px solid rgba(42, 58, 64, 0.10);
+      border-radius: 14px;
+      background: rgba(255,255,255,0.92);
+      cursor: pointer;
+      padding: 0;
+      margin-left: auto;
+    }
+
+    .menu-toggle-icon {
+      display: inline-flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 4px;
+    }
+
+    .menu-toggle-icon span {
+      display: block;
+      width: 18px;
+      height: 2px;
+      border-radius: 999px;
+      background: var(--accent-deep);
     }
 
     .hero {
@@ -343,13 +376,14 @@
 
     .project-tag {
       display: inline-flex;
+      width: fit-content;
       padding: 6px 9px;
       border-radius: 999px;
       background: rgba(21,27,36,0.06);
       color: var(--muted);
       font-size: 0.74rem;
       font-weight: 600;
-      margin-bottom: 10px;
+      margin-top: auto;
     }
 
     .project-card h4 {
@@ -370,6 +404,9 @@
       width: 100%;
       text-align: left;
       cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
     }
 
     .simple-copy {
@@ -382,14 +419,106 @@
       margin: 0;
     }
 
-    .footer {
-      display: flex;
-      justify-content: space-between;
+    .mini-cta {
+      margin-top: 22px;
+      border: 1px solid rgba(78, 199, 211, 0.22);
+      background: rgba(255,255,255,0.96);
+      border-radius: var(--radius-lg);
+      padding: 22px;
+      box-shadow: 0 10px 22px rgba(30, 40, 58, 0.10);
+      display: grid;
       gap: 12px;
-      flex-wrap: wrap;
-      padding: 18px 4px 0;
+    }
+
+    .mini-cta h4 {
+      margin: 0;
+      font-family: "Space Grotesk", sans-serif;
+      font-size: 1.08rem;
+      letter-spacing: -0.03em;
+    }
+
+    .mini-cta p {
+      margin: 0;
       color: var(--muted);
-      font-size: 0.92rem;
+      line-height: 1.65;
+    }
+
+    .pill-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: fit-content;
+      padding: 11px 16px;
+      border-radius: 999px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      background: var(--accent-deep);
+      color: #fff;
+      transition: 180ms ease;
+    }
+
+    .pill-button:hover {
+      transform: translateY(-1px);
+    }
+
+    .footer {
+      margin-top: 26px;
+      border: 1px solid rgba(45, 75, 87, 0.16);
+      background: linear-gradient(135deg, rgba(230, 239, 242, 0.96), rgba(243, 248, 249, 0.98));
+      box-shadow: 0 22px 48px rgba(35, 52, 60, 0.10);
+      backdrop-filter: blur(12px);
+      border-radius: var(--radius-xl);
+      padding: 28px;
+      display: grid;
+      gap: 22px;
+    }
+
+    .footer-top {
+      display: grid;
+      gap: 10px;
+    }
+
+    .footer-title {
+      margin: 0;
+      font-family: "Space Grotesk", sans-serif;
+      font-size: 1.25rem;
+      letter-spacing: -0.03em;
+      color: #203943;
+    }
+
+    .footer-copy {
+      margin: 0;
+      color: #4f646c;
+      line-height: 1.7;
+      max-width: 46rem;
+    }
+
+    .footer-links {
+      display: grid;
+      gap: 18px;
+    }
+
+    .footer-group h4 {
+      margin: 0 0 10px;
+      font-family: "Space Grotesk", sans-serif;
+      font-size: 1rem;
+      color: #203943;
+    }
+
+    .footer-group a {
+      display: block;
+      color: #556870;
+      margin-bottom: 8px;
+      font-size: 0.95rem;
+    }
+
+    .footer-group a:hover {
+      color: var(--text);
+    }
+
+    .footer-links {
+      padding-top: 8px;
+      border-top: 1px solid rgba(45, 75, 87, 0.10);
     }
 
     @media (min-width: 760px) {
@@ -400,32 +529,79 @@
       .projects {
         grid-template-columns: repeat(3, minmax(0, 1fr));
       }
+
+      .footer-links {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
     }
 
-    @media (max-width: 720px) {
+    @media (min-width: 1180px) {
+      .hero {
+        padding: 52px;
+      }
+
+      .hero-sections {
+        max-width: 62rem;
+      }
+
+      .section {
+        padding: 34px;
+      }
+    }
+
+    @media (max-width: 1120px) {
       .page {
+        width: 100%;
+        max-width: 100%;
         padding: 16px 14px 40px;
       }
 
       .nav {
         border-radius: 24px;
         padding: 14px;
-        align-items: flex-start;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+
+      .menu-toggle {
+        display: inline-flex;
+      }
+
+      .nav-links {
+        display: none;
+        width: 100%;
+        margin: 10px 0 0;
+        padding-top: 10px;
+        border-top: 1px solid rgba(42, 58, 64, 0.10);
         flex-direction: column;
+        align-items: stretch;
+        gap: 6px;
+      }
+
+      .nav-links.open {
+        display: flex;
+      }
+
+      .nav-links a {
+        width: 100%;
+        text-align: left;
+        background: rgba(255,255,255,0.72);
       }
 
       .hero,
-      .section {
+      .section,
+      .footer {
         padding: 24px;
       }
+    }
 
+    @media (max-width: 720px) {
       .hero-header {
-        flex-direction: column-reverse;
         align-items: flex-start;
       }
 
       .hero-avatar {
-        width: 110px;
+        width: 88px;
       }
 
       .hero h2 {
@@ -435,6 +611,26 @@
   </style>
 </head>
 <body>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const toggle = document.querySelector('.menu-toggle');
+      const nav = document.querySelector('.nav-links');
+
+      if (!toggle || !nav) return;
+
+      toggle.addEventListener('click', function () {
+        const isOpen = nav.classList.toggle('open');
+        toggle.setAttribute('aria-expanded', String(isOpen));
+      });
+
+      nav.querySelectorAll('a').forEach(function (link) {
+        link.addEventListener('click', function () {
+          nav.classList.remove('open');
+          toggle.setAttribute('aria-expanded', 'false');
+        });
+      });
+    });
+  </script>
   <div class="page">
     <header class="nav">
       <div class="brand">
@@ -444,10 +640,17 @@
           <p>Freedom Unchained and parallel projects</p>
         </div>
       </div>
-      <nav class="nav-links" aria-label="Primary">
+      <button class="menu-toggle" type="button" aria-label="Toggle navigation" aria-expanded="false" aria-controls="site-nav">
+        <span class="menu-toggle-icon" aria-hidden="true">
+          <span></span>
+          <span></span>
+          <span></span>
+        </span>
+      </button>
+      <nav class="nav-links" id="site-nav" aria-label="Primary">
         <a href="#freedom-unchained">Start Here</a>
         <a href="#projects">Projects</a>
-        <a href="#about">Connect</a>
+        <a href="projects/contact.html">Connect</a>
       </nav>
     </header>
 
@@ -511,68 +714,111 @@
               <span>Join the Freedom Unchained group and get involved.</span>
             </a>
           </div>
+
+          <div class="mini-cta">
+            <h4>Stay connected</h4>
+            <p>Join the Freedom Unchained list for occasional updates on content, projects, and ways to follow the work or get involved.</p>
+            <a class="pill-button" href="https://sendfox.com/lp/1y7ygy" target="_blank" rel="noreferrer">Join the Freedom Unchained list</a>
+          </div>
         </section>
 
         <section class="section" id="projects">
-          <h3>Projects in Planning</h3>
-          <p class="section-intro">These are some of the projects, communities, and future builds growing out of the larger mission behind Freedom Unchained. Each one represents a different part of the parallel structures, tools, relationships, and places I want to help bring into reality.</p>
+          <h3>Projects Connected to Freedom Unchained</h3>
+          <p class="section-intro">These are not random side ideas. They are different branches of the larger Freedom Unchained mission. Each one gives people a specific lane to follow, support, join, or help build.</p>
 
           <div class="projects">
             <a class="project-card" href="projects/foundation-freedom.html">
-              <div class="project-tag">Institutional / organizational build</div>
               <h4>Foundation Freedom</h4>
               <p>An incubator for building trusts, private membership associations, decentralized organizations, and other parallel structures outside centralized control.</p>
+              <div class="project-tag">Institutional / organizational build</div>
             </a>
 
             <a class="project-card" href="projects/pactum.html">
-              <div class="project-tag">Home / community systems project</div>
               <h4>Pactum</h4>
-              <p>A home-first system for organizing the individual, the household, and the community through practical coordination, local exchange, and voluntary cooperation.</p>
+              <p>A home-first system for organizing the individual, the household, and the community through practical coordination, local exchange, and voluntary cooperation. Join the list if you want updates as it develops.</p>
+              <div class="project-tag">Home / community systems project</div>
             </a>
 
             <a class="project-card" href="projects/bitcoin-gameshow.html">
-              <div class="project-tag">Interactive media project</div>
               <h4>Bitcoin Gameshow</h4>
-              <p>An interactive media concept that blends entertainment, financial ideas, and audience participation to make markets and value more engaging.</p>
+              <p>An interactive media concept that blends entertainment, financial ideas, and audience participation to make markets and value more engaging. Join the list if you want updates as it takes shape.</p>
+              <div class="project-tag">Interactive media project</div>
             </a>
 
             <a class="project-card" href="projects/founders-circle.html">
-              <div class="project-tag">Collaborative community</div>
               <h4>Founders Circle</h4>
               <p>A collaborative circle for builders, thinkers, organizers, and contributors to connect, support meaningful work, and move ideas into action.</p>
+              <div class="project-tag">Collaborative community</div>
             </a>
 
             <a class="project-card" href="projects/the-grove.html">
-              <div class="project-tag">Land / gathering place</div>
               <h4>The Grove</h4>
               <p>A land-based gathering place for stewardship, food, mentorship, spiritual connection, and healthier community life through shared land and shared work.</p>
+              <div class="project-tag">Land / gathering place</div>
             </a>
 
-            <a class="project-card" href="projects/your-vision.html">
-              <div class="project-tag">Shared future / invitation</div>
-              <h4>Your Vision</h4>
-              <p>An invitation to bring your own ideas, projects, and dreams into the conversation and explore where they might connect with this larger mission.</p>
+            <a class="project-card" href="projects/mystery-school-mother-earth.html">
+              <h4>Mystery School of Mother Earth</h4>
+              <p>A PMA branch under Foundation Freedom for an online-first spiritual-centered community, local circles, aligned vendors, practitioners, and Mother Earth Market events.</p>
+              <div class="project-tag">PMA / spiritual-centered community</div>
             </a>
           </div>
         </section>
 
-
-        <section class="section" id="about">
-          <h3>Why this page exists</h3>
-          <p class="section-intro">This page is a simple starting point. It brings together my work, the larger direction behind Freedom Unchained, and the projects and communities growing out of it.</p>
+        <section class="section" id="your-vision">
+          <h3>Your Vision</h3>
+          <p class="section-intro">Not everything worth building starts from one person alone. This is the open invitation for people whose own ideas, projects, and dreams may connect with the larger Freedom Unchained mission.</p>
 
           <div class="simple-copy">
+            <p>If something in this work resonates with your own direction, this is the place to step closer and explore the overlap.</p>
+            <p><a href="projects/your-vision.html"><strong>Explore the invitation →</strong></a></p>
+          </div>
+        </section>
+
+        <section class="section" id="about">
+          <h3>Connect</h3>
+          <p class="section-intro">If you want to follow the work more closely, ask a question, talk about a project, or reach out directly, there is now a dedicated contact page with the best ways to connect.</p>
+
+          <div class="simple-copy">
+            <p>You can visit the <a href="projects/contact.html"><strong>contact page</strong></a> to reach out through Telegram, Signal, or text.</p>
             <p>Freedom Unchained is the front door for the mission. From here, you can follow the work, explore the projects, and find the places where ideas, people, and parallel structures are beginning to take shape.</p>
-            <p>Over time, this page will continue to grow as the work becomes more active, more public, and more connected. For now, it is here to keep the path simple: one place to start, one place to connect, and one place to follow what comes next.</p>
-            <p>This page will keep evolving as the work becomes more active, more public, and more connected, but for now it remains a simple place to start and follow what comes next.</p>
           </div>
         </section>
       </div>
     </main>
 
     <footer class="footer">
-      <span>Garrett</span>
-      <span>Simple home base, focused on Freedom Unchained.</span>
+      <div class="footer-top">
+        <h3 class="footer-title">Freedom Unchained</h3>
+        <p class="footer-copy">A place to follow the mission, explore connected projects, stay in touch, and find the paths that are beginning to take shape through this work.</p>
+      </div>
+
+      <div class="footer-links">
+        <div class="footer-group">
+          <h4>Explore</h4>
+          <a href="#freedom-unchained">Freedom Unchained</a>
+          <a href="#projects">Projects</a>
+          <a href="#your-vision">Your Vision</a>
+        </div>
+
+        <div class="footer-group">
+          <h4>Projects</h4>
+          <a href="projects/pactum.html">Pactum</a>
+          <a href="projects/bitcoin-gameshow.html">Bitcoin Gameshow</a>
+          <a href="projects/foundation-freedom.html">Foundation Freedom</a>
+          <a href="projects/mystery-school-mother-earth.html">Mystery School of Mother Earth</a>
+          <a href="projects/founders-circle.html">Founders Circle</a>
+          <a href="projects/the-grove.html">The Grove</a>
+        </div>
+
+        <div class="footer-group">
+          <h4>Connect</h4>
+          <a href="https://sendfox.com/lp/1y7ygy" target="_blank" rel="noreferrer">Join the Freedom Unchained list</a>
+          <a href="projects/contact.html">Contact Garrett</a>
+          <a href="https://www.youtube.com/c/FreedomUnchained" target="_blank" rel="noreferrer">YouTube</a>
+          <a href="https://www.facebook.com/freedomunchained" target="_blank" rel="noreferrer">Facebook</a>
+        </div>
+      </div>
     </footer>
   </div>
 
