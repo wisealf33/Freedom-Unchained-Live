@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Foundation Freedom • Freedom Unchained</title>
-  <meta name="description" content="An incubator for building trusts, private membership associations, decentralized organizations, and other parallel structures outside centralized control." />
+  <meta name="description" content="Foundation Freedom is the project hub for active Freedom Unchained projects and the planning-stage ideas being shaped into real-world branches." />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
@@ -27,7 +27,7 @@
     body { margin: 0; font-family: "Instrument Sans", system-ui, sans-serif; color: var(--text); background: radial-gradient(circle at top left, rgba(78,199,211,0.14), transparent 28%), radial-gradient(circle at top right, rgba(45,75,87,0.08), transparent 24%), linear-gradient(180deg, #fbfcfb 0%, var(--bg) 100%); min-height: 100vh; }
     a { color: inherit; text-decoration: none; }
     .page { max-width: var(--container); margin: 0 auto; padding: 24px 18px 56px; }
-    .nav, .hero, .section, .cta, .construction-banner, .project-panel { border: 1px solid var(--line); background: var(--surface); box-shadow: var(--shadow); backdrop-filter: blur(12px); }
+    .nav, .hero, .section, .cta, .construction-banner, .project-panel, .project-status { border: 1px solid var(--line); background: var(--surface); box-shadow: var(--shadow); backdrop-filter: blur(12px); }
     .nav { display: flex; justify-content: space-between; align-items: center; gap: 14px; padding: 14px 18px; border-radius: 999px; position: sticky; top: 16px; z-index: 10; }
     .brand { display: flex; align-items: center; gap: 12px; }
     .brand-mark { width: 42px; height: 42px; border-radius: 14px; display: grid; place-items: center; background: linear-gradient(135deg, var(--accent), #7dd9df); color: #fff; font-family: "Space Grotesk", sans-serif; font-weight: 700; }
@@ -47,20 +47,30 @@
     .section p { margin: 0; color: var(--muted); line-height: 1.8; }
     .section ul { margin: 16px 0 0; padding-left: 20px; color: var(--muted); line-height: 1.75; }
     .grid { display: grid; gap: 18px; margin-top: 20px; }
+    .project-status { margin-top: 20px; border-radius: var(--radius-xl); padding: 24px; display: grid; gap: 14px; }
+    .status-row { display: grid; gap: 8px; padding: 16px 0; border-top: 1px solid rgba(42, 58, 64, 0.10); }
+    .status-row:first-child { border-top: 0; padding-top: 0; }
+    .status-label { display: inline-flex; width: fit-content; padding: 7px 10px; border-radius: 999px; background: rgba(78, 199, 211, 0.13); color: var(--accent-deep); font-size: 0.78rem; font-weight: 700; }
+    .status-row h4 { margin: 0; font-family: "Space Grotesk", sans-serif; letter-spacing: -0.03em; font-size: 1.08rem; }
+    .status-row p { margin: 0; color: var(--muted); line-height: 1.65; }
     .project-panel { margin-top: 20px; border-radius: var(--radius-xl); padding: 28px; }
     .project-panel h3 { margin: 0 0 12px; font-family: "Space Grotesk", sans-serif; font-size: clamp(1.55rem, 3vw, 2rem); letter-spacing: -0.04em; color: var(--accent-deep); }
     .project-panel p { margin: 0; color: var(--muted); line-height: 1.8; }
     .project-panel .eyebrow { margin-bottom: 14px; }
     .detail-grid { display: grid; gap: 16px; margin-top: 20px; }
     .detail-card { display: block; border: 1px solid rgba(42, 58, 64, 0.10); border-radius: var(--radius-lg); padding: 20px; background: rgba(255,255,255,0.78); }
+    .detail-card.featured { background: linear-gradient(135deg, rgba(255,255,255,0.96), rgba(235,249,250,0.92)); border-color: rgba(78, 199, 211, 0.24); }
     .detail-card h4 { margin: 0 0 8px; font-family: "Space Grotesk", sans-serif; font-size: 1.08rem; letter-spacing: -0.03em; }
     .detail-card p { margin: 0; color: var(--muted); line-height: 1.7; }
     .detail-card ul { margin: 12px 0 0; padding-left: 18px; color: var(--muted); line-height: 1.7; }
+    .card-meta { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+    .card-meta span { display: inline-flex; padding: 6px 9px; border-radius: 999px; background: rgba(42, 58, 64, 0.06); color: var(--muted); font-size: 0.76rem; font-weight: 700; }
+    .card-meta .live { background: rgba(78, 199, 211, 0.16); color: var(--accent-deep); }
     .cta { margin-top: 20px; border-radius: var(--radius-lg); padding: 22px; }
     .cta strong { display: block; font-family: "Space Grotesk", sans-serif; font-size: 1.1rem; margin-bottom: 8px; }
     .cta p { margin: 0 0 14px; color: var(--muted); line-height: 1.7; }
     .cta a { display: inline-flex; align-items: center; padding: 10px 14px; border-radius: 999px; background: var(--accent-deep); color: #fff; font-weight: 600; }
-    @media (min-width: 760px) { .grid, .detail-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .footer-links { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+    @media (min-width: 760px) { .grid, .detail-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .detail-card.featured { grid-column: span 2; } .project-status { grid-template-columns: repeat(3, minmax(0, 1fr)); } .status-row { border-top: 0; border-left: 1px solid rgba(42, 58, 64, 0.10); padding: 0 0 0 18px; } .status-row:first-child { border-left: 0; padding-left: 0; } .footer-links { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
     @media (max-width: 720px) { .page { padding: 16px 14px 40px; } .nav { border-radius: 24px; padding: 14px; flex-direction: column; align-items: flex-start; } .hero, .section { padding: 24px; } }
 
     .footer {
@@ -104,45 +114,63 @@
       </section>
 
       <section class="hero">
-        <div class="eyebrow">Institutional / organizational build</div>
+        <div class="eyebrow">Project hub / organizational umbrella</div>
         <h2>Foundation Freedom</h2>
-        <p>An incubator for building trusts, private membership associations, decentralized organizations, and other parallel structures outside centralized control.</p>
+        <p>The hub for the projects already open and running under the Freedom Unchained mission, along with the ideas still being shaped into future branches, PMAs, tools, communities, and gathering places.</p>
       </section>
 
       <div class="grid">
         <section class="section">
-          <h3>What it is</h3>
-          <p>Foundation Freedom is about building the organizational and legal containers that freer communities and independent systems will need if they are going to endure in practice.</p>
+          <h3>What this page is for</h3>
+          <p>This page is the public build map. It shows what is already moving, what is being developed next, and where each project fits inside the larger Freedom Unchained ecosystem.</p>
         </section>
 
         <section class="section">
-          <h3>Current planning focus</h3>
-          <p>The planning work here is about clarifying the structure, purpose, and first useful forms this incubator should take so it becomes durable and real.</p>
+          <h3>How to read it</h3>
+          <p>Open projects have a real site, active work, or a public doorway. Planning projects are still being refined into a clear offer, first useful version, or structure worth inviting people into.</p>
         </section>
       </div>
 
-      <section class="section">
-        <h3>Why it matters</h3>
-        <p>This matters because parallel systems eventually need legitimate containers, governance, and continuity, not just energy and ideas.</p>
+      <section class="project-status">
+        <div class="status-row">
+          <span class="status-label">Open now</span>
+          <h4>Projects people can visit or join</h4>
+          <p>These have a public surface, live site, or active community path.</p>
+        </div>
+
+        <div class="status-row">
+          <span class="status-label">Being built</span>
+          <h4>Branches taking form</h4>
+          <p>These are close enough to name, frame, and keep moving toward a first real version.</p>
+        </div>
+
+        <div class="status-row">
+          <span class="status-label">In vision</span>
+          <h4>Ideas still organizing</h4>
+          <p>These belong here because they may become future lanes under the same mission.</p>
+        </div>
       </section>
 
       <section class="project-panel">
-        <div class="eyebrow">Foundation Freedom project map</div>
+        <div class="eyebrow">Open and running</div>
         <h3>Active projects</h3>
-        <p>These are the projects that already have a public site, live project surface, or active build path connected to the Freedom Unchained mission.</p>
+        <p>These are the projects with a live doorway right now. They are the clearest places for someone to click into, understand, follow, or participate in.</p>
 
         <div class="detail-grid">
-          <a class="detail-card" href="https://localized.life/" target="_blank" rel="noreferrer">
+          <a class="detail-card featured" href="https://localized.life/" target="_blank" rel="noreferrer">
+            <div class="card-meta"><span class="live">Live site</span><span>Local tools</span></div>
             <h4>Localized.life</h4>
-            <p>A live local-tools project for real-world community, starting with SaleTrail: a garage sale directory, flyer generator, and simple route planner.</p>
+            <p>A live local-tools project for real-world community, starting with SaleTrail: a garage sale directory, flyer generator, and simple route planner. This is one of the most concrete public builds in the ecosystem.</p>
           </a>
 
           <a class="detail-card" href="founders-circle.html">
+            <div class="card-meta"><span class="live">Live site</span><span>Working circle</span></div>
             <h4>Founders Circle</h4>
-            <p>A live private working circle for serious builders of strong families, resilient communities, and practical collaboration.</p>
+            <p>A private working circle for serious builders focused on strong families, resilient communities, practical collaboration, and moving meaningful work from idea into action.</p>
           </a>
 
           <a class="detail-card" href="mystery-school-mother-earth.html">
+            <div class="card-meta"><span class="live">Active branch</span><span>PMA / spiritual community</span></div>
             <h4>Mystery School of Mother Earth Foundation</h4>
             <p>A separate PMA branch under Foundation Freedom, focused on an online-first spiritual-centered membership community, local Mother Earth Circles, aligned vendors and practitioners, and real-world Mother Earth Market events.</p>
           </a>
@@ -150,27 +178,31 @@
       </section>
 
       <section class="project-panel">
-        <div class="eyebrow">Planning-stage ideas</div>
+        <div class="eyebrow">In your mind / being shaped</div>
         <h3>Projects under planning</h3>
-        <p>These project lanes still matter, but they are better treated as planning-stage or concept-stage until the public offer, first useful version, or build path becomes clear.</p>
+        <p>These are the ideas that still feel alive, but need more definition before they become public offers, active communities, or full project pages. They stay visible here so the larger pattern is not lost.</p>
 
         <div class="detail-grid">
           <a class="detail-card" href="pactum.html">
+            <div class="card-meta"><span>Concept</span><span>Home / community systems</span></div>
             <h4>Pactum</h4>
             <p>A home-first coordination system for the individual, household, and community through practical organization, local exchange, and voluntary cooperation.</p>
           </a>
 
           <a class="detail-card" href="bitcoin-gameshow.html">
+            <div class="card-meta"><span>Concept</span><span>Interactive media</span></div>
             <h4>Bitcoin Gameshow</h4>
             <p>An interactive media concept that blends entertainment, financial ideas, and audience participation to make markets and value more engaging.</p>
           </a>
 
           <a class="detail-card" href="the-grove.html">
+            <div class="card-meta"><span>Vision</span><span>Land / gathering place</span></div>
             <h4>The Grove</h4>
             <p>A land-based gathering place vision for stewardship, food, mentorship, spiritual connection, and healthier community life through shared land and shared work.</p>
           </a>
 
           <a class="detail-card" href="your-vision.html">
+            <div class="card-meta"><span>Invitation</span><span>Future collaborators</span></div>
             <h4>Your Vision</h4>
             <p>An open invitation for aligned builders, creators, and contributors whose own ideas may connect with the larger mission.</p>
           </a>
@@ -178,8 +210,8 @@
       </section>
 
       <section class="cta">
-        <strong>Stay connected to the larger mission</strong>
-        <p>This project supports the larger Freedom Unchained mission by helping build the structures that can hold freedom over time.</p>
+        <strong>Follow the projects as they take shape</strong>
+        <p>Foundation Freedom gives the larger mission a place to organize its branches: what is open now, what is being built, and what may become real with the right timing, structure, and people.</p>
         <a href="../index.html#freedom-unchained">Return to Freedom Unchained</a>
       </section>
     </main>
