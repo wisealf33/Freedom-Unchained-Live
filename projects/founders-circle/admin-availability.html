@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Admin Availability | Founders' Circle</title>
+    <meta name="description" content="Set Founders' Circle alignment call availability.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Inter:wght@400;600;700;900&family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body class="schedule-page">
+    <main class="schedule-shell">
+      <a class="brand schedule-brand" href="index.html">Founders' Circle</a>
+      <section class="schedule-card">
+        <div class="schedule-intro">
+          <p class="section-kicker">Admin</p>
+          <h1>Set Alignment Call Availability</h1>
+          <p>Choose the recurring days and times applicants can book. Booked slots are removed automatically in this local version.</p>
+        </div>
+
+        <div class="admin-calendar-panel">
+          <div class="calendar-heading">
+            <button class="calendar-nav" type="button" id="admin-prev-month" aria-label="Previous month">‹</button>
+            <h2 id="admin-calendar-month">Month</h2>
+            <button class="calendar-nav" type="button" id="admin-next-month" aria-label="Next month">›</button>
+          </div>
+          <div class="calendar-weekdays" aria-hidden="true">
+            <span>Sun</span>
+            <span>Mon</span>
+            <span>Tue</span>
+            <span>Wed</span>
+            <span>Thu</span>
+            <span>Fri</span>
+            <span>Sat</span>
+          </div>
+          <div class="admin-calendar-grid" id="admin-calendar-grid"></div>
+          <div class="admin-calendar-legend" aria-label="Calendar legend">
+            <span><i class="legend-open"></i>Open</span>
+            <span><i class="legend-booked"></i>Booked</span>
+            <span><i class="legend-custom"></i>Custom</span>
+            <span><i class="legend-blocked"></i>Blocked</span>
+          </div>
+        </div>
+
+        <form id="availability-form" class="availability-form">
+          <div class="availability-grid" id="availability-grid"></div>
+          <div class="override-actions">
+            <button class="button schedule-button" type="submit">Save Availability</button>
+            <button class="button secondary-admin-button" id="reset-availability" type="button">Reset to 30-Min Defaults</button>
+          </div>
+          <p class="form-note" id="availability-note" role="status" aria-live="polite"></p>
+        </form>
+
+        <div class="override-panel">
+          <div class="schedule-intro override-intro">
+            <p class="section-kicker">Date Exceptions</p>
+            <h2>Override a Specific Date</h2>
+            <p>Use this when one day is different from your normal weekly availability.</p>
+          </div>
+
+          <form id="override-form" class="availability-form">
+            <label>
+              <span>Date</span>
+              <input name="overrideDate" id="override-date" type="date" required>
+            </label>
+            <label class="check-field details-check">
+              <input name="blocked" id="override-blocked" type="checkbox">
+              <span>Block this entire day</span>
+            </label>
+            <fieldset class="availability-day override-times">
+              <legend>Custom times for this date</legend>
+              <div id="override-times"></div>
+            </fieldset>
+            <div class="override-actions">
+              <button class="button schedule-button" type="submit">Save Date Override</button>
+              <button class="button secondary-admin-button" id="clear-override" type="button">Clear Override</button>
+            </div>
+            <p class="form-note" id="override-note" role="status" aria-live="polite"></p>
+          </form>
+
+          <div class="override-list" id="override-list"></div>
+        </div>
+      </section>
+    </main>
+    <script src="script.js"></script>
+  </body>
+</html>

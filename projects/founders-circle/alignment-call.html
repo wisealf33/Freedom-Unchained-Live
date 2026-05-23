@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Schedule Alignment Call | Founders' Circle</title>
+    <meta name="description" content="Schedule a private alignment call for Founders' Circle.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Inter:wght@400;600;700;900&family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body class="schedule-page">
+    <main class="schedule-shell">
+      <a class="brand schedule-brand" href="index.html">Founders' Circle</a>
+
+      <section class="schedule-card">
+        <div class="schedule-intro">
+          <p class="section-kicker">Private Next Step</p>
+          <h1>Schedule Your Alignment Call</h1>
+          <p>This 15-20 minute call is a values and fit conversation before any PMA agreement or membership payment is offered.</p>
+        </div>
+
+        <div class="calendar-booking" aria-label="Alignment call scheduler">
+          <div class="calendar-panel">
+            <div class="calendar-heading">
+              <button class="calendar-nav" type="button" id="prev-month" aria-label="Previous month">‹</button>
+              <h2 id="calendar-month">Month</h2>
+              <button class="calendar-nav" type="button" id="next-month" aria-label="Next month">›</button>
+            </div>
+            <div class="calendar-weekdays" aria-hidden="true">
+              <span>Sun</span>
+              <span>Mon</span>
+              <span>Tue</span>
+              <span>Wed</span>
+              <span>Thu</span>
+              <span>Fri</span>
+              <span>Sat</span>
+            </div>
+            <div class="calendar-grid" id="calendar-grid"></div>
+          </div>
+
+          <div class="time-panel">
+            <h2 id="selected-date-label">Select a date</h2>
+            <p>Available 20-minute alignment call times.</p>
+            <div class="time-periods" id="time-periods" aria-label="Time of day">
+              <button class="time-period selected" type="button" data-period="morning">Morning</button>
+              <button class="time-period" type="button" data-period="afternoon">Afternoon</button>
+              <button class="time-period" type="button" data-period="evening">Evening</button>
+              <button class="time-period" type="button" data-period="night">Night</button>
+            </div>
+            <div class="time-slots" id="time-slots"></div>
+          </div>
+        </div>
+
+        <form id="alignment-call-form" class="schedule-form">
+          <input name="selectedDate" id="selected-date-input" type="hidden" required>
+          <input name="selectedTime" id="selected-time-input" type="hidden" required>
+          <div class="applicant-summary" id="applicant-summary"></div>
+          <button class="button schedule-button" type="submit">Book Alignment Call</button>
+          <p class="form-note" id="alignment-note" role="status" aria-live="polite"></p>
+        </form>
+      </section>
+    </main>
+    <script src="script.js"></script>
+  </body>
+</html>

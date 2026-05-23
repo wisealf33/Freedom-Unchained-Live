@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Apply to Founders' Circle</title>
+    <meta name="description" content="Apply to join Founders' Circle by application, alignment call, private membership agreement, and payment after acceptance.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body class="apply-page">
+    <main>
+      <section class="apply-hero">
+        <a class="apply-logo" href="index.html">Founders' Circle</a>
+        <div class="apply-panel">
+          <h1>Rebuilding the Craft of Voluntary Associations</h1>
+          <p>The Founders' Circle exists to rebuild the craft of voluntary association in service of strong families and resilient communities.</p>
+          <a class="button apply-scroll" href="#application">Apply to become part of the Founders Circle</a>
+        </div>
+      </section>
+
+      <section id="application" class="application-section">
+        <div class="application-card">
+          <div class="application-intro">
+            <h2>Apply to Founders’ Circle + Free Mastermind</h2>
+            <p>Membership is granted by application and review. Limited Spots Available</p>
+          </div>
+
+          <form id="founders-application" class="application-form">
+            <label>
+              <span class="sr-only">First Name</span>
+              <input name="firstName" type="text" autocomplete="given-name" placeholder="First Name" required>
+            </label>
+            <label>
+              <span class="sr-only">Last Name</span>
+              <input name="lastName" type="text" autocomplete="family-name" placeholder="Last Name" required>
+            </label>
+            <label>
+              <span class="sr-only">Email Address</span>
+              <input name="email" type="email" autocomplete="email" placeholder="Email Address" required>
+            </label>
+            <button class="button submit-button" type="submit">Submit</button>
+            <p class="form-note" id="form-note" role="status" aria-live="polite"></p>
+          </form>
+        </div>
+      </section>
+    </main>
+    <script src="script.js"></script>
+  </body>
+</html>
