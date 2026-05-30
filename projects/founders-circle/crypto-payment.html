@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Crypto Payment | Founders' Circle</title>
+    <meta name="description" content="Lock a crypto payment quote and submit transaction details for blockchain confirmation.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Inter:wght@400;600;700;900&family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body class="schedule-page">
+    <main class="schedule-shell">
+      <a class="brand schedule-brand" href="index.html">Founders' Circle</a>
+      <section class="schedule-card">
+        <div class="schedule-intro">
+          <p class="section-kicker">Crypto Payment</p>
+          <h1>Lock a Crypto Quote</h1>
+          <p>This payment is set for <strong data-payment-amount>$33.00</strong>. Choose a currency, lock the quoted amount for one hour, send payment, then submit the transaction details.</p>
+        </div>
+
+        <div class="applicant-summary agreement-summary" id="payment-applicant-summary"></div>
+
+        <div class="payment-progress" aria-label="Payment progress">
+          <span class="complete">PMA signed</span>
+          <span class="active">Quote locked</span>
+          <span>Blockchain confirmation</span>
+          <span>Payment confirmed</span>
+        </div>
+
+        <form id="crypto-payment-form" class="schedule-form">
+          <div class="payment-instructions">
+            <p class="instruction-kicker">Step 1</p>
+            <h2>Choose a currency</h2>
+            <p>Each currency has its own receiving address and network. Do not send one coin to another coin's address.</p>
+          </div>
+
+          <label>
+            <span>Crypto currency</span>
+            <select name="cryptoAsset" id="crypto-asset" required>
+              <option value="">Choose a currency</option>
+              <option value="btc">Bitcoin (BTC)</option>
+              <option value="eth">Ethereum (ETH)</option>
+              <option value="usdt">Tether (USDT / TRC20)</option>
+              <option value="bnb">BNB (BNB Smart Chain)</option>
+              <option value="xrp">XRP</option>
+              <option value="usdc">USD Coin (USDC / Ethereum)</option>
+              <option value="trx">TRON (TRX)</option>
+              <option value="doge">Dogecoin (DOGE)</option>
+              <option value="hype">Hyperliquid (HYPE)</option>
+              <option value="zec">Zcash (ZEC)</option>
+              <option value="ada">Cardano (ADA)</option>
+              <option value="bch">Bitcoin Cash (BCH)</option>
+              <option value="xmr">Monero (XMR)</option>
+              <option value="link">Chainlink (LINK / Ethereum)</option>
+              <option value="ltc">Litecoin (LTC)</option>
+              <option value="icp">Internet Computer (ICP)</option>
+              <option value="dash">Dash (DASH)</option>
+            </select>
+          </label>
+
+          <button class="button secondary-admin-button" id="lock-crypto-quote" type="button">Lock 1-Hour Quote</button>
+
+          <div class="crypto-quote-panel" id="crypto-quote-panel" hidden>
+            <p class="instruction-kicker">Step 2</p>
+            <h2>Send the locked amount</h2>
+            <dl>
+              <div><dt>Payment amount</dt><dd id="quote-usd">$33.00</dd></div>
+              <div><dt>Amount due</dt><dd id="quote-amount">Choose a currency</dd></div>
+              <div><dt>Receiving address</dt><dd id="quote-address">Address not configured yet</dd></div>
+              <div><dt>Confirmations needed</dt><dd id="quote-confirmations">Not locked</dd></div>
+              <div><dt>Quote expires</dt><dd id="quote-expires">Not locked</dd></div>
+            </dl>
+            <p>Only send the selected currency to the matching address. Once the transaction is seen on-chain, this payment waits for the required confirmations before it is marked confirmed.</p>
+          </div>
+
+          <details class="deep-help">
+            <summary>Need help getting crypto?</summary>
+            <p>The hardest part for many new people is buying crypto and withdrawing it correctly. Some people may use a familiar app or exchange to buy and send crypto. Availability depends on location and account access.</p>
+            <p>Before full launch, we can add a free crypto basics course covering wallets, addresses, networks, confirmations, transaction IDs, test payments, and privacy-focused currencies.</p>
+          </details>
+
+          <label>
+            <span>Transaction ID / hash</span>
+            <textarea name="paymentNote" rows="4" placeholder="Paste the transaction ID/hash and any wallet note needed to verify the payment." required></textarea>
+          </label>
+
+          <label class="check-field details-check">
+            <input name="paymentConfirmed" type="checkbox" required>
+            <span>I confirm I sent the selected currency to the matching address and understand the payment is complete after the required blockchain confirmations.</span>
+          </label>
+
+          <button class="button schedule-button" type="submit">Submit Transaction for Confirmation</button>
+          <p class="form-note" id="payment-note" role="status" aria-live="polite"></p>
+        </form>
+      </section>
+    </main>
+    <script src="script.js"></script>
+  </body>
+</html>

@@ -628,6 +628,7 @@ footer p {
 }
 
 input,
+select,
 textarea {
   background: #fbfbfb;
   border: 1px solid var(--line);
@@ -642,6 +643,14 @@ input::placeholder,
 textarea::placeholder {
   color: #9b9b9b;
   opacity: 1;
+}
+
+select {
+  appearance: none;
+  background-image: linear-gradient(45deg, transparent 50%, var(--ink) 50%), linear-gradient(135deg, var(--ink) 50%, transparent 50%);
+  background-position: calc(100% - 22px) 50%, calc(100% - 16px) 50%;
+  background-repeat: no-repeat;
+  background-size: 6px 6px, 6px 6px;
 }
 
 textarea {
@@ -1177,6 +1186,682 @@ textarea {
   color: var(--muted);
 }
 
+.admin-shell {
+  max-width: 1180px;
+}
+
+.admin-dashboard-card {
+  padding: clamp(28px, 4vw, 46px);
+}
+
+.admin-dashboard-intro p:last-child {
+  margin-bottom: 20px;
+}
+
+.admin-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 28px;
+}
+
+.admin-links a {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 700;
+  padding: 10px 14px;
+}
+
+.admin-links a:hover,
+.admin-links a[aria-current="page"] {
+  background: var(--bright);
+  border-color: var(--bright);
+}
+
+.funnel-summary {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(4, 1fr);
+  margin-bottom: 28px;
+}
+
+.funnel-stat {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  display: grid;
+  gap: 4px;
+  min-height: 86px;
+  padding: 14px;
+}
+
+.funnel-stat strong {
+  color: var(--navy);
+  font-size: 30px;
+  line-height: 1;
+}
+
+.funnel-stat span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.applicant-dashboard {
+  display: grid;
+  gap: 22px;
+  grid-template-columns: minmax(260px, 0.82fr) minmax(0, 1.65fr);
+}
+
+.applicant-list-panel,
+.applicant-detail-panel {
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  min-width: 0;
+  padding: 18px;
+}
+
+.dashboard-toolbar {
+  margin-bottom: 14px;
+}
+
+.dashboard-toolbar select {
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  color: var(--ink);
+  font: 700 14px/1 Inter, Arial, sans-serif;
+  min-height: 46px;
+  padding: 0 12px;
+  width: 100%;
+}
+
+.applicant-list {
+  display: grid;
+  gap: 10px;
+  max-height: 680px;
+  overflow: auto;
+  padding-right: 4px;
+}
+
+.applicant-list-item {
+  background: var(--paper);
+  border: 1px solid transparent;
+  border-radius: 12px;
+  color: var(--ink);
+  cursor: pointer;
+  display: grid;
+  gap: 5px;
+  padding: 14px;
+  text-align: left;
+}
+
+.applicant-list-item:hover,
+.applicant-list-item.selected {
+  border-color: var(--bright);
+  box-shadow: 0 0 18px rgba(150, 248, 69, 0.22);
+}
+
+.applicant-list-item strong {
+  color: var(--navy);
+  font-size: 15px;
+}
+
+.applicant-list-item span,
+.applicant-list-item small {
+  color: var(--muted);
+}
+
+.applicant-list-item small {
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.empty-admin-state {
+  background: var(--paper);
+  border-radius: 12px;
+  display: grid;
+  gap: 6px;
+  padding: 18px;
+}
+
+.empty-admin-state strong {
+  color: var(--navy);
+}
+
+.empty-admin-state span {
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.applicant-detail-header {
+  align-items: flex-start;
+  display: flex;
+  gap: 18px;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+
+.applicant-detail-header h2 {
+  color: var(--navy);
+  font-size: clamp(28px, 4vw, 42px);
+  line-height: 1;
+  margin: 0 0 8px;
+}
+
+.applicant-detail-header a {
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.stage-pill {
+  background: var(--bright);
+  border-radius: 999px;
+  color: var(--ink);
+  flex: 0 0 auto;
+  font-size: 12px;
+  font-weight: 900;
+  padding: 10px 12px;
+  text-transform: uppercase;
+}
+
+.stage-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 22px;
+}
+
+.stage-actions button {
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--ink);
+  cursor: pointer;
+  font: 700 12px/1 Inter, Arial, sans-serif;
+  min-height: 38px;
+  padding: 10px 12px;
+}
+
+.stage-actions button:hover,
+.stage-actions button.selected {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--white);
+}
+
+.admin-next-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 22px;
+}
+
+.admin-next-actions a {
+  background: var(--bright);
+  border-radius: 999px;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 900;
+  padding: 11px 14px;
+}
+
+.admin-next-actions a:hover {
+  background: var(--ink);
+  color: var(--white);
+}
+
+.payment-session-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.payment-session-list {
+  display: grid;
+  gap: 14px;
+}
+
+.payment-session-card {
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  display: grid;
+  gap: 16px;
+  padding: 18px;
+}
+
+.payment-session-card h2 {
+  color: var(--navy);
+  font-size: 24px;
+  font-weight: 900;
+  margin: 0 0 4px;
+}
+
+.payment-session-card p {
+  color: var(--muted);
+  margin: 0;
+}
+
+.payment-session-card dl {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  margin: 0;
+}
+
+.payment-session-card dt {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.payment-session-card dd {
+  color: var(--ink);
+  font-weight: 800;
+  margin: 4px 0 0;
+  overflow-wrap: anywhere;
+}
+
+.admin-detail-grid {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(2, 1fr);
+  margin-bottom: 22px;
+}
+
+.admin-detail-grid article,
+.application-answers article {
+  background: var(--paper);
+  border-radius: 12px;
+  padding: 18px;
+}
+
+.admin-detail-grid h3,
+.application-answers h3,
+.application-answers h4 {
+  color: var(--navy);
+  font-weight: 900;
+}
+
+.admin-detail-grid h3,
+.application-answers h3 {
+  font-size: 18px;
+  margin-bottom: 14px;
+}
+
+.admin-detail-grid dl {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+}
+
+.admin-detail-grid dl div {
+  display: grid;
+  gap: 3px;
+}
+
+.admin-detail-grid dt {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.admin-detail-grid dd,
+.admin-detail-grid p,
+.application-answers p {
+  color: var(--muted);
+  line-height: 1.55;
+  margin: 0;
+}
+
+.application-answers {
+  display: grid;
+  gap: 12px;
+}
+
+.application-answers h3 {
+  margin: 0;
+}
+
+.application-answers h4 {
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.agreement-summary {
+  margin-bottom: 22px;
+}
+
+.agreement-box {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  color: var(--muted);
+  display: grid;
+  gap: 14px;
+  line-height: 1.65;
+  margin-bottom: 24px;
+  max-height: 420px;
+  overflow: auto;
+  padding: 22px;
+}
+
+.agreement-box h2 {
+  color: var(--navy);
+  font-size: 22px;
+  font-weight: 900;
+}
+
+.payment-options {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 18px;
+}
+
+.payment-options legend {
+  color: var(--navy);
+  font-weight: 900;
+  padding: 0 6px;
+}
+
+.payment-options label {
+  align-items: flex-start;
+  background: var(--paper);
+  border: 1px solid transparent;
+  border-radius: 12px;
+  cursor: pointer;
+  display: flex;
+  gap: 12px;
+  padding: 16px;
+}
+
+.payment-options label:hover {
+  border-color: var(--bright);
+}
+
+.payment-options input {
+  margin-top: 3px;
+  width: auto;
+}
+
+.payment-options strong,
+.payment-options small {
+  display: block;
+}
+
+.payment-options small {
+  color: var(--muted);
+  line-height: 1.45;
+  margin-top: 4px;
+}
+
+.payment-progress {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(4, 1fr);
+  margin: 0 0 24px;
+}
+
+.payment-progress span {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 900;
+  padding: 11px 12px;
+  text-align: center;
+}
+
+.payment-progress span.complete {
+  background: rgba(150, 248, 69, 0.24);
+  border-color: rgba(150, 248, 69, 0.7);
+  color: var(--ink);
+}
+
+.payment-progress span.active {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--white);
+}
+
+.payment-choice-grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-bottom: 22px;
+}
+
+.payment-choice-card {
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  color: var(--ink);
+  display: grid;
+  gap: 10px;
+  padding: 22px;
+  transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+
+.payment-choice-card:hover {
+  border-color: rgba(150, 248, 69, 0.8);
+  box-shadow: 0 18px 44px rgba(150, 248, 69, 0.22);
+  transform: translateY(-2px);
+}
+
+.payment-choice-card span {
+  color: var(--bright);
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.payment-choice-card strong {
+  color: var(--navy);
+  font-size: 22px;
+  font-weight: 900;
+}
+
+.payment-choice-card p,
+.payment-before-you-start p {
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.payment-before-you-start {
+  background: rgba(150, 248, 69, 0.13);
+  border: 1px solid rgba(150, 248, 69, 0.45);
+  border-radius: 14px;
+  display: grid;
+  gap: 8px;
+  padding: 18px;
+}
+
+.payment-before-you-start h2 {
+  color: var(--navy);
+  font-size: 20px;
+  font-weight: 900;
+}
+
+.payment-instructions {
+  background: rgba(150, 248, 69, 0.13);
+  border: 1px solid rgba(150, 248, 69, 0.5);
+  border-radius: 14px;
+  color: var(--muted);
+  display: grid;
+  gap: 12px;
+  line-height: 1.55;
+  padding: 18px;
+}
+
+.payment-instructions[hidden] {
+  display: none;
+}
+
+.payment-instructions h2 {
+  color: var(--navy);
+  font-size: 20px;
+  font-weight: 900;
+}
+
+.instruction-kicker {
+  color: var(--bright);
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.payment-instructions ol {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding-left: 20px;
+}
+
+.payment-instructions p {
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.crypto-quote-panel {
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  display: grid;
+  gap: 12px;
+  padding: 18px;
+}
+
+.crypto-quote-panel[hidden] {
+  display: none;
+}
+
+.crypto-quote-panel h2 {
+  color: var(--navy);
+  font-size: 20px;
+  font-weight: 900;
+}
+
+.crypto-quote-panel dl {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+}
+
+.crypto-quote-panel dl div {
+  align-items: start;
+  border-bottom: 1px solid var(--line);
+  display: grid;
+  gap: 10px;
+  grid-template-columns: 150px 1fr;
+  padding-bottom: 10px;
+}
+
+.crypto-quote-panel dl div:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+.crypto-quote-panel dt {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.crypto-quote-panel dd {
+  color: var(--ink);
+  font-weight: 900;
+  overflow-wrap: anywhere;
+}
+
+.crypto-quote-panel .missing-address {
+  color: #d12416;
+}
+
+.crypto-quote-panel p {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.55;
+  margin: 0;
+}
+
+.crypto-help,
+.crypto-address-note,
+.deep-help {
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  display: grid;
+  gap: 6px;
+  padding: 14px;
+}
+
+.crypto-help h3,
+.crypto-address-note strong,
+.deep-help summary {
+  color: var(--navy);
+  font-size: 16px;
+  font-weight: 900;
+}
+
+.crypto-help p,
+.crypto-address-note span,
+.deep-help p {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.help-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.help-actions a {
+  background: var(--ink);
+  border-radius: 999px;
+  color: var(--white);
+  font-size: 12px;
+  font-weight: 900;
+  padding: 10px 12px;
+}
+
+.help-actions a:hover {
+  background: var(--bright);
+  color: var(--ink);
+}
+
+.deep-help {
+  gap: 10px;
+}
+
+.deep-help summary {
+  cursor: pointer;
+}
+
+.crypto-address-note[hidden] {
+  display: none;
+}
+
 @media (max-width: 1180px) {
   .site-header,
   .hero,
@@ -1234,6 +1919,12 @@ textarea {
   .field-grid,
   .process-line,
   .slot-field,
+  .funnel-summary,
+  .payment-progress,
+  .payment-choice-grid,
+  .payment-session-card dl,
+  .applicant-dashboard,
+  .admin-detail-grid,
   .availability-grid,
   .override-times > div,
   .override-actions,
@@ -1277,5 +1968,9 @@ textarea {
 
   .apply-hero {
     min-height: 640px;
+  }
+
+  .crypto-quote-panel dl div {
+    grid-template-columns: 1fr;
   }
 }

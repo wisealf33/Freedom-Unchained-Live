@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Freedom Payments</title>
+    <meta name="description" content="Reusable crypto and Bridge Bucks payment system for Freedom Unchained projects, trusts, and PMAs.">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <header>
+      <div>
+        <p>Freedom Payments</p>
+        <h1>One payment system for every project, trust, and PMA.</h1>
+      </div>
+      <a class="button" href="#new-session">Create checkout</a>
+    </header>
+
+    <main>
+      <section class="panel">
+        <div class="section-heading">
+          <div>
+            <p>Accounts</p>
+            <h2>Payment Destinations</h2>
+          </div>
+          <span>Each account can carry its own crypto addresses and Bridge Bucks link.</span>
+        </div>
+        <div class="accounts" id="accounts"></div>
+      </section>
+
+      <section class="panel">
+        <div class="section-heading">
+          <div>
+            <p>New Account</p>
+            <h2>Add a Project, Trust, or PMA</h2>
+          </div>
+        </div>
+        <form id="account-form" class="grid-form">
+          <label>
+            <span>Name</span>
+            <input name="name" placeholder="Foundation Freedom Trust" required>
+          </label>
+          <label>
+            <span>Type</span>
+            <input name="type" placeholder="Trust, PMA, Project, Product">
+          </label>
+          <label class="full">
+            <span>Bridge Bucks link</span>
+            <input name="bridgeBucksUrl" placeholder="https://www.bridgebucksbank.com/participate?a_aid=Freedom_Unchained">
+          </label>
+          <button class="button" type="submit">Create Account</button>
+          <p id="account-note" class="note"></p>
+        </form>
+      </section>
+
+      <section class="panel" id="new-session">
+        <div class="section-heading">
+          <div>
+            <p>Checkout</p>
+            <h2>Create a Plug-and-Play Payment</h2>
+          </div>
+          <span>This creates a reusable checkout session for donations, products, membership fees, courses, or one-off project payments.</span>
+        </div>
+        <form id="session-form" class="grid-form">
+          <label>
+            <span>Destination account</span>
+            <select name="accountId" id="account-select" required></select>
+          </label>
+          <label>
+            <span>Amount USD</span>
+            <input name="amountUsd" type="number" min="1" step="0.01" value="33" required>
+          </label>
+          <label>
+            <span>Purpose</span>
+            <input name="purpose" placeholder="Yearly membership, donation, product, course" required>
+          </label>
+          <label>
+            <span>Reference</span>
+            <input name="referenceId" placeholder="Applicant ID, order ID, donation ID">
+          </label>
+          <label>
+            <span>Payer name</span>
+            <input name="payerName" placeholder="Optional">
+          </label>
+          <label>
+            <span>Payer email</span>
+            <input name="payerEmail" type="email" placeholder="Optional">
+          </label>
+          <button class="button" type="submit">Create Checkout Session</button>
+          <p id="session-note" class="note"></p>
+        </form>
+      </section>
+
+      <section class="panel">
+        <div class="section-heading">
+          <div>
+            <p>Sessions</p>
+            <h2>Payment Tracking</h2>
+          </div>
+          <span>Crypto payments move from quote locked to pending confirmations to confirmed. Bridge Bucks can use its own reference tracking.</span>
+        </div>
+        <div class="sessions" id="sessions"></div>
+      </section>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>

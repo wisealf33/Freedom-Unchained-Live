@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Applicant Dashboard | Founders' Circle</title>
+    <meta name="description" content="Review Founders' Circle applicants, answers, call bookings, and membership stage.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Inter:wght@400;600;700;900&family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body class="schedule-page">
+    <main class="schedule-shell admin-shell">
+      <a class="brand schedule-brand" href="index.html">Founders' Circle</a>
+      <section class="schedule-card admin-dashboard-card">
+        <div class="schedule-intro admin-dashboard-intro">
+          <p class="section-kicker">Admin</p>
+          <h1>Applicant Dashboard</h1>
+          <p>Review applications, see booked alignment calls, and move each person through the membership funnel.</p>
+          <div class="admin-links" aria-label="Admin pages">
+            <a href="admin-availability.html">Availability Calendar</a>
+            <a aria-current="page" href="admin-applications.html">Applicant Dashboard</a>
+            <a href="admin-payments.html">Payment Sessions</a>
+          </div>
+        </div>
+
+        <div class="funnel-summary" id="funnel-summary" aria-label="Funnel summary"></div>
+
+        <div class="applicant-dashboard">
+          <aside class="applicant-list-panel" aria-label="Applicants">
+            <div class="dashboard-toolbar">
+              <label>
+                <span class="sr-only">Filter applicants by stage</span>
+                <select id="applicant-stage-filter">
+                  <option value="all">All stages</option>
+                  <option value="applied">Applied</option>
+                  <option value="details-completed">Details Completed</option>
+                  <option value="call-booked">Call Booked</option>
+                  <option value="approved">Approved</option>
+                  <option value="pma-sent">PMA Sent</option>
+                  <option value="payment">Payment</option>
+                  <option value="member">Member</option>
+                  <option value="declined">Declined</option>
+                </select>
+              </label>
+            </div>
+            <div class="applicant-list" id="applicant-list"></div>
+          </aside>
+
+          <section class="applicant-detail-panel" id="applicant-detail" aria-live="polite">
+            <div class="empty-admin-state">
+              <strong>No applicant selected</strong>
+              <span>Choose an applicant to review their answers and update their funnel stage.</span>
+            </div>
+          </section>
+        </div>
+      </section>
+    </main>
+    <script src="script.js"></script>
+  </body>
+</html>

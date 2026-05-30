@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Payment Sessions | Founders' Circle</title>
+    <meta name="description" content="Review reusable project payment sessions across Freedom Unchained projects.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Inter:wght@400;600;700;900&family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body class="schedule-page">
+    <main class="schedule-shell wide-admin-shell">
+      <a class="brand schedule-brand" href="index.html">Founders' Circle</a>
+      <section class="schedule-card">
+        <div class="admin-header">
+          <div>
+            <p class="section-kicker">Reusable Payment Processor</p>
+            <h1>Payment Sessions</h1>
+            <p>Track project payments, donation sessions, product payments, crypto quotes, Bridge Bucks references, and confirmation status from one place.</p>
+          </div>
+          <div class="admin-links">
+            <a href="admin-applications.html">Applicant Dashboard</a>
+            <a href="admin-availability.html">Availability Calendar</a>
+            <a aria-current="page" href="admin-payments.html">Payment Sessions</a>
+          </div>
+        </div>
+
+        <div class="payment-session-tools">
+          <a class="button secondary-admin-button" href="payment.html?project=foundation-freedom&amp;purpose=Contribution&amp;amount=33">Test Foundation Freedom Payment</a>
+          <a class="button secondary-admin-button" href="payment.html?project=founders-circle&amp;purpose=Yearly%20membership&amp;amount=33">Test Founders Circle Payment</a>
+        </div>
+
+        <div class="payment-session-list" id="payment-session-list"></div>
+      </section>
+    </main>
+    <script src="script.js"></script>
+  </body>
+</html>

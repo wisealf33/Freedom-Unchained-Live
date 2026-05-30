@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>PMA Agreement | Founders' Circle</title>
+    <meta name="description" content="Review and sign the Founders' Circle private membership association agreement.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Inter:wght@400;600;700;900&family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body class="schedule-page">
+    <main class="schedule-shell">
+      <a class="brand schedule-brand" href="index.html">Founders' Circle</a>
+      <section class="schedule-card">
+        <div class="schedule-intro">
+          <p class="section-kicker">Private Membership Association</p>
+          <h1>Review the Membership Agreement</h1>
+          <p>This is placeholder agreement language for building the flow. The final PMA text should be reviewed before real members use it.</p>
+        </div>
+
+        <div class="applicant-summary agreement-summary" id="pma-applicant-summary"></div>
+
+        <article class="agreement-box">
+          <h2>Founders' Circle Private Membership Association Agreement</h2>
+          <p>By signing this agreement, I request to participate as a private member of Founders' Circle, a private working circle formed for mutual support, project development, education, voluntary association, and principled collaboration.</p>
+          <p>I understand that Founders' Circle is not a casual spectator community. It is intended for serious participants who are willing to work on their own projects while also supporting other members and their projects.</p>
+          <p>I agree to act with honesty, discretion, personal responsibility, and respect for the private nature of member conversations, shared ideas, documents, and project discussions.</p>
+          <p>I understand that membership may be accepted, paused, or ended by the association if my participation is no longer aligned with the purpose, standards, or working culture of the circle.</p>
+          <p>I understand that payment alone does not create membership unless acceptance has been granted and this agreement has been completed.</p>
+        </article>
+
+        <form id="pma-form" class="schedule-form">
+          <label>
+            <span>Type your full name to sign</span>
+            <input name="signedName" type="text" autocomplete="name" required>
+          </label>
+          <label class="check-field details-check">
+            <input name="pmaAccepted" type="checkbox" required>
+            <span>I have read and agree to the private membership association terms above.</span>
+          </label>
+          <button class="button schedule-button" type="submit">Sign and Continue to Payment</button>
+          <p class="form-note" id="pma-note" role="status" aria-live="polite"></p>
+        </form>
+      </section>
+    </main>
+    <script src="script.js"></script>
+  </body>
+</html>

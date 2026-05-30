@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Membership Payment | Founders' Circle</title>
+    <meta name="description" content="Choose a Founders' Circle membership payment path after PMA approval.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Inter:wght@400;600;700;900&family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body class="schedule-page">
+    <main class="schedule-shell">
+      <a class="brand schedule-brand" href="index.html">Founders' Circle</a>
+      <section class="schedule-card">
+        <div class="schedule-intro">
+          <p class="section-kicker">Membership Payment</p>
+          <h1>Choose Your Payment Path</h1>
+          <p>This payment is set for <strong data-payment-amount>$33.00</strong>. Choose the path you want to use, then follow the detailed instructions on the next page.</p>
+        </div>
+
+        <div class="applicant-summary agreement-summary" id="payment-applicant-summary"></div>
+
+        <div class="payment-progress" aria-label="Payment progress">
+          <span class="complete">PMA signed</span>
+          <span class="active">Payment pending</span>
+          <span>Blockchain confirmation</span>
+          <span>Payment confirmed</span>
+        </div>
+
+        <div class="payment-choice-grid">
+          <a class="payment-choice-card" id="crypto-payment-link" href="crypto-payment.html">
+            <span>Crypto</span>
+            <strong>Pay with cryptocurrency</strong>
+            <p>Choose a supported coin, lock a one-hour quote, send the exact amount to the matching address, then submit the transaction ID for confirmation tracking.</p>
+          </a>
+
+          <a class="payment-choice-card" id="bridge-payment-link" href="bridge-bucks-payment.html">
+            <span>Bridge Bucks</span>
+            <strong>Pay with Bridge Bucks</strong>
+            <p>Use the Founders' Circle Bridge Bucks link, confirm the Freedom_Unchained URL value, then submit the payment reference for confirmation.</p>
+          </a>
+        </div>
+
+        <div class="payment-before-you-start">
+          <h2>Before you choose</h2>
+          <p>This payment step is intentionally different from a normal checkout. If you are already comfortable with crypto or Bridge Bucks, choose your path and continue. If you are new, read the instructions carefully and ask before sending funds.</p>
+        </div>
+      </section>
+    </main>
+    <script src="script.js"></script>
+  </body>
+</html>

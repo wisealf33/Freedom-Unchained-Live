@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Checkout | Freedom Payments</title>
+    <meta name="description" content="Choose a payment path and lock a crypto quote.">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <main class="checkout-shell">
+      <a class="back" href="index.html">Freedom Payments</a>
+      <section class="panel">
+        <div class="section-heading">
+          <div>
+            <p>Checkout</p>
+            <h1 id="checkout-title">Payment</h1>
+          </div>
+          <span id="checkout-meta">Loading payment session...</span>
+        </div>
+
+        <div class="checkout-grid">
+          <form id="crypto-form" class="pay-box">
+            <h2>Crypto</h2>
+            <p>Choose a currency, lock the live quote for one hour, send the exact amount, then submit the transaction hash for confirmation tracking.</p>
+            <label>
+              <span>Currency</span>
+              <select id="asset-select" required></select>
+            </label>
+            <button class="button secondary" type="button" id="lock-quote">Lock 1-hour quote</button>
+            <div class="quote" id="quote" hidden>
+              <dl>
+                <div><dt>Amount due</dt><dd id="quote-amount"></dd></div>
+                <div><dt>Address</dt><dd id="quote-address"></dd></div>
+                <div><dt>Confirmations</dt><dd id="quote-confirmations"></dd></div>
+                <div><dt>Expires</dt><dd id="quote-expires"></dd></div>
+              </dl>
+            </div>
+            <label>
+              <span>Transaction hash</span>
+              <textarea name="transactionHash" rows="4" placeholder="Paste the blockchain transaction hash"></textarea>
+            </label>
+            <button class="button" type="submit">Submit for Confirmation Tracking</button>
+            <p class="note" id="crypto-note"></p>
+          </form>
+
+          <form id="bridge-form" class="pay-box">
+            <h2>Bridge Bucks</h2>
+            <p>Use the account-specific Bridge Bucks link, then submit the confirmation/reference so the payment can be matched to this session.</p>
+            <a class="button secondary" id="bridge-link" target="_blank" rel="noreferrer">Open Bridge Bucks Link</a>
+            <label>
+              <span>Bridge Bucks reference</span>
+              <textarea name="bridgeReference" rows="4" placeholder="Paste receipt, confirmation, or account reference"></textarea>
+            </label>
+            <button class="button" type="submit">Submit Bridge Bucks Reference</button>
+            <p class="note" id="bridge-note"></p>
+          </form>
+        </div>
+      </section>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>

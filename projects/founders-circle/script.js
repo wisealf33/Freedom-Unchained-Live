@@ -29,12 +29,37 @@ const adminCalendarMonth = document.querySelector("#admin-calendar-month");
 const adminPrevMonth = document.querySelector("#admin-prev-month");
 const adminNextMonth = document.querySelector("#admin-next-month");
 const resetAvailability = document.querySelector("#reset-availability");
+const applicantList = document.querySelector("#applicant-list");
+const applicantDetail = document.querySelector("#applicant-detail");
+const applicantStageFilter = document.querySelector("#applicant-stage-filter");
+const funnelSummary = document.querySelector("#funnel-summary");
+const paymentSessionList = document.querySelector("#payment-session-list");
+const pmaForm = document.querySelector("#pma-form");
+const pmaNote = document.querySelector("#pma-note");
+const pmaApplicantSummary = document.querySelector("#pma-applicant-summary");
+const paymentForm = document.querySelector("#payment-form");
+const cryptoPaymentForm = document.querySelector("#crypto-payment-form");
+const bridgePaymentForm = document.querySelector("#bridge-payment-form");
+const paymentNote = document.querySelector("#payment-note");
+const paymentApplicantSummary = document.querySelector("#payment-applicant-summary");
+const cryptoPaymentLink = document.querySelector("#crypto-payment-link");
+const bridgePaymentLink = document.querySelector("#bridge-payment-link");
+const lockCryptoQuote = document.querySelector("#lock-crypto-quote");
+const cryptoAsset = document.querySelector("#crypto-asset");
+const cryptoQuotePanel = document.querySelector("#crypto-quote-panel");
+const quoteAmount = document.querySelector("#quote-amount");
+const quoteAddress = document.querySelector("#quote-address");
+const quoteExpires = document.querySelector("#quote-expires");
+const quoteUsd = document.querySelector("#quote-usd");
+const quoteConfirmations = document.querySelector("#quote-confirmations");
+const paymentAmountText = document.querySelectorAll("[data-payment-amount]");
 const sharedKeys = [
   "foundersApplications",
   "alignmentCallRequests",
   "foundersAvailability",
   "foundersAvailabilityVersion",
-  "foundersDateOverrides"
+  "foundersDateOverrides",
+  "paymentSessions"
 ];
 
 const defaultAvailability = {
@@ -60,6 +85,17 @@ const timeOptions = [
   "7:00 PM", "7:30 PM"
 ];
 const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+const funnelStages = [
+  { value: "applied", label: "Applied" },
+  { value: "details-completed", label: "Details Completed" },
+  { value: "call-booked", label: "Call Booked" },
+  { value: "approved", label: "Approved" },
+  { value: "pma-sent", label: "PMA Sent" },
+  { value: "payment", label: "Payment" },
+  { value: "member", label: "Member" },
+  { value: "declined", label: "Declined" }
+];
+const membershipFeeUsd = 33;
 
 let visibleMonth = new Date();
 visibleMonth.setDate(1);
@@ -67,6 +103,7 @@ let adminVisibleMonth = new Date();
 adminVisibleMonth.setDate(1);
 let selectedDate = "";
 let selectedTime = "";
+let activePaymentContext = null;
 
 upgradeSavedAvailability();
 syncFromServer().then(() => {
@@ -79,15 +116,19 @@ if (form) {
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
 
-    const data = Object.fromEntries(new FormData(form).entries());
-    const application = await createApplication(data);
-    const applications = readJson("foundersApplications", []);
-    applications.push(application);
-    writeJson("foundersApplications", applications);
-    writeJson("activeApplicant", application);
+    try {
+      const data = Object.fromEntries(new FormData(form).entries());
+      const application = await createApplication(data);
+      const applications = readJson("foundersApplications", []);
+      applications.push(application);
+      writeJson("foundersApplications", applications);
+      writeJson("activeApplicant", application);
 
-    note.textContent = "Application received. Continue to the next step.";
-    window.location.href = "application-details.html";
+      note.textContent = "Application received. Choose a time for the alignment call.";
+      window.location.href = "alignment-call.html";
+    } catch {
+      note.textContent = "The application could not be submitted. Make sure the local Founders Circle server is running, then try again.";
+    }
   });
 }
 
@@ -115,7 +156,7 @@ if (detailsForm) {
       item.id === updatedApplicant.id ? updatedApplicant : item
     )));
 
-    window.location.href = "alignment-call.html";
+    window.location.href = "thank-you.html";
   });
 }
 
@@ -158,11 +199,19 @@ if (alignmentForm) {
     requests.push(savedBooking);
     writeJson("alignmentCallRequests", requests);
 
-    alignmentNote.textContent = `Alignment call booked for ${formatDateForDisplay(booking.selectedDate)} at ${booking.selectedTime}.`;
-    selectedTime = "";
-    selectedTimeInput.value = "";
-    renderTimes(selectedDate);
-    renderCalendar();
+    const applicantWithBooking = {
+      ...applicantForBooking,
+      latestBookingId: savedBooking.id,
+      latestBookingAt: new Date().toISOString()
+    };
+    writeJson("activeApplicant", applicantWithBooking);
+    const applications = readJson("foundersApplications", []);
+    writeJson("foundersApplications", applications.map((item) => (
+      item.id === applicantWithBooking.id ? applicantWithBooking : item
+    )));
+
+    alignmentNote.textContent = `Alignment call booked for ${formatDateForDisplay(booking.selectedDate)} at ${booking.selectedTime}. Continue to the quick questions.`;
+    window.location.href = "application-details.html";
   });
 }
 
@@ -286,6 +335,105 @@ if (adminNextMonth) {
   adminNextMonth.addEventListener("click", () => {
     adminVisibleMonth.setMonth(adminVisibleMonth.getMonth() + 1);
     renderAdminCalendar();
+  });
+}
+
+if (applicantStageFilter) {
+  applicantStageFilter.addEventListener("change", () => renderApplicantDashboard());
+}
+
+if (applicantList) {
+  renderApplicantDashboard();
+}
+
+if (paymentSessionList) {
+  renderPaymentSessionsDashboard();
+}
+
+if (pmaForm) {
+  const applicant = getActiveOrLinkedApplicant();
+  renderApplicantGateSummary(pmaApplicantSummary, applicant, "No applicant loaded. Use the approval link from the dashboard.");
+
+  pmaForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const currentApplicant = getActiveOrLinkedApplicant();
+    if (!currentApplicant) {
+      pmaNote.textContent = "No approved applicant found for this agreement.";
+      return;
+    }
+
+    const formData = Object.fromEntries(new FormData(pmaForm).entries());
+    const signedApplicant = {
+      ...currentApplicant,
+      pma: {
+        signedName: formData.signedName || "",
+        signedAt: new Date().toISOString(),
+        accepted: Boolean(formData.pmaAccepted)
+      },
+      stage: "payment",
+      stageUpdatedAt: new Date().toISOString()
+    };
+    const saved = await updateApplication(signedApplicant);
+    saveApplicantLocally({ ...signedApplicant, ...saved });
+    writeJson("activeApplicant", { ...signedApplicant, ...saved });
+    window.location.href = linkedPageUrl("payment.html", signedApplicant.id);
+  });
+}
+
+if (paymentForm || cryptoPaymentLink || bridgePaymentLink) {
+  initializePaymentFlow();
+}
+
+if (cryptoPaymentForm) {
+  initializePaymentFlow();
+  hydrateStoredQuote();
+
+  lockCryptoQuote?.addEventListener("click", lockQuoteForSelectedAsset);
+  cryptoAsset?.addEventListener("change", () => {
+    cryptoQuotePanel.hidden = true;
+    writeJson("activeCryptoQuote", null);
+  });
+
+  cryptoPaymentForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const quote = readJson("activeCryptoQuote", null);
+    if (!quote || new Date(quote.expiresAt).getTime() < Date.now()) {
+      paymentNote.textContent = "Lock a fresh crypto quote before submitting payment.";
+      return;
+    }
+
+    if (!quote.addressConfigured) {
+      paymentNote.textContent = "This currency does not have a receiving address yet. Choose another currency or wait until the address is configured.";
+      return;
+    }
+
+    const formData = Object.fromEntries(new FormData(cryptoPaymentForm).entries());
+    await submitPaymentForReview({
+      method: "Crypto",
+      asset: quote.label,
+      amount: `${quote.amountDueText} ${quote.asset.toUpperCase()}`,
+      usdAmount: `$${Number(quote.amountUsd || quote.membershipFeeUsd).toFixed(2)}`,
+      address: quote.address || "Address not configured",
+      quote,
+      note: formData.paymentNote || "",
+      confirmed: Boolean(formData.paymentConfirmed)
+    });
+  });
+}
+
+if (bridgePaymentForm) {
+  initializePaymentFlow();
+
+  bridgePaymentForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const formData = Object.fromEntries(new FormData(bridgePaymentForm).entries());
+    await submitPaymentForReview({
+      method: "Bridge Bucks",
+      amount: paymentAmountForContext(activePaymentContext),
+      usdAmount: paymentAmountForContext(activePaymentContext),
+      note: formData.paymentNote || "",
+      confirmed: Boolean(formData.paymentConfirmed)
+    });
   });
 }
 
@@ -605,8 +753,17 @@ function formatDateForDisplay(dateKey) {
 async function syncFromServer() {
   if (location.protocol === "file:") return;
 
+  if (window.__FOUNDERS_INITIAL_STATE__) {
+    sharedKeys.forEach((key) => {
+      if (window.__FOUNDERS_INITIAL_STATE__[key] !== undefined && window.__FOUNDERS_INITIAL_STATE__[key] !== null) {
+        localStorage.setItem(key, JSON.stringify(window.__FOUNDERS_INITIAL_STATE__[key]));
+      }
+    });
+    return;
+  }
+
   try {
-    const response = await fetch("/api/state");
+    const response = await fetch(apiUrl("/founders-state"));
     if (!response.ok) return;
     const state = await response.json();
 
@@ -631,51 +788,104 @@ function refreshCurrentView() {
     renderAdminCalendar();
     renderOverrideList();
   }
+
+  if (applicantList) {
+    renderApplicantDashboard();
+  }
+
+  if (paymentSessionList) {
+    renderPaymentSessionsDashboard();
+  }
 }
 
 async function createApplication(data) {
-  if (location.protocol === "file:") {
-    return {
-      id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()),
-      ...data,
-      submittedAt: new Date().toISOString()
-    };
-  }
+  const localApplication = {
+    id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()),
+    ...data,
+    submittedAt: new Date().toISOString()
+  };
 
-  const response = await fetch("/api/applications", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data)
-  });
-  return response.json();
+  if (location.protocol === "file:") return localApplication;
+
+  try {
+    const response = await fetch(apiUrl("/founders-applications"), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data)
+    });
+    return response.ok ? response.json() : localApplication;
+  } catch {
+    return localApplication;
+  }
 }
 
 async function updateApplication(application) {
   if (location.protocol === "file:") return application;
 
-  await fetch(`/api/applications/${application.id}`, {
+  try {
+    const response = await fetch(apiUrl(`/founders-applications/${application.id}`), {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(application)
+    });
+    return response.ok ? response.json() : application;
+  } catch {
+    return application;
+  }
+}
+
+async function getPaymentSession(id) {
+  if (location.protocol === "file:") {
+    const sessions = readJson("paymentSessions", []);
+    return sessions.find((session) => session.id === id) || readJson("activePaymentSession", null);
+  }
+
+  const response = await fetch(apiUrl(`/payment-sessions/${id}`));
+  return response.ok ? response.json() : null;
+}
+
+async function updatePaymentSession(session) {
+  if (location.protocol === "file:" || !session.id) {
+    const sessions = readJson("paymentSessions", []);
+    const updated = sessions.some((item) => item.id === session.id)
+      ? sessions.map((item) => (item.id === session.id ? session : item))
+      : [...sessions, session];
+    writeJson("paymentSessions", updated);
+    return session;
+  }
+
+  const response = await fetch(apiUrl(`/payment-sessions/${session.id}`), {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(application)
+    body: JSON.stringify(session)
   });
-  return application;
+  return response.ok ? response.json() : session;
 }
 
 async function createBooking(booking) {
-  if (location.protocol === "file:") return booking;
+  const localBooking = {
+    id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()),
+    ...booking
+  };
 
-  const response = await fetch("/api/bookings", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(booking)
-  });
-  return response.json();
+  if (location.protocol === "file:") return localBooking;
+
+  try {
+    const response = await fetch(apiUrl("/founders-bookings"), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(booking)
+    });
+    return response.ok ? response.json() : localBooking;
+  } catch {
+    return localBooking;
+  }
 }
 
 async function saveAvailability(availability) {
   if (location.protocol === "file:") return;
 
-  await fetch("/api/availability", {
+  await fetch(apiUrl("/founders-availability"), {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ availability })
@@ -685,7 +895,7 @@ async function saveAvailability(availability) {
 async function saveDateOverride(dateKey, override) {
   if (location.protocol === "file:") return;
 
-  await fetch(`/api/date-overrides/${dateKey}`, {
+  await fetch(apiUrl(`/founders-date-overrides/${dateKey}`), {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(override)
@@ -695,7 +905,7 @@ async function saveDateOverride(dateKey, override) {
 async function deleteDateOverride(dateKey) {
   if (location.protocol === "file:") return;
 
-  await fetch(`/api/date-overrides/${dateKey}`, {
+  await fetch(apiUrl(`/founders-date-overrides/${dateKey}`), {
     method: "DELETE"
   });
 }
@@ -711,4 +921,621 @@ function readJson(key, fallback) {
 
 function writeJson(key, value) {
   localStorage.setItem(key, JSON.stringify(value));
+}
+
+function apiUrl(path) {
+  const url = new URL(path, window.location.href);
+  url.username = "";
+  url.password = "";
+  return url.toString();
+}
+
+function renderApplicantDashboard(selectedId = readJson("selectedApplicantId", "")) {
+  if (!applicantList || !applicantDetail) return;
+
+  const applications = getApplicationsWithDerivedStages();
+  const bookings = readJson("alignmentCallRequests", []);
+  const selectedFilter = applicantStageFilter?.value || "all";
+  const filteredApplications = applications.filter((application) => (
+    selectedFilter === "all" || getApplicantStage(application, bookings) === selectedFilter
+  ));
+  const selectedApplicant = applications.find((application) => application.id === selectedId)
+    || filteredApplications[0]
+    || null;
+
+  renderFunnelSummary(applications, bookings);
+  renderApplicantList(filteredApplications, bookings, selectedApplicant?.id || "");
+  renderApplicantDetail(selectedApplicant, bookings);
+}
+
+function renderPaymentSessionsDashboard() {
+  if (!paymentSessionList) return;
+
+  const sessions = readJson("paymentSessions", [])
+    .slice()
+    .sort((a, b) => String(b.updatedAt || b.createdAt || "").localeCompare(String(a.updatedAt || a.createdAt || "")));
+
+  if (!sessions.length) {
+    paymentSessionList.innerHTML = `
+      <div class="empty-admin-state">
+        <strong>No payment sessions yet</strong>
+        <span>When a project starts a payment, donation, product purchase, or membership payment, it will show here.</span>
+      </div>
+    `;
+    return;
+  }
+
+  paymentSessionList.innerHTML = sessions.map((session) => {
+    const payment = session.payment || {};
+    const status = session.status || "created";
+    return `
+      <article class="payment-session-card">
+        <div>
+          <p class="section-kicker">${escapeHtml(session.projectName || readableProjectName(session.projectKey))}</p>
+          <h2>${escapeHtml(session.purpose || "Payment")}</h2>
+          <p>${escapeHtml(session.payerName || session.payerEmail || session.referenceId || "No payer details yet")}</p>
+        </div>
+        <dl>
+          <div><dt>Amount</dt><dd>$${Number(session.amountUsd || 0).toFixed(2)}</dd></div>
+          <div><dt>Status</dt><dd>${escapeHtml(status)}</dd></div>
+          <div><dt>Method</dt><dd>${escapeHtml(payment.method || "Not selected")}</dd></div>
+          <div><dt>Confirmation</dt><dd>${escapeHtml(formatPaymentReview(payment))}</dd></div>
+          <div><dt>Submitted</dt><dd>${escapeHtml(formatDateTime(payment.submittedAt))}</dd></div>
+          <div><dt>Reference</dt><dd>${escapeHtml(payment.note || payment.quote?.asset || session.referenceId || "Not recorded")}</dd></div>
+        </dl>
+        <div class="admin-next-actions">
+          <a href="${escapeHtml(paymentPageUrl("payment.html", { type: "session", session }))}">Open Payment</a>
+          <a href="${escapeHtml(paymentPageUrl("crypto-payment.html", { type: "session", session }))}">Crypto Page</a>
+          <a href="${escapeHtml(paymentPageUrl("bridge-bucks-payment.html", { type: "session", session }))}">Bridge Bucks Page</a>
+        </div>
+      </article>
+    `;
+  }).join("");
+}
+
+function renderFunnelSummary(applications, bookings) {
+  if (!funnelSummary) return;
+
+  funnelSummary.innerHTML = funnelStages.map((stage) => {
+    const count = applications.filter((application) => getApplicantStage(application, bookings) === stage.value).length;
+    return `
+      <div class="funnel-stat">
+        <strong>${count}</strong>
+        <span>${stage.label}</span>
+      </div>
+    `;
+  }).join("");
+}
+
+function renderApplicantList(applications, bookings, selectedId) {
+  applicantList.innerHTML = applications.length
+    ? applications.map((application) => {
+      const stage = getApplicantStage(application, bookings);
+      const booking = getLatestBookingForApplicant(application, bookings);
+      const name = getApplicantName(application);
+      return `
+        <button class="applicant-list-item ${application.id === selectedId ? "selected" : ""}" type="button" data-applicant-id="${escapeHtml(application.id)}">
+          <strong>${escapeHtml(name)}</strong>
+          <span>${escapeHtml(application.email || "No email")}</span>
+          <small>${escapeHtml(getStageLabel(stage))}${booking ? ` • ${escapeHtml(formatBookingShort(booking))}` : ""}</small>
+        </button>
+      `;
+    }).join("")
+    : `<div class="empty-admin-state"><strong>No applicants here yet</strong><span>New applications will appear after someone submits the form.</span></div>`;
+
+  applicantList.querySelectorAll("[data-applicant-id]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const id = button.dataset.applicantId;
+      writeJson("selectedApplicantId", id);
+      renderApplicantDashboard(id);
+    });
+  });
+}
+
+function renderApplicantDetail(application, bookings) {
+  if (!application) {
+    applicantDetail.innerHTML = `
+      <div class="empty-admin-state">
+        <strong>No applicant selected</strong>
+        <span>Choose an applicant to review their answers and update their funnel stage.</span>
+      </div>
+    `;
+    return;
+  }
+
+  writeJson("selectedApplicantId", application.id);
+  const stage = getApplicantStage(application, bookings);
+  const latestBooking = getLatestBookingForApplicant(application, bookings);
+  const details = application.details || {};
+
+  applicantDetail.innerHTML = `
+    <div class="applicant-detail-header">
+      <div>
+        <p class="section-kicker">Applicant</p>
+        <h2>${escapeHtml(getApplicantName(application))}</h2>
+        <a href="mailto:${escapeHtml(application.email || "")}">${escapeHtml(application.email || "No email")}</a>
+      </div>
+      <span class="stage-pill">${escapeHtml(getStageLabel(stage))}</span>
+    </div>
+
+    <div class="stage-actions" aria-label="Update applicant stage">
+      ${funnelStages.map((item) => `
+        <button class="${item.value === stage ? "selected" : ""}" type="button" data-stage="${item.value}">
+          ${escapeHtml(item.label)}
+        </button>
+      `).join("")}
+    </div>
+
+    <div class="admin-next-actions">
+      <a href="${escapeHtml(linkedPageUrl("pma-agreement.html", application.id))}">Open PMA Agreement</a>
+      <a href="${escapeHtml(linkedPageUrl("payment.html", application.id))}">Open Payment Page</a>
+    </div>
+
+    <div class="admin-detail-grid">
+      <article>
+        <h3>Application</h3>
+        <dl>
+          <div><dt>Submitted</dt><dd>${escapeHtml(formatDateTime(application.submittedAt))}</dd></div>
+          <div><dt>Details</dt><dd>${escapeHtml(application.detailsSubmittedAt ? formatDateTime(application.detailsSubmittedAt) : "Not completed")}</dd></div>
+          <div><dt>SendFox</dt><dd>${escapeHtml(formatSendFoxStatus(application.sendFox))}</dd></div>
+          <div><dt>PMA</dt><dd>${escapeHtml(formatPmaStatus(application.pma))}</dd></div>
+          <div><dt>Payment</dt><dd>${escapeHtml(formatPaymentStatus(application.payment))}</dd></div>
+          <div><dt>Payment Confirmation</dt><dd>${escapeHtml(formatPaymentReview(application.payment))}</dd></div>
+        </dl>
+      </article>
+
+      <article>
+        <h3>Alignment Call</h3>
+        ${latestBooking ? `
+          <dl>
+            <div><dt>Date</dt><dd>${escapeHtml(formatDateForDisplay(latestBooking.selectedDate))}</dd></div>
+            <div><dt>Time</dt><dd>${escapeHtml(latestBooking.selectedTime || "")}</dd></div>
+            <div><dt>Requested</dt><dd>${escapeHtml(formatDateTime(latestBooking.requestedAt))}</dd></div>
+          </dl>
+        ` : `<p>No call booked yet.</p>`}
+      </article>
+    </div>
+
+    <div class="application-answers">
+      <h3>Answers</h3>
+      ${renderAnswer("What are you building right now?", details.project)}
+      ${renderAnswer("Why does Founders' Circle feel aligned?", details.alignment)}
+      ${renderAnswer("What help would move the project forward?", details.needs)}
+      ${renderAnswer("Willing to support other members?", details.willingToSupport ? "Yes" : "Not confirmed yet")}
+      ${renderAnswer("How can they support other members?", details.contribution)}
+      ${renderAnswer("What does weekly commitment look like?", details.commitment)}
+      ${renderAnswer("Anything else to know before the call?", details.context)}
+      ${renderAnswer("Active member agreement", details.activeMember ? "Accepted" : "Not accepted yet")}
+    </div>
+  `;
+
+  applicantDetail.querySelectorAll("[data-stage]").forEach((button) => {
+    button.addEventListener("click", async () => {
+      await setApplicantStage(application.id, button.dataset.stage);
+    });
+  });
+}
+
+function getApplicationsWithDerivedStages() {
+  return readJson("foundersApplications", []).map((application) => ({
+    stage: application.stage || null,
+    ...application
+  }));
+}
+
+function getApplicantStage(application, bookings = readJson("alignmentCallRequests", [])) {
+  if (application.stage) return application.stage;
+  if (getLatestBookingForApplicant(application, bookings)) return "call-booked";
+  if (application.detailsSubmittedAt || application.details) return "details-completed";
+  return "applied";
+}
+
+function getLatestBookingForApplicant(application, bookings) {
+  const matched = bookings
+    .filter((booking) => booking.applicantId === application.id || booking.email === application.email)
+    .sort((a, b) => String(b.requestedAt || "").localeCompare(String(a.requestedAt || "")));
+
+  return matched[0] || null;
+}
+
+async function setApplicantStage(id, stage) {
+  const applications = readJson("foundersApplications", []);
+  const existing = applications.find((application) => application.id === id);
+  if (!existing) return;
+
+  const updated = {
+    ...existing,
+    stage,
+    stageUpdatedAt: new Date().toISOString()
+  };
+  const saved = await updateApplication({
+    id,
+    stage: updated.stage,
+    stageUpdatedAt: updated.stageUpdatedAt
+  });
+  writeJson("foundersApplications", applications.map((application) => (
+    application.id === id ? { ...updated, ...saved } : application
+  )));
+  renderApplicantDashboard(id);
+}
+
+function saveApplicantLocally(applicant) {
+  const applications = readJson("foundersApplications", []);
+  const exists = applications.some((item) => item.id === applicant.id);
+  const updatedApplications = exists
+    ? applications.map((item) => (item.id === applicant.id ? applicant : item))
+    : [...applications, applicant];
+  writeJson("foundersApplications", updatedApplications);
+}
+
+function getActiveOrLinkedApplicant() {
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get("applicant");
+  const applications = readJson("foundersApplications", []);
+  if (id) return applications.find((application) => application.id === id) || null;
+  return readJson("activeApplicant", null);
+}
+
+async function initializePaymentFlow() {
+  activePaymentContext = await getPaymentContext();
+  renderPaymentContextSummary(paymentApplicantSummary, activePaymentContext, "No payment session loaded. Start from the project, product, donation, or PMA approval link.");
+  updatePaymentAmountText(activePaymentContext);
+  updatePaymentPathLinks(activePaymentContext);
+}
+
+async function getPaymentContext() {
+  const params = new URLSearchParams(window.location.search);
+  const sessionId = params.get("session");
+  if (sessionId) {
+    const session = await getPaymentSession(sessionId);
+    if (session) return { type: "session", session };
+  }
+
+  if (params.get("project")) {
+    const session = await createPaymentSessionFromParams(params);
+    if (session?.id && location.protocol !== "file:") {
+      const url = new URL(window.location.href);
+      url.search = `session=${encodeURIComponent(session.id)}`;
+      history.replaceState(null, "", url.toString());
+    }
+    return session ? { type: "session", session } : buildPaymentContextFromParams(params);
+  }
+
+  const applicant = getActiveOrLinkedApplicant();
+  if (applicant) {
+    return {
+      type: "applicant",
+      applicant,
+      projectName: "Founders' Circle",
+      purpose: "Yearly membership",
+      amountUsd: membershipFeeUsd
+    };
+  }
+
+  const savedSession = readJson("activePaymentSession", null);
+  if (savedSession) return { type: "session", session: savedSession };
+
+  return null;
+}
+
+async function createPaymentSessionFromParams(params) {
+  const payload = {
+    project: params.get("project") || "freedom-unchained",
+    projectName: params.get("projectName") || "",
+    purpose: params.get("purpose") || "",
+    amountUsd: params.get("amount") || params.get("amountUsd") || "",
+    referenceId: params.get("reference") || params.get("referenceId") || "",
+    payerName: params.get("name") || params.get("payerName") || "",
+    payerEmail: params.get("email") || params.get("payerEmail") || "",
+    returnUrl: params.get("returnUrl") || "",
+    destination: params.get("destination") || params.get("project") || ""
+  };
+
+  if (location.protocol === "file:") {
+    const session = {
+      id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()),
+      projectKey: payload.project,
+      projectName: payload.projectName || readableProjectName(payload.project),
+      purpose: payload.purpose || "Payment",
+      amountUsd: Number.parseFloat(payload.amountUsd) || membershipFeeUsd,
+      referenceId: payload.referenceId,
+      payerName: payload.payerName,
+      payerEmail: payload.payerEmail,
+      destination: payload.destination,
+      status: "created",
+      createdAt: new Date().toISOString()
+    };
+    writeJson("activePaymentSession", session);
+    return session;
+  }
+
+  const response = await fetch(apiUrl("/payment-sessions"), {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  });
+  const session = await response.json();
+  writeJson("activePaymentSession", session);
+  return session;
+}
+
+function buildPaymentContextFromParams(params) {
+  const project = params.get("project") || "freedom-unchained";
+  return {
+    type: "session",
+    session: {
+      id: "",
+      projectKey: project,
+      projectName: params.get("projectName") || readableProjectName(project),
+      purpose: params.get("purpose") || "Payment",
+      amountUsd: Number.parseFloat(params.get("amount") || params.get("amountUsd")) || membershipFeeUsd,
+      referenceId: params.get("reference") || params.get("referenceId") || "",
+      payerName: params.get("name") || params.get("payerName") || "",
+      payerEmail: params.get("email") || params.get("payerEmail") || "",
+      destination: params.get("destination") || project
+    }
+  };
+}
+
+function readableProjectName(value) {
+  return String(value || "Freedom Unchained")
+    .split("-")
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
+}
+
+function renderApplicantGateSummary(target, applicant, emptyMessage) {
+  if (!target) return;
+
+  target.innerHTML = applicant
+    ? `<strong>${escapeHtml(getApplicantName(applicant))}</strong><span>${escapeHtml(applicant.email || "")}</span>`
+    : `<strong>No applicant loaded</strong><span>${escapeHtml(emptyMessage)}</span>`;
+}
+
+function renderPaymentContextSummary(target, context, emptyMessage) {
+  if (!target) return;
+
+  if (!context) {
+    target.innerHTML = `<strong>No payment loaded</strong><span>${escapeHtml(emptyMessage)}</span>`;
+    return;
+  }
+
+  const session = context.session;
+  const title = context.type === "applicant"
+    ? getApplicantName(context.applicant)
+    : session.projectName || readableProjectName(session.projectKey);
+  const subtitle = context.type === "applicant"
+    ? context.applicant.email || "Founders' Circle membership"
+    : [session.purpose, session.payerEmail].filter(Boolean).join(" | ") || "Project payment";
+  const amount = paymentAmountForContext(context);
+
+  target.innerHTML = `
+    <strong>${escapeHtml(title)}</strong>
+    <span>${escapeHtml(subtitle)}</span>
+    <span>${escapeHtml(amount)} due</span>
+  `;
+}
+
+function linkedPageUrl(page, applicantId) {
+  return `${page}?applicant=${encodeURIComponent(applicantId || "")}`;
+}
+
+function paymentPageUrl(page, context) {
+  if (context?.type === "session" && context.session?.id) {
+    return `${page}?session=${encodeURIComponent(context.session.id)}`;
+  }
+
+  const applicantId = context?.applicant?.id || new URLSearchParams(window.location.search).get("applicant") || "";
+  return linkedPageUrl(page, applicantId);
+}
+
+function updatePaymentPathLinks(context) {
+  if (cryptoPaymentLink) cryptoPaymentLink.href = paymentPageUrl("crypto-payment.html", context);
+  if (bridgePaymentLink) bridgePaymentLink.href = paymentPageUrl("bridge-bucks-payment.html", context);
+}
+
+function updatePaymentAmountText(context) {
+  paymentAmountText.forEach((item) => {
+    item.textContent = paymentAmountForContext(context);
+  });
+}
+
+function paymentAmountForContext(context = activePaymentContext) {
+  const amount = context?.session?.amountUsd || context?.amountUsd || membershipFeeUsd;
+  return `$${Number(amount).toFixed(2)}`;
+}
+
+async function lockQuoteForSelectedAsset() {
+  if (!cryptoAsset?.value) {
+    paymentNote.textContent = "Choose a currency first, then lock the quote.";
+    return;
+  }
+
+  lockCryptoQuote.disabled = true;
+  lockCryptoQuote.textContent = "Locking quote...";
+  paymentNote.textContent = "";
+
+  try {
+    const context = activePaymentContext || await getPaymentContext();
+    const quoteUrl = new URL(apiUrl("/crypto-quote"));
+    quoteUrl.searchParams.set("asset", cryptoAsset.value);
+    if (context?.type === "session" && context.session?.id) {
+      quoteUrl.searchParams.set("session", context.session.id);
+    } else {
+      quoteUrl.searchParams.set("amountUsd", String(context?.amountUsd || membershipFeeUsd));
+    }
+    const response = await fetch(quoteUrl.toString());
+    const quote = await response.json();
+
+    if (!response.ok) {
+      paymentNote.textContent = quote.error || "Crypto quote is unavailable right now.";
+      return;
+    }
+
+    writeJson("activeCryptoQuote", quote);
+    renderCryptoQuote(quote);
+    paymentNote.textContent = quote.addressConfigured
+      ? "Quote locked for one hour. Send the exact amount shown."
+      : "Quote locked, but the receiving address is not configured yet. Do not send funds until the address is added.";
+  } catch {
+    paymentNote.textContent = "Crypto quote is unavailable right now. Try again in a minute.";
+  } finally {
+    lockCryptoQuote.disabled = false;
+    lockCryptoQuote.textContent = "Lock 1-Hour Quote";
+  }
+}
+
+function hydrateStoredQuote() {
+  const quote = readJson("activeCryptoQuote", null);
+  if (!quote || new Date(quote.expiresAt).getTime() < Date.now()) {
+    writeJson("activeCryptoQuote", null);
+    return;
+  }
+
+  if (cryptoAsset && quote.asset) cryptoAsset.value = quote.asset;
+  renderCryptoQuote(quote);
+}
+
+function renderCryptoQuote(quote) {
+  if (!cryptoQuotePanel) return;
+
+  cryptoQuotePanel.hidden = false;
+  if (quoteUsd) quoteUsd.textContent = `$${Number(quote.amountUsd || quote.membershipFeeUsd).toFixed(2)}`;
+  if (quoteAmount) quoteAmount.textContent = `${quote.amountDueText} ${String(quote.asset || "").toUpperCase()}`;
+  if (quoteAddress) {
+    quoteAddress.textContent = quote.address || "Address not configured yet";
+    quoteAddress.classList.toggle("missing-address", !quote.addressConfigured);
+  }
+  if (quoteConfirmations) {
+    quoteConfirmations.textContent = `${quote.confirmationsRequired} confirmation${quote.confirmationsRequired === 1 ? "" : "s"}`;
+  }
+  if (quoteExpires) quoteExpires.textContent = formatDateTime(quote.expiresAt);
+}
+
+async function submitPaymentForReview(payment) {
+  const context = activePaymentContext || await getPaymentContext();
+  if (!context) {
+    paymentNote.textContent = "No payment session loaded. Start from the project, product, donation, or PMA approval link.";
+    return;
+  }
+
+  if (context.type === "session") {
+    const updatedSession = {
+      ...context.session,
+      payment: {
+        ...payment,
+        verificationStatus: payment.method === "Crypto" ? "pending-confirmations" : "confirmation-needed",
+        confirmationsRequired: payment.quote?.confirmationsRequired || null,
+        status: "submitted",
+        submittedAt: new Date().toISOString()
+      },
+      status: "payment-submitted"
+    };
+    const saved = await updatePaymentSession(updatedSession);
+    const merged = { ...updatedSession, ...saved };
+    activePaymentContext = { type: "session", session: merged };
+    writeJson("activePaymentSession", merged);
+    paymentNote.textContent = payment.method === "Crypto"
+      ? "Transaction submitted. Payment will be confirmed after the required blockchain confirmations."
+      : "Payment submitted. Confirmation will be recorded once the payment reference is verified.";
+    return;
+  }
+
+  const applicant = context.applicant;
+
+  const updatedApplicant = {
+    ...applicant,
+    payment: {
+      ...payment,
+      verificationStatus: payment.method === "Crypto" ? "pending-confirmations" : "confirmation-needed",
+      confirmationsRequired: payment.quote?.confirmationsRequired || null,
+      status: "submitted",
+      submittedAt: new Date().toISOString()
+    },
+    stage: "payment",
+    stageUpdatedAt: new Date().toISOString()
+  };
+
+  const saved = await updateApplication(updatedApplicant);
+  const merged = { ...updatedApplicant, ...saved };
+  saveApplicantLocally(merged);
+  writeJson("activeApplicant", merged);
+  paymentNote.textContent = payment.method === "Crypto"
+    ? "Transaction submitted. Payment will be confirmed after the required blockchain confirmations."
+    : "Payment submitted. Confirmation will be recorded once the payment reference is verified.";
+}
+
+function getApplicantName(application) {
+  return [application.firstName, application.lastName].filter(Boolean).join(" ") || "Unnamed Applicant";
+}
+
+function getStageLabel(value) {
+  return funnelStages.find((stage) => stage.value === value)?.label || "Applied";
+}
+
+function formatBookingShort(booking) {
+  return `${formatDateForDisplay(booking.selectedDate)} ${booking.selectedTime || ""}`.trim();
+}
+
+function formatDateTime(value) {
+  if (!value) return "Not recorded";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "Not recorded";
+  return date.toLocaleString(undefined, {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    hour: "numeric",
+    minute: "2-digit"
+  });
+}
+
+function formatSendFoxStatus(value) {
+  if (!value) return "Not configured";
+  if (value.synced) return `Synced${value.contactId ? ` #${value.contactId}` : ""}`;
+  return value.status ? `Needs attention (${value.status})` : "Needs attention";
+}
+
+function formatPmaStatus(value) {
+  if (!value?.signedAt) return "Not signed";
+  return `Signed by ${value.signedName || "applicant"} on ${formatDateTime(value.signedAt)}`;
+}
+
+function formatPaymentStatus(value) {
+  if (!value?.submittedAt) return "Not submitted";
+  const amount = value.amount ? ` for ${value.amount}` : "";
+  const asset = value.asset ? ` (${value.asset})` : "";
+  return `${value.method || "Payment"}${asset}${amount} submitted on ${formatDateTime(value.submittedAt)}`;
+}
+
+function formatPaymentReview(value) {
+  if (!value?.status) return "Not started";
+  if (value.verificationStatus === "pending-confirmations") {
+    const count = value.confirmationsRequired ? ` (${value.confirmationsRequired} needed)` : "";
+    return `Pending blockchain confirmations${count}`;
+  }
+  if (value.verificationStatus === "confirmation-needed") return "Confirmation needed";
+  if (value.status === "submitted") return "Submitted for confirmation";
+  if (value.status === "confirmed") return "Confirmed";
+  if (value.status === "needs-attention") return "Needs attention";
+  return value.status;
+}
+
+function renderAnswer(label, value) {
+  return `
+    <article>
+      <h4>${escapeHtml(label)}</h4>
+      <p>${escapeHtml(value || "No answer yet.")}</p>
+    </article>
+  `;
+}
+
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
 }

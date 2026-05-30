@@ -3,8 +3,8 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Application Details | Founders' Circle</title>
-    <meta name="description" content="Answer a few application questions before scheduling a Founders' Circle alignment call.">
+    <title>Pre-Call Questions | Founders' Circle</title>
+    <meta name="description" content="Answer a few quick questions after scheduling a Founders' Circle alignment call.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Inter:wght@400;600;700;900&family=Poppins:wght@400;700&display=swap" rel="stylesheet">
@@ -15,23 +15,27 @@
       <a class="brand schedule-brand" href="index.html">Founders' Circle</a>
       <section class="schedule-card">
         <div class="schedule-intro">
-          <p class="section-kicker">Application Details</p>
-          <h1>Before the Alignment Call</h1>
-          <p>Answer these so the conversation can start with context and stay focused on fit, purpose, and contribution.</p>
+          <p class="section-kicker">Pre-Call Questions</p>
+          <h1>A Few Quick Questions</h1>
+          <p>Answer these after scheduling so the alignment call can start with context and stay focused on fit, purpose, and contribution.</p>
         </div>
 
         <form id="application-details-form" class="schedule-form">
           <label>
-            <span>What are you building right now?</span>
+            <span>What are you building or hoping to build right now?</span>
             <textarea name="project" rows="4" required></textarea>
           </label>
           <label>
-            <span>Why does Founders' Circle feel aligned with where you are going?</span>
+            <span>Why do you want to join Founders' Circle?</span>
             <textarea name="alignment" rows="4" required></textarea>
           </label>
           <label>
             <span>What kind of help would move your project forward?</span>
             <textarea name="needs" rows="4" required></textarea>
+          </label>
+          <label class="check-field details-check">
+            <input name="willingToSupport" type="checkbox" required>
+            <span>Yes, I am willing to actively support other members and their projects.</span>
           </label>
           <label>
             <span>How can you actively support other members and their projects?</span>
@@ -41,11 +45,15 @@
             <span>What does a serious weekly commitment look like for you?</span>
             <textarea name="commitment" rows="3" required></textarea>
           </label>
+          <label>
+            <span>Is there anything else I should know before our call?</span>
+            <textarea name="context" rows="3"></textarea>
+          </label>
           <label class="check-field details-check">
             <input name="activeMember" type="checkbox" required>
             <span>I understand this is an active working circle, not a spectator community.</span>
           </label>
-          <button class="button schedule-button" type="submit">Continue to Scheduling</button>
+          <button class="button schedule-button" type="submit">Finish Pre-Call Questions</button>
           <p class="form-note" id="details-note" role="status" aria-live="polite"></p>
         </form>
       </section>

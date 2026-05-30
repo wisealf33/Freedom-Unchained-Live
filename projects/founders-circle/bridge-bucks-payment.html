@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Bridge Bucks Payment | Founders' Circle</title>
+    <meta name="description" content="Use Bridge Bucks for Founders' Circle yearly membership payment.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Inter:wght@400;600;700;900&family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body class="schedule-page">
+    <main class="schedule-shell">
+      <a class="brand schedule-brand" href="index.html">Founders' Circle</a>
+      <section class="schedule-card">
+        <div class="schedule-intro">
+          <p class="section-kicker">Bridge Bucks Payment</p>
+          <h1>Pay With Bridge Bucks</h1>
+          <p>This payment is set for <strong data-payment-amount>$33.00</strong>. Bridge Bucks is simpler than crypto quoting, but you must confirm the payment link is the correct Freedom Unchained path.</p>
+        </div>
+
+        <div class="applicant-summary agreement-summary" id="payment-applicant-summary"></div>
+
+        <div class="payment-progress" aria-label="Payment progress">
+          <span class="complete">PMA signed</span>
+          <span class="active">Payment pending</span>
+          <span>Payment confirmation</span>
+          <span>Payment confirmed</span>
+        </div>
+
+        <form id="bridge-payment-form" class="schedule-form">
+          <div class="payment-instructions">
+            <p class="instruction-kicker">Bridge Bucks path selected</p>
+            <h2>Instructions</h2>
+            <p>Bridge Bucks is the preferred alternative payment path for people who want a simple way into newer payment systems while supporting Freedom Unchained, Founders' Circle, and the surrounding community. It operates through Bridge Bucks Bank, an ecclesiastical church banking/payment system.</p>
+            <ol>
+              <li>Open the Founders' Circle Bridge Bucks link: <a href="https://www.bridgebucksbank.com/participate?a_aid=Freedom_Unchained" target="_blank" rel="noreferrer">bridgebucksbank.com/participate?a_aid=Freedom_Unchained</a>.</li>
+              <li>Before paying, confirm the URL includes <strong>a_aid=Freedom_Unchained</strong>.</li>
+              <li>If that exact Freedom_Unchained value is missing or changed, stop and use the official link above.</li>
+              <li>Submit the Bridge Bucks confirmation, receipt note, or reference below.</li>
+            </ol>
+          </div>
+
+          <div class="crypto-quote-panel">
+            <h2>Amount due</h2>
+            <dl>
+              <div><dt>Payment amount</dt><dd data-payment-amount>$33.00</dd></div>
+              <div><dt>Payment path</dt><dd>Bridge Bucks</dd></div>
+              <div><dt>Required URL check</dt><dd>a_aid=Freedom_Unchained</dd></div>
+            </dl>
+          </div>
+
+          <label>
+            <span>Bridge Bucks confirmation/reference</span>
+            <textarea name="paymentNote" rows="4" placeholder="Paste your Bridge Bucks confirmation, receipt note, or reference." required></textarea>
+          </label>
+
+          <label class="check-field details-check">
+            <input name="paymentConfirmed" type="checkbox" required>
+            <span>I confirm I used the correct Bridge Bucks link with a_aid=Freedom_Unchained.</span>
+          </label>
+
+          <button class="button schedule-button" type="submit">Submit Bridge Bucks Payment</button>
+          <p class="form-note" id="payment-note" role="status" aria-live="polite"></p>
+        </form>
+      </section>
+    </main>
+    <script src="script.js"></script>
+  </body>
+</html>

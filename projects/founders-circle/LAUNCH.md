@@ -21,6 +21,7 @@ Then open:
 
 - Public site: `http://localhost:4173`
 - Apply page: `http://localhost:4173/apply.html`
+- Applicant dashboard: `http://localhost:4173/admin-applications.html`
 - Admin availability: `http://localhost:4173/admin-availability.html`
 
 ## Required production settings
@@ -29,8 +30,66 @@ Set these environment variables on the host:
 
 - `ADMIN_PASSWORD`: protects the admin availability page and availability-editing API routes.
 - `DATA_DIR`: optional path for saved data. Use a persistent disk/path on the host.
+- `SENDFOX_TOKEN`: optional SendFox personal access token. When set, new applications are added to SendFox.
+- `SENDFOX_APPLIED_LIST_ID`: optional SendFox list ID for people who complete the first application step. You can also use `SENDFOX_LIST_ID` if you only want one list for now.
+- `MEMBERSHIP_FEE_USD`: optional yearly fee override. Defaults to `33`.
+- Crypto receiving addresses: optional receiving addresses for the crypto payment page. Leave a currency unset until the real receiving address is ready.
+
+  `CRYPTO_ADDRESS_BTC`, `CRYPTO_ADDRESS_LTC`, `CRYPTO_ADDRESS_DASH`, `CRYPTO_ADDRESS_XRP`, `CRYPTO_ADDRESS_XMR`, `CRYPTO_ADDRESS_ZEC`, `CRYPTO_ADDRESS_BCH`, `CRYPTO_ADDRESS_DOGE`, `CRYPTO_ADDRESS_ETH`, `CRYPTO_ADDRESS_LINK`, `CRYPTO_ADDRESS_ADA`, `CRYPTO_ADDRESS_USDT`, `CRYPTO_ADDRESS_USDC`, `CRYPTO_ADDRESS_BNB`, `CRYPTO_ADDRESS_TRX`, `CRYPTO_ADDRESS_HYPE`, `CRYPTO_ADDRESS_ICP`
 
 The app stores applications, bookings, availability, and date overrides in `data/store.json` by default.
+
+## SendFox funnel setup
+
+Recommended starting funnel:
+
+1. Create a SendFox list named `Founders Circle - Applied`.
+2. Create a personal access token in SendFox under account OAuth/API settings.
+3. Set `SENDFOX_TOKEN` to that token on the production host.
+4. Set `SENDFOX_APPLIED_LIST_ID` to the numeric ID of the `Founders Circle - Applied` list.
+
+When someone submits first name, last name, and email on `apply.html`, the app saves the application and adds that contact to the SendFox applied list.
+
+## Reusable payment processor links
+
+The payment pages can now be reused by any Freedom Unchained project. A project can start a payment by linking to `payment.html` with a few values in the URL:
+
+```text
+payment.html?project=foundation-freedom&purpose=Contribution&amount=33
+```
+
+Useful values:
+
+- `project`: where the payment belongs, such as `founders-circle`, `foundation-freedom`, or `freedom-unchained`.
+- `purpose`: what the payment is for, such as `Yearly membership`, `Donation`, `Course`, or `Product`.
+- `amount`: the USD amount to quote before crypto conversion.
+- `reference`: optional internal project record, product id, applicant id, order id, or donation id.
+- `name` and `email`: optional payer details if the project already collected them.
+- `destination`: optional internal label for where the finished payment should be routed.
+
+The app creates a payment session, lets the payer choose Crypto or Bridge Bucks, stores the submitted transaction/reference details, and shows the session in `admin-payments.html`.
+
+Crypto payments currently verify at the tracking level: the session records the transaction hash, selected currency, receiving address, required confirmations, and `pending-confirmations` status. The intended final flow is automatic blockchain confirmation: once the transaction is found on-chain and reaches the required confirmations, the payment becomes confirmed without admin approval. Full automatic confirmation needs either your own node connections or trusted blockchain explorer APIs for each supported chain.
+
+Current applicant path:
+
+1. Apply with name and email.
+2. Schedule an alignment call.
+3. Answer the pre-call questions.
+4. Land on the confirmation page.
+5. After manual approval, complete the PMA agreement.
+6. Choose crypto or Bridge Bucks on the payment page.
+7. Bridge Bucks users follow the Freedom_Unchained Bridge Bucks link and submit a reference.
+8. Crypto users choose a currency, lock a one-hour quote for the yearly membership fee, send to the matching receiving address, and submit the transaction hash.
+9. Admin confirms payment and marks the applicant as a member.
+
+Later stages can use separate SendFox lists or automations:
+
+- `Founders Circle - Details Completed`
+- `Founders Circle - Alignment Call Booked`
+- `Founders Circle - Approved`
+- `Founders Circle - PMA Sent`
+- `Founders Circle - Member`
 
 ## Suggested first launch host
 
