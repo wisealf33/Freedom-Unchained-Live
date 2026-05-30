@@ -146,7 +146,9 @@ if (detailsForm) {
     const updatedApplicant = {
       ...applicant,
       details,
-      detailsSubmittedAt: new Date().toISOString()
+      detailsSubmittedAt: new Date().toISOString(),
+      stage: "details-completed",
+      stageUpdatedAt: new Date().toISOString()
     };
     await updateApplication(updatedApplicant);
     writeJson("activeApplicant", updatedApplicant);
@@ -202,8 +204,17 @@ if (alignmentForm) {
     const applicantWithBooking = {
       ...applicantForBooking,
       latestBookingId: savedBooking.id,
-      latestBookingAt: new Date().toISOString()
+      latestBookingAt: new Date().toISOString(),
+      stage: "call-booked",
+      stageUpdatedAt: new Date().toISOString()
     };
+    await updateApplication({
+      id: applicantWithBooking.id,
+      latestBookingId: applicantWithBooking.latestBookingId,
+      latestBookingAt: applicantWithBooking.latestBookingAt,
+      stage: applicantWithBooking.stage,
+      stageUpdatedAt: applicantWithBooking.stageUpdatedAt
+    });
     writeJson("activeApplicant", applicantWithBooking);
     const applications = readJson("foundersApplications", []);
     writeJson("foundersApplications", applications.map((item) => (
@@ -763,7 +774,7 @@ async function syncFromServer() {
   }
 
   try {
-    const response = await fetch(apiUrl("/founders-state"));
+    const response = await fetch(apiUrl("/founders-public-state"));
     if (!response.ok) return;
     const state = await response.json();
 

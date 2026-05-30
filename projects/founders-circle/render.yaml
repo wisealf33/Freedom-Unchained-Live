@@ -1,0 +1,38 @@
+services:
+  - type: web
+    name: founders-circle
+    env: node
+    plan: starter
+    rootDir: projects/founders-circle
+    buildCommand: npm ci
+    startCommand: npm start
+    healthCheckPath: /healthz
+    disk:
+      name: founders-circle-data
+      mountPath: /var/data
+      sizeGB: 1
+    envVars:
+      - key: NODE_VERSION
+        value: 20
+      - key: DATA_DIR
+        value: /var/data
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: SENDFOX_TOKEN
+        sync: false
+      - key: SENDFOX_APPLIED_LIST_ID
+        sync: false
+      - key: SENDFOX_DETAILS_LIST_ID
+        sync: false
+      - key: SENDFOX_CALL_BOOKED_LIST_ID
+        sync: false
+      - key: SENDFOX_APPROVED_LIST_ID
+        sync: false
+      - key: SENDFOX_PMA_SENT_LIST_ID
+        sync: false
+      - key: SENDFOX_PAYMENT_LIST_ID
+        sync: false
+      - key: SENDFOX_MEMBER_LIST_ID
+        sync: false
+      - key: SENDFOX_DECLINED_LIST_ID
+        sync: false

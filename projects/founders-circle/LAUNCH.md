@@ -32,6 +32,7 @@ Set these environment variables on the host:
 - `DATA_DIR`: optional path for saved data. Use a persistent disk/path on the host.
 - `SENDFOX_TOKEN`: optional SendFox personal access token. When set, new applications are added to SendFox.
 - `SENDFOX_APPLIED_LIST_ID`: optional SendFox list ID for people who complete the first application step. You can also use `SENDFOX_LIST_ID` if you only want one list for now.
+- `SENDFOX_DETAILS_LIST_ID`, `SENDFOX_CALL_BOOKED_LIST_ID`, `SENDFOX_APPROVED_LIST_ID`, `SENDFOX_PMA_SENT_LIST_ID`, `SENDFOX_PAYMENT_LIST_ID`, `SENDFOX_MEMBER_LIST_ID`, `SENDFOX_DECLINED_LIST_ID`: optional stage-specific lists for SendFox automations.
 - `MEMBERSHIP_FEE_USD`: optional yearly fee override. Defaults to `33`.
 - Crypto receiving addresses: optional receiving addresses for the crypto payment page. Leave a currency unset until the real receiving address is ready.
 
@@ -39,16 +40,29 @@ Set these environment variables on the host:
 
 The app stores applications, bookings, availability, and date overrides in `data/store.json` by default.
 
+The backend also exposes `GET /healthz` for host health checks. Public calendar pages use `/founders-public-state`, which only returns availability and booked slot times. Full applicant, payment, and admin state is available through `/founders-state` only behind the admin password.
+
 ## SendFox funnel setup
 
 Recommended starting funnel:
 
 1. Create a SendFox list named `Founders Circle - Applied`.
-2. Create a personal access token in SendFox under account OAuth/API settings.
-3. Set `SENDFOX_TOKEN` to that token on the production host.
-4. Set `SENDFOX_APPLIED_LIST_ID` to the numeric ID of the `Founders Circle - Applied` list.
+2. Create lists for each major stage you want to automate: `Details Completed`, `Call Booked`, `Approved`, `PMA Sent`, `Payment`, `Member`, and `Declined`.
+3. Create a personal access token in SendFox under account OAuth/API settings.
+4. Set `SENDFOX_TOKEN` to that token on the production host.
+5. Set each `SENDFOX_*_LIST_ID` value to the numeric ID of the matching SendFox list.
 
-When someone submits first name, last name, and email on `apply.html`, the app saves the application and adds that contact to the SendFox applied list.
+When someone submits first name, last name, and email on `apply.html`, the app saves the application and adds that contact to the SendFox applied list. When they schedule, answer the questionnaire, or when you update their stage in the admin dashboard, the backend can move them into the matching SendFox list. SendFox can then run the emails for each stage.
+
+## Deployment package
+
+This folder now includes:
+
+- `.env.example`: copy of the production variables you need to fill in.
+- `Dockerfile`: container startup for VPS, Fly.io, Railway, or any Docker-capable host.
+- `render.yaml`: Render Blueprint with a persistent `/var/data` disk and `/healthz` health check.
+
+For Render, connect the repo, point the service at `projects/founders-circle/render.yaml`, fill in the secret environment variables, then point Cloudflare `founders.freedomunchained.life` at the service URL.
 
 ## Reusable payment processor links
 

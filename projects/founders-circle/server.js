@@ -13,6 +13,16 @@ const storePath = path.join(dataDir, "store.json");
 const adminPassword = process.env.ADMIN_PASSWORD || "";
 const sendFoxToken = process.env.SENDFOX_TOKEN || "";
 const sendFoxAppliedListId = process.env.SENDFOX_APPLIED_LIST_ID || process.env.SENDFOX_LIST_ID || "";
+const sendFoxStageListIds = {
+  applied: sendFoxAppliedListId,
+  "details-completed": process.env.SENDFOX_DETAILS_LIST_ID || "",
+  "call-booked": process.env.SENDFOX_CALL_BOOKED_LIST_ID || "",
+  approved: process.env.SENDFOX_APPROVED_LIST_ID || "",
+  "pma-sent": process.env.SENDFOX_PMA_SENT_LIST_ID || "",
+  payment: process.env.SENDFOX_PAYMENT_LIST_ID || "",
+  member: process.env.SENDFOX_MEMBER_LIST_ID || "",
+  declined: process.env.SENDFOX_DECLINED_LIST_ID || ""
+};
 const membershipFeeUsd = Number.parseFloat(process.env.MEMBERSHIP_FEE_USD || "33");
 
 const paymentProjects = {
@@ -67,6 +77,14 @@ const initialStore = {
 
 app.use(express.json({ limit: "1mb" }));
 
+app.get("/healthz", (_request, response) => {
+  response.json({
+    ok: true,
+    service: "founders-circle",
+    timestamp: new Date().toISOString()
+  });
+});
+
 app.get(["/admin-availability", "/admin-availability.html"], requireAdmin, async (_request, response) => {
   response.send(await renderPageWithState("admin-availability.html"));
 });
@@ -92,8 +110,13 @@ app.use(express.static(__dirname, {
   extensions: ["html"]
 }));
 
-app.get(["/api/state", "/founders-state"], async (_request, response) => {
+app.get(["/api/state", "/founders-state"], requireAdmin, async (_request, response) => {
   response.json(await readStore());
+});
+
+app.get(["/api/public-state", "/founders-public-state"], async (_request, response) => {
+  const store = await readStore();
+  response.json(publicStoreState(store));
 });
 
 app.get(["/api/crypto-quote", "/crypto-quote"], async (request, response) => {
@@ -212,6 +235,9 @@ app.post(["/api/applications", "/founders-applications"], async (request, respon
   const sendFoxResult = await addApplicationToSendFox(application);
   if (sendFoxResult) {
     application.sendFox = sendFoxResult;
+    application.sendFoxStages = {
+      applied: sendFoxResult
+    };
   }
 
   store.foundersApplications.push(application);
@@ -228,11 +254,20 @@ app.patch(["/api/applications/:id", "/founders-applications/:id"], async (reques
     return;
   }
 
-  store.foundersApplications[index] = {
+  const updatedApplication = {
     ...store.foundersApplications[index],
     ...request.body,
     detailsSubmittedAt: request.body.details ? new Date().toISOString() : store.foundersApplications[index].detailsSubmittedAt
   };
+  const stageSyncResult = await syncApplicationStageToSendFox(updatedApplication, updatedApplication.stage);
+  if (stageSyncResult) {
+    updatedApplication.sendFoxStages = {
+      ...(updatedApplication.sendFoxStages || {}),
+      [updatedApplication.stage]: stageSyncResult
+    };
+  }
+
+  store.foundersApplications[index] = updatedApplication;
   await writeStore(store);
   response.json(store.foundersApplications[index]);
 });
@@ -298,6 +333,19 @@ async function renderPageWithState(fileName) {
   const state = await readStore();
   const stateScript = `<script>window.__FOUNDERS_INITIAL_STATE__ = ${JSON.stringify(state).replaceAll("<", "\\u003c")};</script>`;
   return html.replace('<script src="script.js"></script>', `${stateScript}\n    <script src="script.js"></script>`);
+}
+
+function publicStoreState(store) {
+  return {
+    foundersAvailability: store.foundersAvailability,
+    foundersAvailabilityVersion: store.foundersAvailabilityVersion,
+    foundersDateOverrides: store.foundersDateOverrides,
+    alignmentCallRequests: store.alignmentCallRequests.map((booking) => ({
+      selectedDate: booking.selectedDate,
+      selectedTime: booking.selectedTime,
+      requestedAt: booking.requestedAt
+    }))
+  };
 }
 
 function paymentFlowFileName(requestPath) {
@@ -387,12 +435,20 @@ function requireAdmin(request, response, next) {
   response.status(401).send("Authentication required");
 }
 
-async function addApplicationToSendFox(application) {
+async function syncApplicationStageToSendFox(application, stage) {
+  if (!stage || !sendFoxStageListIds[stage]) {
+    return null;
+  }
+
+  return addApplicationToSendFox(application, sendFoxStageListIds[stage]);
+}
+
+async function addApplicationToSendFox(application, listIdValue = sendFoxAppliedListId) {
   if (!sendFoxToken || !application.email) {
     return null;
   }
 
-  const lists = parseSendFoxListIds(sendFoxAppliedListId);
+  const lists = parseSendFoxListIds(listIdValue);
   const payload = {
     email: application.email,
     first_name: application.firstName,
