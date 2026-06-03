@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Freedom Unchained Build Map</title>
+  <meta name="description" content="Explore the full Freedom Unchained ecosystem of active projects, near-launch builds, and future vision branches." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root { --bg:#f4f6f5; --surface:rgba(255,255,255,.92); --line:rgba(42,58,64,.10); --text:#1d2730; --muted:#5c6970; --accent:#4ec7d3; --accent-soft:rgba(78,199,211,.14); --accent-deep:#2d4b57; --shadow:0 18px 50px rgba(38,55,63,.10); --radius-xl:30px; --radius-lg:22px; --container:1120px; }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family:"Instrument Sans",system-ui,sans-serif; color:var(--text); background:radial-gradient(circle at top left,rgba(78,199,211,.14),transparent 28%),radial-gradient(circle at top right,rgba(45,75,87,.08),transparent 24%),linear-gradient(180deg,#fbfcfb 0%,var(--bg) 100%); min-height:100vh; }
+    a { color:inherit; text-decoration:none; }
+    .page { max-width:var(--container); margin:0 auto; padding:24px 18px 56px; }
+    .nav,.hero,.section,.vision-card,.cta { border:1px solid var(--line); background:var(--surface); box-shadow:var(--shadow); backdrop-filter:blur(12px); }
+    .nav { display:flex; justify-content:space-between; align-items:center; gap:14px; padding:14px 18px; border-radius:999px; position:sticky; top:16px; z-index:10; }
+    .brand { display:flex; align-items:center; gap:12px; }
+    .brand-mark { width:42px; height:42px; border-radius:14px; display:grid; place-items:center; background:linear-gradient(135deg,var(--accent),#7dd9df); color:#fff; font-family:"Space Grotesk",sans-serif; font-weight:700; }
+    .brand h1,.hero h2,.section h3,.vision-card h4 { font-family:"Space Grotesk",sans-serif; letter-spacing:-.04em; }
+    .brand h1 { margin:0; font-size:1rem; }
+    .brand p { margin:2px 0 0; font-size:.92rem; color:var(--muted); }
+    .back-link { padding:10px 14px; border-radius:999px; color:var(--muted); font-size:.95rem; font-weight:600; background:rgba(255,255,255,.84); }
+    .hero { margin-top:28px; border-radius:var(--radius-xl); padding:40px; background:radial-gradient(circle at top right,rgba(78,199,211,.18),transparent 26%),radial-gradient(circle at bottom left,rgba(45,75,87,.10),transparent 24%),linear-gradient(135deg,rgba(255,255,255,.98),rgba(246,250,250,.9)); }
+    .eyebrow,.status { display:inline-flex; width:fit-content; align-items:center; padding:7px 10px; border-radius:999px; background:var(--accent-soft); color:var(--accent-deep); font-size:.78rem; font-weight:700; }
+    .eyebrow { margin-bottom:18px; color:var(--accent); font-size:.82rem; }
+    .hero h2 { margin:0; font-size:clamp(2.3rem,6vw,4.2rem); color:var(--accent-deep); line-height:.95; }
+    .hero p,.section p,.vision-card p,.cta p { color:var(--muted); line-height:1.75; }
+    .hero p { margin:18px 0 0; max-width:50rem; }
+    .section { margin-top:20px; border-radius:var(--radius-xl); padding:28px; }
+    .section h3 { margin:0 0 10px; font-size:clamp(1.5rem,3vw,2rem); }
+    .section p { margin:0; max-width:54rem; }
+    .vision-grid { display:grid; gap:16px; margin-top:20px; }
+    .vision-card { display:grid; gap:10px; border-radius:var(--radius-lg); padding:20px; background:rgba(255,255,255,.82); }
+    .vision-card h4 { margin:0; font-size:1.14rem; }
+    .vision-card p { margin:0; }
+    .vision-card .help { color:#40545d; }
+    .button-row { display:flex; flex-wrap:wrap; gap:10px; margin-top:4px; }
+    .button { display:inline-flex; align-items:center; justify-content:center; width:fit-content; padding:10px 14px; border-radius:999px; background:var(--accent-deep); color:#fff; font-weight:700; }
+    .button.secondary { background:rgba(42,58,64,.08); color:var(--accent-deep); }
+    .cta { margin-top:20px; border-radius:var(--radius-lg); padding:22px; }
+    .cta strong { display:block; font-family:"Space Grotesk",sans-serif; font-size:1.1rem; margin-bottom:8px; }
+    .footer { margin-top:26px; border:1px solid rgba(45,75,87,.16); background:linear-gradient(135deg,rgba(230,239,242,.96),rgba(243,248,249,.98)); box-shadow:0 22px 48px rgba(35,52,60,.10); border-radius:var(--radius-xl); padding:28px; display:grid; gap:22px; }
+    .footer-title { margin:0; font-family:"Space Grotesk",sans-serif; font-size:1.25rem; letter-spacing:-.03em; color:#203943; }
+    .footer-copy { margin:0; color:#4f646c; line-height:1.7; max-width:46rem; }
+    .footer-links { display:grid; gap:18px; padding-top:8px; border-top:1px solid rgba(45,75,87,.10); }
+    .footer-group h4 { margin:0 0 10px; font-family:"Space Grotesk",sans-serif; font-size:1rem; color:#203943; }
+    .footer-group a { display:block; color:#556870; margin-bottom:8px; font-size:.95rem; }
+    @media (min-width:760px) { .vision-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } .footer-links { grid-template-columns:repeat(3,minmax(0,1fr)); } }
+    @media (min-width:1040px) { .vision-grid { grid-template-columns:repeat(3,minmax(0,1fr)); } }
+    @media (max-width:720px) { .page { padding:16px 14px 40px; } .nav { border-radius:24px; padding:14px; flex-direction:column; align-items:flex-start; } .hero,.section,.vision-card { padding:24px; } }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="nav">
+      <div class="brand">
+        <div class="brand-mark">G</div>
+        <div>
+          <h1>Garrett J Grubbs</h1>
+          <p>Freedom Unchained and parallel projects</p>
+        </div>
+      </div>
+      <a class="back-link" href="../index.html#projects">Back to Freedom Unchained</a>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="eyebrow">Vision Library / Project Map</div>
+        <h2>Freedom Unchained Build Map</h2>
+        <p>Freedom Unchained is not one project. It is a growing ecosystem of practical tools, community structures, spiritual foundations, local systems, and future visions. Some branches are already active. Some are close to launch. Some are still visions waiting for the right people, funding, and structure. This page lets you explore the full map without overwhelming the main front door.</p>
+      </section>
+
+      <section class="section">
+        <h3>Potential With Support</h3>
+        <p>These are not finished businesses pretending to be complete. They are branches of a larger mission. Some are already moving. Others are vision-stage projects that can become real quickly with the right builders, donors, partners, and community support. Many of these ideas are already mapped enough to begin. With a little help from the right people, they can move from vision into working projects quickly.</p>
+      </section>
+
+      <section class="section">
+        <h3>Active / Open Now</h3>
+        <div class="vision-grid">
+          <a class="vision-card" href="founders-circle/index.html">
+            <span class="status">Active</span>
+            <h4>Founders Circle</h4>
+            <p>A private builder circle for serious builders who want to help shape practical freedom projects.</p>
+            <p class="help">Support helps organize calls, member flow, agreements, and the private builder path.</p>
+            <span class="button">View Project</span>
+          </a>
+          <a class="vision-card" href="support.html">
+            <span class="status">Active</span>
+            <h4>Freedom Unchained Mission Support</h4>
+            <p>The support path for funding content, software, organizing, education, and early project development.</p>
+            <p class="help">Support keeps the base mission alive and helps move vision-stage branches into first working versions.</p>
+            <span class="button">Support Mission</span>
+          </a>
+          <a class="vision-card" href="https://localized.life/" target="_blank" rel="noreferrer">
+            <span class="status">Active</span>
+            <h4>Localized.life / SaleTrail</h4>
+            <p>Local tools for real-world community, starting with garage sale discovery, flyers, and route planning.</p>
+            <p class="help">Support helps turn local trade tools into practical community infrastructure.</p>
+            <span class="button">View Project</span>
+          </a>
+          <a class="vision-card" href="mystery-school-mother-earth.html">
+            <span class="status">Active</span>
+            <h4>Mystery School of Mother Earth</h4>
+            <p>A spiritual-centered PMA branch with online community, local circles, vendors, practitioners, and events.</p>
+            <p class="help">Support helps clarify member flow, local circles, and the marketplace/event branch.</p>
+            <span class="button">View Project</span>
+          </a>
+        </div>
+      </section>
+
+      <section class="section">
+        <h3>Near Launch / Being Built</h3>
+        <div class="vision-grid">
+          <a class="vision-card" href="pro-se-record-builder.html">
+            <span class="status">Being Built</span>
+            <h4>Pro Se Record Builder</h4>
+            <p>A planning tool for clearer records, due process, and self-representation preparation.</p>
+            <p class="help">Support helps turn the planning map into templates, workflows, and plain-language guidance.</p>
+            <span class="button">Explore Vision</span>
+          </a>
+          <a class="vision-card" href="pactum.html">
+            <span class="status">Being Built</span>
+            <h4>Pactum</h4>
+            <p>A home-first coordination system for households, local exchange, and voluntary cooperation.</p>
+            <p class="help">Support helps move Pactum from concept into a simple first useful version.</p>
+            <span class="button">View Project</span>
+          </a>
+          <a class="vision-card" href="foundation-freedom.html">
+            <span class="status">Being Built</span>
+            <h4>Foundation Freedom</h4>
+            <p>The organizing umbrella for PMAs, trusts, associations, and parallel structure projects.</p>
+            <p class="help">Support helps clarify the legal/organizational containers that can hold the work.</p>
+            <span class="button">View Project</span>
+          </a>
+          <a class="vision-card" href="mother-earth-market.html">
+            <span class="status">Being Built</span>
+            <h4>Mother Earth Market</h4>
+            <p>A market and event branch for aligned vendors, practitioners, spiritual community, and local connection.</p>
+            <p class="help">Support helps define the first event, vendor flow, and public invitation.</p>
+            <span class="button">Explore Vision</span>
+          </a>
+          <a class="vision-card" href="pawpaw-tree-revival.html">
+            <span class="status">Needs Builders</span>
+            <h4>Pawpaw Tree Revival</h4>
+            <p>A food, land, and stewardship vision around reviving useful native abundance and local growing culture.</p>
+            <p class="help">Support helps map the first nursery, education, or community planting effort.</p>
+            <span class="button">Explore Vision</span>
+          </a>
+          <a class="vision-card" href="natural-law-due-process.html">
+            <span class="status">Being Built</span>
+            <h4>Natural Law / Due Process Education</h4>
+            <p>Plain-language education around rights, responsibility, record-building, and lawful process.</p>
+            <p class="help">Support helps create guides, videos, templates, and learning paths.</p>
+            <span class="button">Explore Vision</span>
+          </a>
+        </div>
+      </section>
+
+      <section class="section">
+        <h3>Vision Stage / Future Branches</h3>
+        <div class="vision-grid">
+          <a class="vision-card" href="the-grove.html">
+            <span class="status">Vision Stage</span>
+            <h4>The Grove</h4>
+            <p>A land-based gathering place for stewardship, food, mentorship, and healthier community life.</p>
+            <p class="help">Support helps identify land, people, first uses, and a grounded path forward.</p>
+            <span class="button">View Project</span>
+          </a>
+          <a class="vision-card" href="church-fellowship-structure.html">
+            <span class="status">Vision Stage</span>
+            <h4>Church / Fellowship Structure</h4>
+            <p>A spiritual and organizational foundation for gathering, service, education, and mission-aligned work.</p>
+            <p class="help">Support helps map purpose, governance, membership, and first fellowship forms.</p>
+            <span class="button">Explore Vision</span>
+          </a>
+          <a class="vision-card" href="local-stewardship-networks.html">
+            <span class="status">Vision Stage</span>
+            <h4>Local Stewardship Networks</h4>
+            <p>Local networks for stronger families, shared responsibility, land, food, skills, and community resilience.</p>
+            <p class="help">Support helps turn loose relationships into useful local patterns and tools.</p>
+            <span class="button">Explore Vision</span>
+          </a>
+          <a class="vision-card" href="community-security-support-systems.html">
+            <span class="status">Vision Stage</span>
+            <h4>Community Security / Support Systems</h4>
+            <p>Practical systems for mutual aid, protection, accountability, response, and local trust.</p>
+            <p class="help">Support helps define ethical, lawful, community-rooted first steps.</p>
+            <span class="button">Explore Vision</span>
+          </a>
+          <a class="vision-card" href="parallel-economy-tools.html">
+            <span class="status">Vision Stage</span>
+            <h4>Parallel Economy Tools</h4>
+            <p>Tools for local trade, member-to-member exchange, offers, needs, value, and practical coordination.</p>
+            <p class="help">Support helps connect the economic vision to usable software and local pilots.</p>
+            <span class="button">Explore Vision</span>
+          </a>
+          <a class="vision-card" href="bitcoin-gameshow.html">
+            <span class="status">Vision Stage</span>
+            <h4>Bitcoin Gameshow</h4>
+            <p>An interactive media concept that makes financial ideas more memorable, participatory, and alive.</p>
+            <p class="help">Support helps sharpen the show format, audience path, and first pilot.</p>
+            <span class="button">View Project</span>
+          </a>
+        </div>
+      </section>
+
+      <section class="cta">
+        <strong>Want to help move a vision forward?</strong>
+        <p>Support can fund first versions. Founders Circle is the builder path for people who want to help create the projects directly.</p>
+        <div class="button-row">
+          <a class="button" href="support.html">Support the Mission</a>
+          <a class="button secondary" href="founders-circle/apply.html">Apply for Founders Circle</a>
+          <a class="button secondary" href="contact.html">Contact Garrett</a>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div>
+        <h3 class="footer-title">Freedom Unchained</h3>
+        <p class="footer-copy">A simple front door for the mission, with a deeper map for the projects and visions that can become real with support.</p>
+      </div>
+      <div class="footer-links">
+        <div class="footer-group">
+          <h4>Explore</h4>
+          <a href="../index.html">Start Here</a>
+          <a href="build-map.html">Build Map</a>
+          <a href="support.html">Support</a>
+        </div>
+        <div class="footer-group">
+          <h4>Active Paths</h4>
+          <a href="founders-circle/apply.html">Apply for Founders Circle</a>
+          <a href="support.html">Support the Mission</a>
+          <a href="contact.html">Contact Garrett</a>
+        </div>
+        <div class="footer-group">
+          <h4>Project Hubs</h4>
+          <a href="foundation-freedom.html">Foundation Freedom</a>
+          <a href="your-vision.html">Your Vision</a>
+          <a href="https://localized.life/" target="_blank" rel="noreferrer">Localized.life</a>
+        </div>
+      </div>
+    </footer>
+  </div>
+</body>
+</html>
