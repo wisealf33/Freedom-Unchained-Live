@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Freedom Unchained</title>
-  <meta name="description" content="Garrett's simple home base for Freedom Unchained, projects, and public work." />
+  <meta name="description" content="Freedom Unchained is a God-rooted mission hub for practical tools, content, and communities that support natural law, self-governance, strong families, local trade, due process, and parallel systems." />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
@@ -131,6 +131,16 @@
     .nav-links a:hover {
       background: rgba(255,255,255,0.84);
       color: var(--text);
+    }
+
+    .nav-links .nav-strong {
+      background: var(--accent-deep);
+      color: #fff;
+    }
+
+    .nav-links .nav-strong:hover {
+      background: #203943;
+      color: #fff;
     }
 
     .menu-toggle {
@@ -287,6 +297,23 @@
       color: #516069;
     }
 
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 24px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-note {
+      color: var(--accent-deep);
+      font-weight: 700;
+      margin: 10px 0 0;
+      position: relative;
+      z-index: 1;
+    }
+
     .section-grid {
       display: grid;
       gap: 20px;
@@ -329,14 +356,17 @@
     }
 
     .links-grid,
-    .projects {
+    .projects,
+    .door-grid,
+    .project-map {
       display: grid;
       gap: 12px;
       margin-top: 20px;
     }
 
     .link-card,
-    .project-card {
+    .project-card,
+    .door-card {
       border-radius: var(--radius-lg);
       padding: 18px;
       background: var(--surface-strong);
@@ -349,7 +379,8 @@
     }
 
     .link-card:hover,
-    .project-card:hover {
+    .project-card:hover,
+    .door-card:hover {
       transform: translateY(-2px);
       box-shadow: 0 20px 36px rgba(30, 40, 58, 0.12);
     }
@@ -361,6 +392,26 @@
     .link-card {
       display: grid;
       gap: 6px;
+    }
+
+    .door-card {
+      border-color: rgba(78, 199, 211, 0.22);
+      box-shadow: 0 8px 18px rgba(78, 199, 211, 0.18);
+      display: grid;
+      gap: 12px;
+    }
+
+    .door-card h4,
+    .project-stage h4 {
+      font-family: "Space Grotesk", sans-serif;
+      letter-spacing: -0.04em;
+      margin: 0;
+    }
+
+    .door-card p {
+      color: var(--muted);
+      line-height: 1.65;
+      margin: 0;
     }
 
     .link-card strong {
@@ -409,6 +460,48 @@
       gap: 12px;
     }
 
+    .project-map {
+      gap: 16px;
+    }
+
+    .project-stage {
+      border: 1px solid rgba(42, 58, 64, 0.10);
+      border-radius: var(--radius-lg);
+      background: rgba(255,255,255,0.76);
+      padding: 20px;
+    }
+
+    .project-stage h4 {
+      color: var(--accent-deep);
+      font-size: 1.16rem;
+      margin-bottom: 14px;
+    }
+
+    .project-stage ul {
+      display: grid;
+      gap: 12px;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .project-stage li {
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    .project-stage strong {
+      color: var(--text);
+    }
+
+    .support-list {
+      columns: 2;
+      color: var(--muted);
+      line-height: 1.7;
+      margin: 20px 0 0;
+      padding-left: 20px;
+    }
+
     .simple-copy {
       display: grid;
       gap: 14px;
@@ -455,6 +548,11 @@
       background: var(--accent-deep);
       color: #fff;
       transition: 180ms ease;
+    }
+
+    .pill-button.secondary {
+      background: rgba(42, 58, 64, 0.08);
+      color: var(--accent-deep);
     }
 
     .pill-button:hover {
@@ -522,7 +620,8 @@
     }
 
     @media (min-width: 760px) {
-      .links-grid {
+      .links-grid,
+      .door-grid {
         grid-template-columns: repeat(3, minmax(0, 1fr));
       }
 
@@ -531,6 +630,14 @@
       }
 
       .footer-links {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .door-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .project-map {
         grid-template-columns: repeat(3, minmax(0, 1fr));
       }
     }
@@ -607,6 +714,10 @@
       .hero h2 {
         font-size: 2.6rem;
       }
+
+      .support-list {
+        columns: 1;
+      }
     }
   </style>
 </head>
@@ -650,7 +761,8 @@
       <nav class="nav-links" id="site-nav" aria-label="Primary">
         <a href="#freedom-unchained">Start Here</a>
         <a href="#projects">Projects</a>
-        <a href="#support">Support</a>
+        <a href="projects/founders-circle/apply.html">Founders Circle</a>
+        <a class="nav-strong" href="projects/support.html">Support</a>
         <a href="projects/contact.html">Connect</a>
       </nav>
     </header>
@@ -670,25 +782,25 @@
 
         <div class="hero-sections">
           <div class="hero-section">
-            <div class="hero-label">Who I Am</div>
-            <p class="hero-text">I’m Garrett J Grubbs, the man behind Freedom Unchained. I’m focused on bringing together ideas, people, and projects that can help build a more free, decentralized, and community-driven future through real work, real participation, and practical action.</p>
+            <div class="hero-label">Mission Hub</div>
+            <p class="hero-text">Freedom Unchained is a God-rooted mission to build practical tools, content, and communities for natural law, self-governance, strong families, local trade, due process, and parallel systems.</p>
           </div>
 
           <div class="hero-section">
             <div class="hero-label">Purpose</div>
-            <p class="hero-text">The purpose of this work is to help redirect our energy away from endless attention on broken systems and toward building something better. Not just criticizing what is failing, but creating parallel structures people can actually rely on, structures rooted in freedom, free will, self-governance, voluntary cooperation, and stronger local communities.</p>
+            <p class="hero-text">This work is about moving from complaining about broken systems into building something people can actually use: education, organizing, builder circles, local tools, and project structures rooted in faith, free will, voluntary cooperation, and practical responsibility.</p>
           </div>
 
           <div class="hero-section">
-            <div class="hero-label">Mission</div>
-            <p class="hero-text">My mission is to help build real-world alternatives that can take the place of centralized systems without losing the functions people still need. That means building toward stronger communities, decentralized collaboration, parallel economies, fair arbitration and dispute resolution, community-based security and support systems, better coordination between people and places, and new ways for communities to work together, build infrastructure, solve problems, and create value without depending on coercive control.</p>
-          </div>
-
-          <div class="hero-section">
-            <div class="hero-label">Call to Action</div>
-            <p class="hero-text">This is for builders, creators, organizers, contributors, problem-solvers, and people who know we need something more. If you are here to connect, collaborate, contribute skills, share ideas, follow the work, explore the projects, or help build what comes next, you are in the right place. And if you are here first to watch and learn, you are welcome too, follow along, share what matters, and step in when you are ready.</p>
+            <div class="hero-label">Launch Path</div>
+            <p class="hero-text">There are two clear ways to step in right now: support the mission financially, or apply to join Founders Circle if you want to actively build with us.</p>
           </div>
         </div>
+        <div class="hero-actions" aria-label="Primary actions">
+          <a class="pill-button" href="projects/support.html">Support the Mission</a>
+          <a class="pill-button secondary" href="projects/founders-circle/apply.html">Apply for Founders Circle</a>
+        </div>
+        <p class="hero-note">Support the mission or join the builders.</p>
       </section>
 
       <div class="section-grid">
@@ -723,46 +835,60 @@
           </div>
         </section>
 
-        <section class="section" id="projects">
-          <h3>Projects Connected to Freedom Unchained</h3>
-          <p class="section-intro">These are not random side ideas. They are different branches of the larger Freedom Unchained mission. Each one gives people a specific lane to follow, support, join, or help build.</p>
+        <section class="section" id="two-ways">
+          <h3>Two Ways to Step In</h3>
+          <p class="section-intro">Freedom Unchained needs both supporters and builders. Pick the door that fits where you are right now.</p>
 
-          <div class="projects">
-            <a class="project-card" href="projects/foundation-freedom.html">
-              <h4>Foundation Freedom</h4>
-              <p>The umbrella project page for the active projects and planning-stage ideas connected to the Freedom Unchained mission.</p>
-              <div class="project-tag">Project umbrella / build map</div>
-            </a>
+          <div class="door-grid">
+            <article class="door-card">
+              <div class="project-tag">Door 1</div>
+              <h4>Support the Mission</h4>
+              <p>For people who believe in the work and want to help fund content, software tools, organizing, and early project development.</p>
+              <a class="pill-button" href="projects/support.html">Support the Mission</a>
+            </article>
 
-            <a class="project-card" href="https://localized.life/" target="_blank" rel="noreferrer">
-              <h4>Localized.life</h4>
-              <p>Practical local tools for real-world community, starting with SaleTrail: a garage sale directory, flyer generator, and simple route planner.</p>
-              <div class="project-tag">Local tools / community infrastructure</div>
-            </a>
-
-            <a class="project-card" href="projects/mystery-school-mother-earth.html">
-              <h4>Mystery School of Mother Earth</h4>
-              <p>A PMA branch under Foundation Freedom for an online-first spiritual-centered community, local circles, aligned vendors, practitioners, and Mother Earth Market events.</p>
-              <div class="project-tag">PMA / spiritual-centered community</div>
-            </a>
-
-            <a class="project-card" href="projects/founders-circle/index.html">
+            <article class="door-card">
+              <div class="project-tag">Door 2</div>
               <h4>Founders Circle</h4>
-              <p>A live private working circle for serious builders focused on strong families, resilient communities, and practical collaboration.</p>
-              <div class="project-tag">Live working circle</div>
-            </a>
+              <p>For people who want to actively build, collaborate, join calls, bring skills, and help shape practical freedom projects.</p>
+              <a class="pill-button secondary" href="projects/founders-circle/apply.html">Apply for Founders Circle</a>
+            </article>
+          </div>
+        </section>
 
-            <a class="project-card" href="projects/pactum.html">
-              <h4>Pactum</h4>
-              <p>A home-first system for organizing the individual, the household, and the community through practical coordination, local exchange, and voluntary cooperation. Join the list if you want updates as it develops.</p>
-              <div class="project-tag">Home / community systems project</div>
-            </a>
+        <section class="section" id="projects">
+          <h3>Mission Map</h3>
+          <p class="section-intro">The projects are branches of one mission: build the people, tools, records, communities, and structures needed for a freer world.</p>
 
-            <a class="project-card" href="projects/bitcoin-gameshow.html">
-              <h4>Bitcoin Gameshow</h4>
-              <p>An interactive media concept that blends entertainment, financial ideas, and audience participation to make markets and value more engaging. Join the list if you want updates as it takes shape.</p>
-              <div class="project-tag">Interactive media project</div>
-            </a>
+          <div class="project-map">
+            <div class="project-stage">
+              <h4>Active Now</h4>
+              <ul>
+                <li><strong>Founders Circle:</strong> a private builder circle for serious builders.</li>
+                <li><strong>Freedom Unchained Mission Fund:</strong> support for content, organizing, software, and early project development.</li>
+              </ul>
+            </div>
+
+            <div class="project-stage">
+              <h4>Building Next</h4>
+              <ul>
+                <li><strong>Pro Se Record Builder:</strong> planning tools for clearer records, due process, and self-representation preparation.</li>
+                <li><strong>Pactum:</strong> home and community coordination for voluntary cooperation.</li>
+                <li><strong>Localized / SaleTrail:</strong> local trade and community infrastructure tools.</li>
+              </ul>
+            </div>
+
+            <div class="project-stage">
+              <h4>Long-Term Vision</h4>
+              <ul>
+                <li><strong>Church / fellowship structure:</strong> spiritual and organizational grounding for the work.</li>
+                <li><strong>Natural-law education:</strong> plain-language teaching around rights, responsibility, and due process.</li>
+                <li><strong>Local stewardship networks:</strong> stronger families, local trade, and resilient communities.</li>
+              </ul>
+            </div>
+          </div>
+          <div class="simple-copy">
+            <p><a href="projects/foundation-freedom.html"><strong>View the fuller project map →</strong></a></p>
           </div>
         </section>
 
@@ -778,9 +904,25 @@
 
         <section class="section" id="support">
           <h3>Support the Mission</h3>
-          <p class="section-intro">These are aligned resources, invitations, and tools that connect with the larger work of building freer families, stronger communities, and parallel structures people can actually use.</p>
+          <p class="section-intro">Donations help fund Freedom Unchained content, website and project development, pro se record-builder planning, Founders Circle development, natural-law and due-process education, local trade tools, fellowship foundation work, software, and organizing costs.</p>
+
+          <ul class="support-list">
+            <li>Freedom Unchained content</li>
+            <li>Website and project development</li>
+            <li>Pro se record-builder planning</li>
+            <li>Founders Circle development</li>
+            <li>Natural-law and due-process education</li>
+            <li>Local trade and community tools</li>
+            <li>Church/fellowship foundation work</li>
+            <li>Software and organizing costs</li>
+          </ul>
 
           <div class="links-grid">
+            <a class="link-card" href="projects/support.html">
+              <strong>Support Freedom Unchained</strong>
+              <span>Open the mission-support page and choose the best way to help. Payment links are being finalized.</span>
+            </a>
+
             <a class="link-card" href="https://www.christianvillages.com/webinar-registration1774465695659?a_aid=Freedom_Unchained&amp;a_bid=3b9c3291" target="_blank" rel="noreferrer">
               <strong>Christian Villages Virtual Event</strong>
               <span>Explore biblical community, intentional village building, PMA and trust-style structures, and practical first steps for finding or building real community.</span>
@@ -810,9 +952,10 @@
         <div class="footer-group">
           <h4>Explore</h4>
           <a href="#freedom-unchained">Freedom Unchained</a>
+          <a href="#two-ways">Two Ways to Step In</a>
           <a href="#projects">Projects</a>
           <a href="#your-vision">Your Vision</a>
-          <a href="#support">Support</a>
+          <a href="projects/support.html">Support</a>
         </div>
 
         <div class="footer-group">
@@ -828,6 +971,8 @@
 
         <div class="footer-group">
           <h4>Connect</h4>
+          <a href="projects/founders-circle/apply.html">Apply for Founders Circle</a>
+          <a href="projects/support.html">Support the Mission</a>
           <a href="https://sendfox.com/lp/1y7ygy" target="_blank" rel="noreferrer">Join the Freedom Unchained list</a>
           <a href="projects/contact.html">Contact Garrett</a>
           <a href="https://www.youtube.com/c/FreedomUnchained" target="_blank" rel="noreferrer">YouTube</a>
