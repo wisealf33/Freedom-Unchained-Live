@@ -29,6 +29,9 @@ Then open:
 Set these environment variables on the host:
 
 - `ADMIN_PASSWORD`: protects the admin availability page and availability-editing API routes.
+- `SESSION_SECRET`: long random secret used to sign login sessions.
+- `INITIAL_ADMIN_EMAIL`: the email for the first account. This first account receives both `admin` and `member` roles.
+- `INITIAL_ADMIN_PASSWORD`: temporary password for the first account. The backend stores only a salted hash in the private data store.
 - `DATA_DIR`: optional path for saved data. Use a persistent disk/path on the host.
 - `SENDFOX_TOKEN`: optional SendFox personal access token. When set, new applications are added to SendFox.
 - `SENDFOX_APPLIED_LIST_ID`: optional SendFox list ID for people who complete the first application step. You can also use `SENDFOX_LIST_ID` if you only want one list for now.
@@ -38,9 +41,18 @@ Set these environment variables on the host:
 
   `CRYPTO_ADDRESS_BTC`, `CRYPTO_ADDRESS_LTC`, `CRYPTO_ADDRESS_DASH`, `CRYPTO_ADDRESS_XRP`, `CRYPTO_ADDRESS_XMR`, `CRYPTO_ADDRESS_ZEC`, `CRYPTO_ADDRESS_BCH`, `CRYPTO_ADDRESS_DOGE`, `CRYPTO_ADDRESS_ETH`, `CRYPTO_ADDRESS_LINK`, `CRYPTO_ADDRESS_ADA`, `CRYPTO_ADDRESS_USDT`, `CRYPTO_ADDRESS_USDC`, `CRYPTO_ADDRESS_BNB`, `CRYPTO_ADDRESS_TRX`, `CRYPTO_ADDRESS_HYPE`, `CRYPTO_ADDRESS_ICP`
 
-The app stores applications, bookings, availability, and date overrides in `data/store.json` by default.
+The app stores applications, bookings, availability, accounts, sessions, and date overrides in `data/store.json` by default. Do not commit this file. Use a persistent private disk on the host.
 
-The backend also exposes `GET /healthz` for host health checks. Public calendar pages use `/founders-public-state`, which only returns availability and booked slot times. Full applicant, payment, and admin state is available through `/founders-state` only behind the admin password.
+The backend also exposes `GET /healthz` for host health checks. Public calendar pages use `/founders-public-state`, which only returns availability and booked slot times. Full applicant, payment, and admin state is available through `/founders-state` only behind an admin login or the legacy admin password.
+
+## First admin/member account
+
+Set `INITIAL_ADMIN_EMAIL` and `INITIAL_ADMIN_PASSWORD` on the backend host before first startup. On startup, the backend creates that account with both roles:
+
+- `admin`: can open admin dashboards and manage applicants.
+- `member`: can open the private member portal.
+
+After the account exists, the password hash is stored in the private data file. Treat the first password as temporary and rotate it after the real account-management screen exists.
 
 ## SendFox funnel setup
 

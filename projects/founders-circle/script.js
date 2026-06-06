@@ -2,6 +2,7 @@ const form = document.querySelector("#founders-application");
 const note = document.querySelector("#form-note");
 const memberLoginForm = document.querySelector("#member-login-form");
 const memberLoginNote = document.querySelector("#member-login-note");
+const memberDashboard = document.querySelector("#member-dashboard");
 const detailsForm = document.querySelector("#application-details-form");
 const detailsNote = document.querySelector("#details-note");
 const alignmentForm = document.querySelector("#alignment-call-form");
@@ -135,10 +136,43 @@ if (form) {
 }
 
 if (memberLoginForm) {
-  memberLoginForm.addEventListener("submit", (event) => {
+  memberLoginForm.addEventListener("submit", async (event) => {
     event.preventDefault();
-    memberLoginNote.textContent = "Member account access is not activated yet. Accepted members will receive login instructions when the private portal is ready.";
+
+    try {
+      const response = await fetch(apiUrl("/founders-login"), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(Object.fromEntries(new FormData(memberLoginForm).entries()))
+      });
+      const result = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        memberLoginNote.textContent = result.error || "Login failed. Check the email and password.";
+        return;
+      }
+
+      localStorage.setItem("foundersAuthToken", result.token);
+      memberLoginNote.textContent = "Login accepted. Opening the member portal.";
+      window.location.href = "member-dashboard.html";
+    } catch {
+      memberLoginNote.textContent = "Member login needs the Founders Circle backend to be running.";
+    }
   });
+}
+
+if (memberDashboard) {
+  const user = window.__FOUNDERS_INITIAL_STATE__?.authUser || null;
+  const emailTarget = memberDashboard.querySelector("[data-member-email]");
+  const adminTools = memberDashboard.querySelector("[data-admin-tools]");
+
+  if (emailTarget && user?.email) {
+    emailTarget.textContent = user.email;
+  }
+
+  if (adminTools && user?.roles?.includes("admin")) {
+    adminTools.hidden = false;
+  }
 }
 
 if (detailsForm) {

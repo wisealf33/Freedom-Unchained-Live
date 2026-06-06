@@ -593,6 +593,31 @@ footer p {
   margin-top: 8px;
 }
 
+.member-portal-actions {
+  display: grid;
+  gap: 24px;
+  margin-top: 34px;
+}
+
+.admin-tools {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  display: grid;
+  gap: 12px;
+  padding: 22px;
+}
+
+.admin-tools h2 {
+  color: var(--navy);
+  font-size: 22px;
+  margin: 0;
+}
+
+.admin-tools a {
+  color: var(--navy);
+  font-weight: 700;
+}
+
 .application-intro {
   text-align: center;
 }

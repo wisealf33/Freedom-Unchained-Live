@@ -18,6 +18,12 @@ services:
         value: /var/data
       - key: ADMIN_PASSWORD
         sync: false
+      - key: SESSION_SECRET
+        sync: false
+      - key: INITIAL_ADMIN_EMAIL
+        sync: false
+      - key: INITIAL_ADMIN_PASSWORD
+        sync: false
       - key: SENDFOX_TOKEN
         sync: false
       - key: SENDFOX_APPLIED_LIST_ID

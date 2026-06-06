@@ -11,6 +11,9 @@ const port = process.env.PORT || 4173;
 const dataDir = process.env.DATA_DIR || path.join(__dirname, "data");
 const storePath = path.join(dataDir, "store.json");
 const adminPassword = process.env.ADMIN_PASSWORD || "";
+const sessionSecret = process.env.SESSION_SECRET || "dev-founders-circle-session-secret";
+const initialAdminEmail = process.env.INITIAL_ADMIN_EMAIL || "";
+const initialAdminPassword = process.env.INITIAL_ADMIN_PASSWORD || "";
 const sendFoxToken = process.env.SENDFOX_TOKEN || "";
 const sendFoxAppliedListId = process.env.SENDFOX_APPLIED_LIST_ID || process.env.SENDFOX_LIST_ID || "";
 const sendFoxStageListIds = {
@@ -72,7 +75,9 @@ const initialStore = {
   foundersAvailability: null,
   foundersAvailabilityVersion: 2,
   foundersDateOverrides: {},
-  paymentSessions: []
+  paymentSessions: [],
+  authUsers: [],
+  authSessions: []
 };
 
 app.use(express.json({ limit: "1mb" }));
@@ -84,6 +89,8 @@ app.get("/healthz", (_request, response) => {
     timestamp: new Date().toISOString()
   });
 });
+
+await ensureInitialAdminUser();
 
 app.get(["/admin-availability", "/admin-availability.html"], requireAdmin, async (_request, response) => {
   response.send(await renderPageWithState("admin-availability.html"));
@@ -97,13 +104,17 @@ app.get(["/admin-payments", "/admin-payments.html"], requireAdmin, async (_reque
   response.send(await renderPageWithState("admin-payments.html"));
 });
 
+app.get(["/member-dashboard", "/member-dashboard.html"], requireMember, async (request, response) => {
+  response.send(await renderPageWithState("member-dashboard.html", { authUser: publicUser(request.authUser) }, false));
+});
+
 app.get(["/pma-agreement", "/pma-agreement.html", "/payment", "/payment.html", "/crypto-payment", "/crypto-payment.html", "/bridge-bucks-payment", "/bridge-bucks-payment.html"], async (request, response, next) => {
   const fileName = paymentFlowFileName(request.path);
   if (!existsSync(path.join(__dirname, fileName))) {
     next();
     return;
   }
-  response.send(await renderPageWithState(fileName));
+  response.send(await renderPageWithState(fileName, {}, false));
 });
 
 app.use(express.static(__dirname, {
@@ -117,6 +128,51 @@ app.get(["/api/state", "/founders-state"], requireAdmin, async (_request, respon
 app.get(["/api/public-state", "/founders-public-state"], async (_request, response) => {
   const store = await readStore();
   response.json(publicStoreState(store));
+});
+
+app.get(["/api/me", "/founders-me"], async (request, response) => {
+  const user = await getRequestUser(request);
+  response.json({ user: publicUser(user) });
+});
+
+app.post(["/api/login", "/founders-login"], async (request, response) => {
+  const email = normalizeEmail(request.body.email);
+  const password = String(request.body.password || "");
+
+  if (!email || !password) {
+    response.status(400).json({ error: "Email and password are required" });
+    return;
+  }
+
+  const store = await readStore();
+  const user = store.authUsers.find((item) => normalizeEmail(item.email) === email);
+
+  if (!user || !(await verifyPassword(password, user.passwordHash))) {
+    response.status(401).json({ error: "Invalid email or password" });
+    return;
+  }
+
+  const session = createSession(user.id);
+  store.authSessions = pruneSessions(store.authSessions).concat(session.record);
+  user.lastLoginAt = new Date().toISOString();
+  await writeStore(store);
+
+  response.cookie?.("founders_session", session.token, cookieOptions());
+  if (!response.cookie) {
+    response.setHeader("Set-Cookie", serializeCookie("founders_session", session.token, cookieOptions()));
+  }
+  response.json({ token: session.token, user: publicUser(user) });
+});
+
+app.post(["/api/logout", "/founders-logout"], async (request, response) => {
+  const token = getSessionToken(request);
+  if (token) {
+    const store = await readStore();
+    store.authSessions = store.authSessions.filter((session) => session.tokenHash !== hashToken(token));
+    await writeStore(store);
+  }
+  response.setHeader("Set-Cookie", serializeCookie("founders_session", "", { ...cookieOptions(), maxAge: 0 }));
+  response.json({ ok: true });
 });
 
 app.get(["/api/crypto-quote", "/crypto-quote"], async (request, response) => {
@@ -328,9 +384,11 @@ async function ensureStore() {
   }
 }
 
-async function renderPageWithState(fileName) {
+async function renderPageWithState(fileName, extraState = {}, includePrivateState = true) {
   const html = await readFile(path.join(__dirname, fileName), "utf8");
-  const state = await readStore();
+  const store = await readStore();
+  const state = includePrivateState ? store : publicStoreState(store);
+  Object.assign(state, extraState);
   const stateScript = `<script>window.__FOUNDERS_INITIAL_STATE__ = ${JSON.stringify(state).replaceAll("<", "\\u003c")};</script>`;
   return html.replace('<script src="script.js"></script>', `${stateScript}\n    <script src="script.js"></script>`);
 }
@@ -346,6 +404,158 @@ function publicStoreState(store) {
       requestedAt: booking.requestedAt
     }))
   };
+}
+
+async function ensureInitialAdminUser() {
+  if (!initialAdminEmail || !initialAdminPassword) {
+    return;
+  }
+
+  const store = await readStore();
+  const email = normalizeEmail(initialAdminEmail);
+  const existingUser = store.authUsers.find((user) => normalizeEmail(user.email) === email);
+
+  if (existingUser) {
+    const roles = new Set([...(existingUser.roles || []), "admin", "member"]);
+    existingUser.roles = [...roles];
+    existingUser.updatedAt = new Date().toISOString();
+  } else {
+    store.authUsers.push({
+      id: crypto.randomUUID(),
+      email,
+      roles: ["admin", "member"],
+      passwordHash: hashPassword(initialAdminPassword),
+      createdAt: new Date().toISOString()
+    });
+  }
+
+  await writeStore(store);
+}
+
+async function requireMember(request, response, next) {
+  const user = await getRequestUser(request);
+  if (user?.roles?.includes("member") || user?.roles?.includes("admin")) {
+    request.authUser = user;
+    next();
+    return;
+  }
+
+  response.redirect("member-login.html");
+}
+
+async function getRequestUser(request) {
+  const token = getSessionToken(request);
+  if (!token) return null;
+
+  const store = await readStore();
+  const sessions = pruneSessions(store.authSessions);
+  if (sessions.length !== store.authSessions.length) {
+    store.authSessions = sessions;
+    await writeStore(store);
+  }
+
+  const tokenHash = hashToken(token);
+  const session = sessions.find((item) => item.tokenHash === tokenHash);
+  if (!session) return null;
+
+  return store.authUsers.find((user) => user.id === session.userId) || null;
+}
+
+function createSession(userId) {
+  const token = crypto.randomBytes(32).toString("base64url");
+  const expiresAt = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString();
+
+  return {
+    token,
+    record: {
+      id: crypto.randomUUID(),
+      userId,
+      tokenHash: hashToken(token),
+      createdAt: new Date().toISOString(),
+      expiresAt
+    }
+  };
+}
+
+function pruneSessions(sessions = []) {
+  const now = Date.now();
+  return sessions.filter((session) => Date.parse(session.expiresAt || "") > now);
+}
+
+function hashPassword(password) {
+  const salt = crypto.randomBytes(16).toString("hex");
+  const key = crypto.scryptSync(password, salt, 64).toString("hex");
+  return `scrypt:${salt}:${key}`;
+}
+
+async function verifyPassword(password, passwordHash = "") {
+  const [scheme, salt, key] = passwordHash.split(":");
+  if (scheme !== "scrypt" || !salt || !key) return false;
+
+  const testKey = crypto.scryptSync(password, salt, 64);
+  const savedKey = Buffer.from(key, "hex");
+  return savedKey.length === testKey.length && crypto.timingSafeEqual(savedKey, testKey);
+}
+
+function getSessionToken(request) {
+  const header = request.headers.authorization || "";
+  if (header.startsWith("Bearer ")) {
+    return header.slice("Bearer ".length).trim();
+  }
+
+  return parseCookies(request.headers.cookie || "").founders_session || "";
+}
+
+function hashToken(token) {
+  return crypto.createHmac("sha256", sessionSecret).update(token).digest("hex");
+}
+
+function publicUser(user) {
+  if (!user) return null;
+  return {
+    id: user.id,
+    email: user.email,
+    roles: user.roles || []
+  };
+}
+
+function normalizeEmail(email) {
+  return String(email || "").trim().toLowerCase();
+}
+
+function parseCookies(cookieHeader) {
+  return String(cookieHeader || "")
+    .split(";")
+    .map((cookie) => cookie.trim())
+    .filter(Boolean)
+    .reduce((cookies, cookie) => {
+      const separator = cookie.indexOf("=");
+      if (separator === -1) return cookies;
+      const key = decodeURIComponent(cookie.slice(0, separator));
+      const value = decodeURIComponent(cookie.slice(separator + 1));
+      cookies[key] = value;
+      return cookies;
+    }, {});
+}
+
+function cookieOptions() {
+  return {
+    httpOnly: true,
+    sameSite: "Lax",
+    secure: process.env.NODE_ENV === "production",
+    path: "/",
+    maxAge: 14 * 24 * 60 * 60 * 1000
+  };
+}
+
+function serializeCookie(name, value, options = {}) {
+  const cookieParts = [`${encodeURIComponent(name)}=${encodeURIComponent(value)}`];
+  if (options.maxAge !== undefined) cookieParts.push(`Max-Age=${Math.floor(options.maxAge / 1000)}`);
+  if (options.path) cookieParts.push(`Path=${options.path}`);
+  if (options.httpOnly) cookieParts.push("HttpOnly");
+  if (options.secure) cookieParts.push("Secure");
+  if (options.sameSite) cookieParts.push(`SameSite=${options.sameSite}`);
+  return cookieParts.join("; ");
 }
 
 function paymentFlowFileName(requestPath) {
@@ -415,7 +625,14 @@ async function getCryptoCompareUsdPrice(asset) {
   return Number(priceData?.USD) || null;
 }
 
-function requireAdmin(request, response, next) {
+async function requireAdmin(request, response, next) {
+  const user = await getRequestUser(request);
+  if (user?.roles?.includes("admin")) {
+    request.authUser = user;
+    next();
+    return;
+  }
+
   if (!adminPassword) {
     next();
     return;
