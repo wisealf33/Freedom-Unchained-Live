@@ -60,6 +60,9 @@ const quoteExpires = document.querySelector("#quote-expires");
 const quoteUsd = document.querySelector("#quote-usd");
 const quoteConfirmations = document.querySelector("#quote-confirmations");
 const paymentAmountText = document.querySelectorAll("[data-payment-amount]");
+const temporaryFoundersBackendUrl = "https://arrivals-quoted-thinking-conclusion.trycloudflare.com";
+const foundersBackendUrl = window.__FOUNDERS_BACKEND_URL__
+  || (["freedomunchained.life", "www.freedomunchained.life"].includes(location.hostname) ? temporaryFoundersBackendUrl : location.origin);
 const sharedKeys = [
   "foundersApplications",
   "alignmentCallRequests",
@@ -158,7 +161,7 @@ if (memberLoginForm) {
 
       localStorage.setItem("foundersAuthToken", result.token);
       memberLoginNote.textContent = "Login accepted. Opening the member portal.";
-      window.location.href = "member-dashboard.html";
+      window.location.href = backendPageUrl(new URLSearchParams(window.location.search).get("next") || "member-dashboard.html");
     } catch {
       memberLoginNote.textContent = "Member login needs the Founders Circle backend to be running.";
     }
@@ -1051,7 +1054,16 @@ function writeJson(key, value) {
 }
 
 function apiUrl(path) {
-  const url = new URL(path, window.location.href);
+  const baseUrl = location.protocol === "file:" ? window.location.href : foundersBackendUrl;
+  const url = new URL(path, baseUrl);
+  url.username = "";
+  url.password = "";
+  return url.toString();
+}
+
+function backendPageUrl(path = "index.html") {
+  if (location.protocol === "file:") return path;
+  const url = new URL(path, foundersBackendUrl);
   url.username = "";
   url.password = "";
   return url.toString();
