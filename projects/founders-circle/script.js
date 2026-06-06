@@ -3,6 +3,10 @@ const note = document.querySelector("#form-note");
 const memberLoginForm = document.querySelector("#member-login-form");
 const memberLoginNote = document.querySelector("#member-login-note");
 const memberDashboard = document.querySelector("#member-dashboard");
+const forgotPasswordForm = document.querySelector("#forgot-password-form");
+const forgotPasswordNote = document.querySelector("#forgot-password-note");
+const resetPasswordForm = document.querySelector("#reset-password-form");
+const resetPasswordNote = document.querySelector("#reset-password-note");
 const detailsForm = document.querySelector("#application-details-form");
 const detailsNote = document.querySelector("#details-note");
 const alignmentForm = document.querySelector("#alignment-call-form");
@@ -157,6 +161,75 @@ if (memberLoginForm) {
       window.location.href = "member-dashboard.html";
     } catch {
       memberLoginNote.textContent = "Member login needs the Founders Circle backend to be running.";
+    }
+  });
+}
+
+document.querySelectorAll("[data-password-toggle]").forEach((button) => {
+  button.addEventListener("click", () => {
+    const input = document.getElementById(button.dataset.passwordToggle);
+    if (!input) return;
+
+    const isPassword = input.type === "password";
+    input.type = isPassword ? "text" : "password";
+    button.setAttribute("aria-label", isPassword ? "Hide password" : "Show password");
+    button.classList.toggle("visible", isPassword);
+  });
+});
+
+if (forgotPasswordForm) {
+  forgotPasswordForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    try {
+      const response = await fetch(apiUrl("/founders-password-reset"), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(Object.fromEntries(new FormData(forgotPasswordForm).entries()))
+      });
+      const result = await response.json().catch(() => ({}));
+      forgotPasswordNote.textContent = result.message || "If an account exists for that email, a reset link will be prepared.";
+
+      if (result.resetUrl) {
+        forgotPasswordNote.innerHTML = `${escapeHtml(forgotPasswordNote.textContent)}<br><a href="${escapeHtml(result.resetUrl)}">Open local reset link</a>`;
+      }
+    } catch {
+      forgotPasswordNote.textContent = "Password reset needs the Founders Circle backend to be running.";
+    }
+  });
+}
+
+if (resetPasswordForm) {
+  resetPasswordForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get("token") || "";
+
+    if (!token) {
+      resetPasswordNote.textContent = "This reset link is missing its token.";
+      return;
+    }
+
+    try {
+      const response = await fetch(apiUrl("/founders-password-reset-confirm"), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          token,
+          password: new FormData(resetPasswordForm).get("password")
+        })
+      });
+      const result = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        resetPasswordNote.textContent = result.error || "Could not update this password.";
+        return;
+      }
+
+      resetPasswordNote.innerHTML = 'Password updated. <a href="member-login.html">Return to login</a>.';
+    } catch {
+      resetPasswordNote.textContent = "Password reset needs the Founders Circle backend to be running.";
     }
   });
 }

@@ -54,6 +54,8 @@ Set `INITIAL_ADMIN_EMAIL` and `INITIAL_ADMIN_PASSWORD` on the backend host befor
 
 After the account exists, the password hash is stored in the private data file. Treat the first password as temporary and rotate it after the real account-management screen exists.
 
+Member login and password reset require the Node backend. Static hosting can show the pages, but it cannot verify passwords, create sessions, or send reset links. The forgot-password flow creates a one-hour reset token in the private data store; email delivery still needs to be connected before production users can receive reset links automatically.
+
 ## SendFox funnel setup
 
 Recommended starting funnel:

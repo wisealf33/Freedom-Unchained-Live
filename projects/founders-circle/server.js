@@ -77,7 +77,8 @@ const initialStore = {
   foundersDateOverrides: {},
   paymentSessions: [],
   authUsers: [],
-  authSessions: []
+  authSessions: [],
+  passwordResets: []
 };
 
 app.use(express.json({ limit: "1mb" }));
@@ -172,6 +173,65 @@ app.post(["/api/logout", "/founders-logout"], async (request, response) => {
     await writeStore(store);
   }
   response.setHeader("Set-Cookie", serializeCookie("founders_session", "", { ...cookieOptions(), maxAge: 0 }));
+  response.json({ ok: true });
+});
+
+app.post(["/api/password-reset/request", "/founders-password-reset"], async (request, response) => {
+  const email = normalizeEmail(request.body.email);
+  if (!email) {
+    response.status(400).json({ error: "Email is required" });
+    return;
+  }
+
+  const store = await readStore();
+  store.passwordResets = prunePasswordResets(store.passwordResets);
+  const user = store.authUsers.find((item) => normalizeEmail(item.email) === email);
+  let resetUrl = "";
+
+  if (user) {
+    const reset = createPasswordReset(user.id);
+    store.passwordResets.push(reset.record);
+    resetUrl = `${request.protocol}://${request.get("host")}/reset-password.html?token=${encodeURIComponent(reset.token)}`;
+  }
+
+  await writeStore(store);
+  response.json({
+    ok: true,
+    message: "If an account exists for that email, a reset link will be prepared.",
+    resetUrl: process.env.NODE_ENV === "production" ? "" : resetUrl
+  });
+});
+
+app.post(["/api/password-reset/confirm", "/founders-password-reset-confirm"], async (request, response) => {
+  const token = String(request.body.token || "");
+  const password = String(request.body.password || "");
+
+  if (!token || password.length < 10) {
+    response.status(400).json({ error: "A reset token and a password of at least 10 characters are required." });
+    return;
+  }
+
+  const store = await readStore();
+  store.passwordResets = prunePasswordResets(store.passwordResets);
+  const tokenHash = hashToken(token);
+  const reset = store.passwordResets.find((item) => item.tokenHash === tokenHash);
+
+  if (!reset) {
+    response.status(400).json({ error: "This reset link is invalid or expired." });
+    return;
+  }
+
+  const user = store.authUsers.find((item) => item.id === reset.userId);
+  if (!user) {
+    response.status(400).json({ error: "This reset link is invalid or expired." });
+    return;
+  }
+
+  user.passwordHash = hashPassword(password);
+  user.passwordUpdatedAt = new Date().toISOString();
+  store.passwordResets = store.passwordResets.filter((item) => item.userId !== user.id);
+  store.authSessions = store.authSessions.filter((session) => session.userId !== user.id);
+  await writeStore(store);
   response.json({ ok: true });
 });
 
@@ -477,9 +537,30 @@ function createSession(userId) {
   };
 }
 
+function createPasswordReset(userId) {
+  const token = crypto.randomBytes(32).toString("base64url");
+  const expiresAt = new Date(Date.now() + 60 * 60 * 1000).toISOString();
+
+  return {
+    token,
+    record: {
+      id: crypto.randomUUID(),
+      userId,
+      tokenHash: hashToken(token),
+      createdAt: new Date().toISOString(),
+      expiresAt
+    }
+  };
+}
+
 function pruneSessions(sessions = []) {
   const now = Date.now();
   return sessions.filter((session) => Date.parse(session.expiresAt || "") > now);
+}
+
+function prunePasswordResets(resets = []) {
+  const now = Date.now();
+  return resets.filter((reset) => Date.parse(reset.expiresAt || "") > now);
 }
 
 function hashPassword(password) {

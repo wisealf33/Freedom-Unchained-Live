@@ -593,6 +593,49 @@ footer p {
   margin-top: 8px;
 }
 
+.password-field {
+  display: block;
+  position: relative;
+}
+
+.password-field input {
+  padding-right: 58px;
+}
+
+.password-toggle {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  color: var(--muted);
+  cursor: pointer;
+  display: flex;
+  height: 44px;
+  justify-content: center;
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px;
+}
+
+.password-toggle:hover,
+.password-toggle.visible {
+  color: var(--navy);
+}
+
+.password-toggle svg {
+  fill: currentColor;
+  height: 24px;
+  width: 24px;
+}
+
+.forgot-password-link {
+  color: var(--navy);
+  font-weight: 700;
+  justify-self: center;
+  margin-top: 4px;
+}
+
 .member-portal-actions {
   display: grid;
   gap: 24px;
