@@ -31,7 +31,7 @@ const sendFoxStageListIds = {
   declined: process.env.SENDFOX_DECLINED_LIST_ID || ""
 };
 const membershipFeeUsd = Number.parseFloat(process.env.MEMBERSHIP_FEE_USD || "33");
-const allowedOrigins = new Set([
+const defaultAllowedOrigins = [
   "https://freedomunchained.life",
   "https://www.freedomunchained.life",
   "https://founderscircle.freedomunchained.life",
@@ -44,7 +44,8 @@ const allowedOrigins = new Set([
   "http://localhost:5187",
   "http://localhost:5190",
   "http://localhost:5191"
-]);
+];
+const allowedOrigins = new Set(parseCsv(process.env.ALLOWED_ORIGINS || defaultAllowedOrigins.join(",")));
 
 const paymentProjects = {
   "founders-circle": {
@@ -847,6 +848,13 @@ function parseSendFoxListIds(value) {
     .split(",")
     .map((id) => Number.parseInt(id.trim(), 10))
     .filter(Number.isInteger);
+}
+
+function parseCsv(value) {
+  return String(value || "")
+    .split(",")
+    .map((item) => item.trim())
+    .filter(Boolean);
 }
 
 async function sendPasswordResetEmail({ to, resetUrl, resetId }) {

@@ -34,6 +34,7 @@ Set these environment variables on the host:
 - `INITIAL_ADMIN_PASSWORD`: temporary password for the first account. The backend stores only a salted hash in the private data store.
 - `DATA_DIR`: optional path for saved data. Use a persistent disk/path on the host.
 - `APP_BASE_URL`: the public Founders Circle backend URL used inside password reset emails, such as `https://founderscircle.freedomunchained.life`.
+- `ALLOWED_ORIGINS`: comma-separated websites allowed to call the backend, such as `https://freedomunchained.life,https://www.freedomunchained.life,https://founderscircle.freedomunchained.life`.
 - `RESEND_API_KEY`: optional Resend API key used for password reset emails.
 - `RESEND_EMAIL_FROM`: the verified sender for password reset emails, such as `Founders Circle <members@founderscircle.freedomunchained.life>`.
 - `RESEND_EMAIL_REPLY_TO`: optional reply-to address for password reset emails.
@@ -47,7 +48,7 @@ Set these environment variables on the host:
 
 The app stores applications, bookings, availability, accounts, sessions, and date overrides in `data/store.json` by default. Do not commit this file. Use a persistent private disk on the host.
 
-The backend also exposes `GET /healthz` for host health checks. Public calendar pages use `/founders-public-state`, which only returns availability and booked slot times. Full applicant, payment, and admin state is available through `/founders-state` only behind an admin login or the legacy admin password.
+The backend also exposes `GET /healthz` for host health checks. Public calendar pages use `/founders-public-state`, which only returns availability and booked slot times. Full applicant, payment, and admin state is available through `/founders-state` only behind an admin login or the legacy admin password. Use `ALLOWED_ORIGINS` when adding other websites that should be allowed to submit applications, create payment sessions, or use shared backend endpoints.
 
 ## First admin/member account
 

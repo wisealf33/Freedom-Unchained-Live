@@ -26,6 +26,8 @@ services:
         sync: false
       - key: APP_BASE_URL
         sync: false
+      - key: ALLOWED_ORIGINS
+        sync: false
       - key: RESEND_API_KEY
         sync: false
       - key: RESEND_EMAIL_FROM
