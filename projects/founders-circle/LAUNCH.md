@@ -33,6 +33,10 @@ Set these environment variables on the host:
 - `INITIAL_ADMIN_EMAIL`: the email for the first account. This first account receives both `admin` and `member` roles.
 - `INITIAL_ADMIN_PASSWORD`: temporary password for the first account. The backend stores only a salted hash in the private data store.
 - `DATA_DIR`: optional path for saved data. Use a persistent disk/path on the host.
+- `APP_BASE_URL`: the public Founders Circle backend URL used inside password reset emails, such as `https://founderscircle.freedomunchained.life`.
+- `RESEND_API_KEY`: optional Resend API key used for password reset emails.
+- `RESEND_EMAIL_FROM`: the verified sender for password reset emails, such as `Founders Circle <members@founderscircle.freedomunchained.life>`.
+- `RESEND_EMAIL_REPLY_TO`: optional reply-to address for password reset emails.
 - `SENDFOX_TOKEN`: optional SendFox personal access token. When set, new applications are added to SendFox.
 - `SENDFOX_APPLIED_LIST_ID`: optional SendFox list ID for people who complete the first application step. You can also use `SENDFOX_LIST_ID` if you only want one list for now.
 - `SENDFOX_DETAILS_LIST_ID`, `SENDFOX_CALL_BOOKED_LIST_ID`, `SENDFOX_APPROVED_LIST_ID`, `SENDFOX_PMA_SENT_LIST_ID`, `SENDFOX_PAYMENT_LIST_ID`, `SENDFOX_MEMBER_LIST_ID`, `SENDFOX_DECLINED_LIST_ID`: optional stage-specific lists for SendFox automations.
@@ -54,7 +58,20 @@ Set `INITIAL_ADMIN_EMAIL` and `INITIAL_ADMIN_PASSWORD` on the backend host befor
 
 After the account exists, the password hash is stored in the private data file. Treat the first password as temporary and rotate it after the real account-management screen exists.
 
-Member login and password reset require the Node backend. Static hosting can show the pages, but it cannot verify passwords, create sessions, or send reset links. The forgot-password flow creates a one-hour reset token in the private data store; email delivery still needs to be connected before production users can receive reset links automatically.
+Member login and password reset require the Node backend. Static hosting can show the pages, but it cannot verify passwords, create sessions, or send reset links. The forgot-password flow creates a one-hour reset token in the private data store. When `RESEND_API_KEY` and `RESEND_EMAIL_FROM` are set, the backend sends the reset link through Resend.
+
+## Resend password reset setup
+
+Use Resend for transactional emails like password reset links. SendFox still handles funnel/list automations; Resend handles direct system emails.
+
+1. Verify the sending domain in Resend.
+2. Create a Resend API key.
+3. Set `RESEND_API_KEY` on the backend host.
+4. Set `RESEND_EMAIL_FROM` to an address on the verified domain, for example `Founders Circle <members@founderscircle.freedomunchained.life>`.
+5. Set `APP_BASE_URL` to the public backend URL where the reset page actually loads.
+6. Restart/redeploy the backend after adding these values.
+
+The reset endpoint always returns a generic message to visitors. In production it does not expose the reset link in the browser response; the link is only sent through email.
 
 ## SendFox funnel setup
 

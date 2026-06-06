@@ -14,6 +14,10 @@ const adminPassword = process.env.ADMIN_PASSWORD || "";
 const sessionSecret = process.env.SESSION_SECRET || "dev-founders-circle-session-secret";
 const initialAdminEmail = process.env.INITIAL_ADMIN_EMAIL || "";
 const initialAdminPassword = process.env.INITIAL_ADMIN_PASSWORD || "";
+const appBaseUrl = process.env.APP_BASE_URL || "";
+const resendApiKey = process.env.RESEND_API_KEY || "";
+const resendEmailFrom = process.env.RESEND_EMAIL_FROM || process.env.EMAIL_FROM || "";
+const resendEmailReplyTo = process.env.RESEND_EMAIL_REPLY_TO || process.env.EMAIL_REPLY_TO || "";
 const sendFoxToken = process.env.SENDFOX_TOKEN || "";
 const sendFoxAppliedListId = process.env.SENDFOX_APPLIED_LIST_ID || process.env.SENDFOX_LIST_ID || "";
 const sendFoxStageListIds = {
@@ -191,7 +195,12 @@ app.post(["/api/password-reset/request", "/founders-password-reset"], async (req
   if (user) {
     const reset = createPasswordReset(user.id);
     store.passwordResets.push(reset.record);
-    resetUrl = `${request.protocol}://${request.get("host")}/reset-password.html?token=${encodeURIComponent(reset.token)}`;
+    resetUrl = `${requestBaseUrl(request)}/reset-password.html?token=${encodeURIComponent(reset.token)}`;
+    reset.record.emailDelivery = await sendPasswordResetEmail({
+      to: user.email,
+      resetUrl,
+      resetId: reset.record.id
+    });
   }
 
   await writeStore(store);
@@ -808,4 +817,107 @@ function parseSendFoxListIds(value) {
     .split(",")
     .map((id) => Number.parseInt(id.trim(), 10))
     .filter(Number.isInteger);
+}
+
+async function sendPasswordResetEmail({ to, resetUrl, resetId }) {
+  if (!resendApiKey || !resendEmailFrom) {
+    return {
+      sent: false,
+      reason: "resend-not-configured",
+      attemptedAt: new Date().toISOString()
+    };
+  }
+
+  const payload = {
+    from: resendEmailFrom,
+    to: [to],
+    subject: "Reset your Founders' Circle password",
+    html: passwordResetEmailHtml(resetUrl),
+    text: passwordResetEmailText(resetUrl)
+  };
+
+  if (resendEmailReplyTo) {
+    payload.reply_to = resendEmailReplyTo;
+  }
+
+  try {
+    const resendResponse = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${resendApiKey}`,
+        "Content-Type": "application/json",
+        "Idempotency-Key": `founders-password-reset-${resetId}`
+      },
+      body: JSON.stringify(payload)
+    });
+
+    if (resendResponse.ok) {
+      const data = await resendResponse.json();
+      return {
+        sent: true,
+        resendId: data.id || null,
+        sentAt: new Date().toISOString()
+      };
+    }
+
+    return {
+      sent: false,
+      status: resendResponse.status,
+      message: await resendResponse.text(),
+      attemptedAt: new Date().toISOString()
+    };
+  } catch (error) {
+    return {
+      sent: false,
+      message: error.message,
+      attemptedAt: new Date().toISOString()
+    };
+  }
+}
+
+function requestBaseUrl(request) {
+  if (appBaseUrl) {
+    return appBaseUrl.replace(/\/+$/, "");
+  }
+
+  const forwardedProtocol = String(request.headers["x-forwarded-proto"] || "").split(",")[0].trim();
+  const protocol = forwardedProtocol || request.protocol;
+  return `${protocol}://${request.get("host")}`;
+}
+
+function passwordResetEmailHtml(resetUrl) {
+  const safeResetUrl = escapeHtml(resetUrl);
+  return `
+    <div style="font-family: Arial, sans-serif; color: #2d2d2f; line-height: 1.5;">
+      <h1 style="color: #070d66;">Reset your Founders' Circle password</h1>
+      <p>Use the button below to choose a new password. This link expires in one hour.</p>
+      <p>
+        <a href="${safeResetUrl}" style="display: inline-block; background: #adfb72; color: #222; padding: 14px 22px; border-radius: 6px; text-decoration: none; font-weight: 700;">
+          Reset password
+        </a>
+      </p>
+      <p>If you did not request this, you can ignore this email.</p>
+      <p style="font-size: 13px; color: #666;">If the button does not work, open this link: ${safeResetUrl}</p>
+    </div>
+  `;
+}
+
+function passwordResetEmailText(resetUrl) {
+  return [
+    "Reset your Founders' Circle password",
+    "",
+    "Use this link to choose a new password. It expires in one hour:",
+    resetUrl,
+    "",
+    "If you did not request this, you can ignore this email."
+  ].join("\n");
+}
+
+function escapeHtml(value) {
+  return String(value || "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
 }

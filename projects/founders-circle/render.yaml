@@ -24,6 +24,14 @@ services:
         sync: false
       - key: INITIAL_ADMIN_PASSWORD
         sync: false
+      - key: APP_BASE_URL
+        sync: false
+      - key: RESEND_API_KEY
+        sync: false
+      - key: RESEND_EMAIL_FROM
+        sync: false
+      - key: RESEND_EMAIL_REPLY_TO
+        sync: false
       - key: SENDFOX_TOKEN
         sync: false
       - key: SENDFOX_APPLIED_LIST_ID
