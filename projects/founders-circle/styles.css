@@ -573,9 +573,9 @@ footer p {
 }
 
 .member-login-logo {
-  color: var(--bright);
   display: inline-block;
   margin-bottom: 34px;
+  position: static;
   text-decoration: none;
 }
 
