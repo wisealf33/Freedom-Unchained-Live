@@ -161,6 +161,14 @@ app.get(["/api/state", "/founders-state"], requireAdmin, async (_request, respon
   response.json(await readStore());
 });
 
+app.get(["/api/export", "/founders-export"], requireAdmin, async (_request, response) => {
+  const store = await readStore();
+  const exportData = migrationExportState(store);
+  response.setHeader("Content-Type", "application/json");
+  response.setHeader("Content-Disposition", `attachment; filename="founders-circle-export-${new Date().toISOString().slice(0, 10)}.json"`);
+  response.json(exportData);
+});
+
 app.get(["/api/public-state", "/founders-public-state"], async (_request, response) => {
   const store = await readStore();
   response.json(publicStoreState(store));
@@ -495,6 +503,19 @@ async function renderPageWithState(fileName, extraState = {}, includePrivateStat
 
 function adminStoreState(store) {
   return {
+    foundersApplications: store.foundersApplications,
+    alignmentCallRequests: store.alignmentCallRequests,
+    foundersAvailability: store.foundersAvailability,
+    foundersAvailabilityVersion: store.foundersAvailabilityVersion,
+    foundersDateOverrides: store.foundersDateOverrides,
+    paymentSessions: store.paymentSessions,
+    authUsers: store.authUsers.map(publicUser)
+  };
+}
+
+function migrationExportState(store) {
+  return {
+    exportedAt: new Date().toISOString(),
     foundersApplications: store.foundersApplications,
     alignmentCallRequests: store.alignmentCallRequests,
     foundersAvailability: store.foundersAvailability,
