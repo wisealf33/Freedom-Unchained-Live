@@ -561,6 +561,38 @@ footer p {
   padding: clamp(42px, 6vw, 64px) clamp(26px, 7vw, 80px);
 }
 
+.member-login-section {
+  align-items: center;
+  display: flex;
+  min-height: 100vh;
+  padding-top: 80px;
+}
+
+.member-login-card {
+  max-width: 680px;
+}
+
+.member-login-logo {
+  color: var(--bright);
+  display: inline-block;
+  margin-bottom: 34px;
+  text-decoration: none;
+}
+
+.member-login-card .application-intro h1 {
+  color: var(--navy);
+  font-size: clamp(42px, 6vw, 58px);
+  line-height: 1;
+}
+
+.member-login-form {
+  margin-top: 34px;
+}
+
+.member-login-button {
+  margin-top: 8px;
+}
+
 .application-intro {
   text-align: center;
 }

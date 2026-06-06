@@ -1,5 +1,7 @@
 const form = document.querySelector("#founders-application");
 const note = document.querySelector("#form-note");
+const memberLoginForm = document.querySelector("#member-login-form");
+const memberLoginNote = document.querySelector("#member-login-note");
 const detailsForm = document.querySelector("#application-details-form");
 const detailsNote = document.querySelector("#details-note");
 const alignmentForm = document.querySelector("#alignment-call-form");
@@ -129,6 +131,13 @@ if (form) {
     } catch {
       note.textContent = "The application could not be submitted. Make sure the local Founders Circle server is running, then try again.";
     }
+  });
+}
+
+if (memberLoginForm) {
+  memberLoginForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    memberLoginNote.textContent = "Member account access is not activated yet. Accepted members will receive login instructions when the private portal is ready.";
   });
 }
 
