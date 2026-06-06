@@ -63,6 +63,7 @@ const paymentAmountText = document.querySelectorAll("[data-payment-amount]");
 const temporaryFoundersBackendUrl = "https://arrivals-quoted-thinking-conclusion.trycloudflare.com";
 const foundersBackendUrl = window.__FOUNDERS_BACKEND_URL__
   || (["freedomunchained.life", "www.freedomunchained.life"].includes(location.hostname) ? temporaryFoundersBackendUrl : location.origin);
+const isStaticFreedomUnchainedHost = ["freedomunchained.life", "www.freedomunchained.life"].includes(location.hostname);
 const sharedKeys = [
   "foundersApplications",
   "alignmentCallRequests",
@@ -114,6 +115,11 @@ adminVisibleMonth.setDate(1);
 let selectedDate = "";
 let selectedTime = "";
 let activePaymentContext = null;
+
+if (isStaticFreedomUnchainedHost && isBackendOnlyPage()) {
+  const pageName = location.pathname.split("/").filter(Boolean).pop() || "member-login.html";
+  window.location.replace(backendPageUrl(`${pageName}${location.search}`));
+}
 
 upgradeSavedAvailability();
 syncFromServer().then(() => {
@@ -1067,6 +1073,18 @@ function backendPageUrl(path = "index.html") {
   url.username = "";
   url.password = "";
   return url.toString();
+}
+
+function isBackendOnlyPage() {
+  return Boolean(
+    memberLoginForm
+    || forgotPasswordForm
+    || resetPasswordForm
+    || memberDashboard
+    || applicantList
+    || availabilityForm
+    || paymentSessionList
+  );
 }
 
 function renderApplicantDashboard(selectedId = readJson("selectedApplicantId", "")) {
