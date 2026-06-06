@@ -36,6 +36,11 @@
         <div class="payment-session-list" id="payment-session-list"></div>
       </section>
     </main>
+    <script>
+      if (!window.__FOUNDERS_INITIAL_STATE__ && location.protocol !== "file:") {
+        location.replace("member-login.html?next=admin-payments.html");
+      }
+    </script>
     <script src="script.js"></script>
   </body>
 </html>
