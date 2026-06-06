@@ -726,18 +726,18 @@ async function requireAdmin(request, response, next) {
     return;
   }
 
-  if (!adminPassword) {
-    next();
-    return;
-  }
-
   const header = request.headers.authorization || "";
   const [scheme, encoded] = header.split(" ");
   const credentials = encoded ? Buffer.from(encoded, "base64").toString("utf8") : "";
   const [, password] = credentials.split(":");
 
-  if (scheme === "Basic" && password === adminPassword) {
+  if (adminPassword && scheme === "Basic" && password === adminPassword) {
     next();
+    return;
+  }
+
+  if (request.accepts("html")) {
+    response.redirect("member-login.html");
     return;
   }
 
