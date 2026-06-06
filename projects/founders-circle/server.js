@@ -447,10 +447,22 @@ async function ensureStore() {
 async function renderPageWithState(fileName, extraState = {}, includePrivateState = true) {
   const html = await readFile(path.join(__dirname, fileName), "utf8");
   const store = await readStore();
-  const state = includePrivateState ? store : publicStoreState(store);
+  const state = includePrivateState ? adminStoreState(store) : publicStoreState(store);
   Object.assign(state, extraState);
   const stateScript = `<script>window.__FOUNDERS_INITIAL_STATE__ = ${JSON.stringify(state).replaceAll("<", "\\u003c")};</script>`;
   return html.replace('<script src="script.js"></script>', `${stateScript}\n    <script src="script.js"></script>`);
+}
+
+function adminStoreState(store) {
+  return {
+    foundersApplications: store.foundersApplications,
+    alignmentCallRequests: store.alignmentCallRequests,
+    foundersAvailability: store.foundersAvailability,
+    foundersAvailabilityVersion: store.foundersAvailabilityVersion,
+    foundersDateOverrides: store.foundersDateOverrides,
+    paymentSessions: store.paymentSessions,
+    authUsers: store.authUsers.map(publicUser)
+  };
 }
 
 function publicStoreState(store) {
