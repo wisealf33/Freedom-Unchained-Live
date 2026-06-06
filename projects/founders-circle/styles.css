@@ -331,6 +331,8 @@ footer p {
 
 .steps h3 {
   display: inline-block;
+  line-height: 1.15;
+  max-width: calc(100% - 92px);
   vertical-align: middle;
 }
 
