@@ -316,6 +316,7 @@ if (alignmentForm) {
       firstName: applicantForBooking.firstName,
       lastName: applicantForBooking.lastName,
       email: applicantForBooking.email,
+      phone: applicantForBooking.phone,
       details: applicantForBooking.details || {},
       selectedDate: selectedDateInput.value,
       selectedTime: selectedTimeInput.value,
@@ -1211,6 +1212,7 @@ function renderApplicantDetail(application, bookings) {
         <p class="section-kicker">Applicant</p>
         <h2>${escapeHtml(getApplicantName(application))}</h2>
         <a href="mailto:${escapeHtml(application.email || "")}">${escapeHtml(application.email || "No email")}</a>
+        ${application.phone ? `<a href="tel:${escapeHtml(application.phone)}">${escapeHtml(application.phone)}</a>` : ""}
       </div>
       <span class="stage-pill">${escapeHtml(getStageLabel(stage))}</span>
     </div>
@@ -1233,6 +1235,7 @@ function renderApplicantDetail(application, bookings) {
         <h3>Application</h3>
         <dl>
           <div><dt>Submitted</dt><dd>${escapeHtml(formatDateTime(application.submittedAt))}</dd></div>
+          <div><dt>Phone</dt><dd>${escapeHtml(application.phone || "Not provided")}</dd></div>
           <div><dt>Details</dt><dd>${escapeHtml(application.detailsSubmittedAt ? formatDateTime(application.detailsSubmittedAt) : "Not completed")}</dd></div>
           <div><dt>SendFox</dt><dd>${escapeHtml(formatSendFoxStatus(application.sendFox))}</dd></div>
           <div><dt>PMA</dt><dd>${escapeHtml(formatPmaStatus(application.pma))}</dd></div>

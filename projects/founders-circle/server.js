@@ -387,12 +387,23 @@ app.patch(["/api/payment-sessions/:id", "/payment-sessions/:id"], async (request
 });
 
 app.post(["/api/applications", "/founders-applications"], async (request, response) => {
+  const firstName = String(request.body.firstName || "").trim();
+  const lastName = String(request.body.lastName || "").trim();
+  const email = normalizeEmail(request.body.email);
+  const phone = normalizePhone(request.body.phone);
+
+  if (!firstName || !lastName || !email || !phone) {
+    response.status(400).json({ error: "First name, last name, email, and phone number are required." });
+    return;
+  }
+
   const store = await readStore();
   const application = {
     id: crypto.randomUUID(),
-    firstName: request.body.firstName || "",
-    lastName: request.body.lastName || "",
-    email: request.body.email || "",
+    firstName,
+    lastName,
+    email,
+    phone,
     submittedAt: new Date().toISOString()
   };
 
@@ -675,6 +686,10 @@ function publicUser(user) {
 
 function normalizeEmail(email) {
   return String(email || "").trim().toLowerCase();
+}
+
+function normalizePhone(phone) {
+  return String(phone || "").trim();
 }
 
 function parseCookies(cookieHeader) {
