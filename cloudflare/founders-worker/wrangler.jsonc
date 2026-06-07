@@ -1,0 +1,13 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "founders-circle-backend",
+  "main": "src/index.js",
+  "compatibility_date": "2026-06-07",
+  "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": true,
+  "vars": {
+    "ORIGIN_BASE_URL": "https://freedomunchained.life/projects/founders-circle",
+    "APP_BASE_URL": "https://freedomunchained.life/projects/founders-circle",
+    "ALLOWED_ORIGINS": "https://freedomunchained.life,https://www.freedomunchained.life,https://founderscircle.freedomunchained.life"
+  }
+}

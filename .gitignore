@@ -4,3 +4,8 @@ node_modules/
 **/node_modules/
 projects/founders-circle/data/
 payments/data/
+.dev.vars
+**/.dev.vars
+
+.wrangler/
+**/.wrangler/
