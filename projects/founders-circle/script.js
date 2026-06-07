@@ -60,7 +60,7 @@ const quoteExpires = document.querySelector("#quote-expires");
 const quoteUsd = document.querySelector("#quote-usd");
 const quoteConfirmations = document.querySelector("#quote-confirmations");
 const paymentAmountText = document.querySelectorAll("[data-payment-amount]");
-const temporaryFoundersBackendUrl = "https://arrivals-quoted-thinking-conclusion.trycloudflare.com";
+const temporaryFoundersBackendUrl = "https://epic-interesting-utilization-therapy.trycloudflare.com";
 const foundersBackendUrl = window.__FOUNDERS_BACKEND_URL__
   || (["freedomunchained.life", "www.freedomunchained.life"].includes(location.hostname) ? temporaryFoundersBackendUrl : location.origin);
 const isStaticFreedomUnchainedHost = ["freedomunchained.life", "www.freedomunchained.life"].includes(location.hostname);
