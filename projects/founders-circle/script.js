@@ -61,9 +61,10 @@ const quoteUsd = document.querySelector("#quote-usd");
 const quoteConfirmations = document.querySelector("#quote-confirmations");
 const paymentAmountText = document.querySelectorAll("[data-payment-amount]");
 const temporaryFoundersBackendUrl = "https://epic-interesting-utilization-therapy.trycloudflare.com";
+const permanentFoundersBackendPath = "/api/founders";
 const foundersBackendUrl = window.__FOUNDERS_BACKEND_URL__
-  || (["freedomunchained.life", "www.freedomunchained.life"].includes(location.hostname) ? temporaryFoundersBackendUrl : location.origin);
-const isStaticFreedomUnchainedHost = ["freedomunchained.life", "www.freedomunchained.life"].includes(location.hostname);
+  || (["freedomunchained.life", "www.freedomunchained.life", "founderscircle.freedomunchained.life"].includes(location.hostname) ? temporaryFoundersBackendUrl : location.origin);
+const isStaticFreedomUnchainedHost = ["freedomunchained.life", "www.freedomunchained.life", "founderscircle.freedomunchained.life"].includes(location.hostname);
 const sharedKeys = [
   "foundersApplications",
   "alignmentCallRequests",
@@ -1061,16 +1062,20 @@ function writeJson(key, value) {
 }
 
 function apiUrl(path) {
-  const baseUrl = location.protocol === "file:" ? window.location.href : foundersBackendUrl;
-  const url = new URL(path, baseUrl);
-  url.username = "";
-  url.password = "";
-  return url.toString();
+  return buildBackendUrl(path);
 }
 
 function backendPageUrl(path = "index.html") {
   if (location.protocol === "file:") return path;
-  const url = new URL(path, foundersBackendUrl);
+  return buildBackendUrl(path);
+}
+
+function buildBackendUrl(path = "") {
+  const cleanPath = String(path || "").replace(/^\/+/, "");
+  const baseUrl = location.protocol === "file:" ? window.location.href : foundersBackendUrl;
+  const url = new URL(baseUrl, location.origin);
+  const basePath = url.pathname.replace(/\/+$/, "");
+  url.pathname = basePath && basePath !== "/" ? `${basePath}/${cleanPath}` : `/${cleanPath}`;
   url.username = "";
   url.password = "";
   return url.toString();

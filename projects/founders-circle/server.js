@@ -19,6 +19,9 @@ const resendApiKey = process.env.RESEND_API_KEY || "";
 const resendEmailFrom = process.env.RESEND_EMAIL_FROM || process.env.EMAIL_FROM || "";
 const resendEmailReplyTo = process.env.RESEND_EMAIL_REPLY_TO || process.env.EMAIL_REPLY_TO || "";
 const sendFoxToken = process.env.SENDFOX_TOKEN || "";
+const supabaseProjectUrl = process.env.SUPABASE_PROJECT_URL || "";
+const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
+const useSupabaseStore = Boolean(supabaseProjectUrl && supabaseServiceRoleKey);
 const sendFoxAppliedListId = process.env.SENDFOX_APPLIED_LIST_ID || process.env.SENDFOX_LIST_ID || "";
 const sendFoxStageListIds = {
   applied: sendFoxAppliedListId,
@@ -167,6 +170,18 @@ app.get(["/api/export", "/founders-export"], requireAdmin, async (_request, resp
   response.setHeader("Content-Type", "application/json");
   response.setHeader("Content-Disposition", `attachment; filename="founders-circle-export-${new Date().toISOString().slice(0, 10)}.json"`);
   response.json(exportData);
+});
+
+app.post(["/api/import", "/founders-import"], requireAdmin, async (request, response) => {
+  const nextStore = sanitizeImportedStore(request.body || {});
+  await writeStore(nextStore);
+  response.json({
+    ok: true,
+    applications: nextStore.foundersApplications.length,
+    bookings: nextStore.alignmentCallRequests.length,
+    authUsers: nextStore.authUsers.length,
+    paymentSessions: nextStore.paymentSessions.length
+  });
 });
 
 app.get(["/api/public-state", "/founders-public-state"], async (_request, response) => {
@@ -482,16 +497,29 @@ app.post(["/api/bookings", "/founders-bookings"], async (request, response) => {
   response.status(201).json(booking);
 });
 
-app.listen(port, () => {
-  console.log(`Founders' Circle running on port ${port}`);
-});
+if (process.argv[1] === fileURLToPath(import.meta.url) && process.env.VERCEL !== "1") {
+  app.listen(port, () => {
+    console.log(`Founders' Circle running on port ${port}`);
+  });
+}
+
+export default app;
 
 async function readStore() {
+  if (useSupabaseStore) {
+    return readSupabaseStore();
+  }
+
   await ensureStore();
   return { ...initialStore, ...JSON.parse(await readFile(storePath, "utf8")) };
 }
 
 async function writeStore(store) {
+  if (useSupabaseStore) {
+    await writeSupabaseStore({ ...initialStore, ...store });
+    return;
+  }
+
   await mkdir(dataDir, { recursive: true });
   await writeFile(storePath, JSON.stringify({ ...initialStore, ...store }, null, 2));
 }
@@ -501,6 +529,328 @@ async function ensureStore() {
   if (!existsSync(storePath)) {
     await writeStore(initialStore);
   }
+}
+
+async function readSupabaseStore() {
+  const [
+    applications,
+    bookings,
+    availabilityRows,
+    overrideRows,
+    paymentSessions,
+    authUsers,
+    authSessions,
+    passwordResets
+  ] = await Promise.all([
+    supabaseSelect("founders_applications", "submitted_at.desc"),
+    supabaseSelect("founders_bookings", "requested_at.desc"),
+    supabaseSelect("founders_availability"),
+    supabaseSelect("founders_date_overrides", "date_key.asc"),
+    supabaseSelect("founders_payment_sessions", "created_at.desc"),
+    supabaseSelect("founders_auth_users", "created_at.asc"),
+    supabaseSelect("founders_auth_sessions", "created_at.asc"),
+    supabaseSelect("founders_password_resets", "created_at.asc")
+  ]);
+
+  const availabilityRow = availabilityRows.find((row) => row.id === "default") || availabilityRows[0] || null;
+
+  return {
+    ...initialStore,
+    foundersApplications: applications.map(applicationFromRow),
+    alignmentCallRequests: bookings.map(bookingFromRow),
+    foundersAvailability: availabilityRow?.availability || null,
+    foundersAvailabilityVersion: availabilityRow?.version || 2,
+    foundersDateOverrides: overrideRows.reduce((overrides, row) => {
+      overrides[row.date_key] = row.override || {};
+      return overrides;
+    }, {}),
+    paymentSessions: paymentSessions.map(paymentSessionFromRow),
+    authUsers: authUsers.map(authUserFromRow),
+    authSessions: authSessions.map(authSessionFromRow),
+    passwordResets: passwordResets.map(passwordResetFromRow)
+  };
+}
+
+async function writeSupabaseStore(store) {
+  await syncSupabaseTable("founders_auth_users", "id", store.authUsers.map(authUserToRow));
+
+  await Promise.all([
+    syncSupabaseTable("founders_applications", "id", store.foundersApplications.map(applicationToRow)),
+    syncSupabaseTable("founders_date_overrides", "date_key", Object.entries(store.foundersDateOverrides || {}).map(([dateKey, override]) => ({
+      date_key: dateKey,
+      override: override || {},
+      updated_at: new Date().toISOString()
+    }))),
+    syncSupabaseTable("founders_payment_sessions", "id", store.paymentSessions.map(paymentSessionToRow)),
+    syncSupabaseTable("founders_auth_sessions", "id", store.authSessions.map(authSessionToRow)),
+    syncSupabaseTable("founders_password_resets", "id", store.passwordResets.map(passwordResetToRow))
+  ]);
+
+  await syncSupabaseTable("founders_bookings", "id", store.alignmentCallRequests.map(bookingToRow));
+
+  await supabaseUpsert("founders_availability", [{
+    id: "default",
+    availability: store.foundersAvailability || {},
+    version: store.foundersAvailabilityVersion || 2,
+    updated_at: new Date().toISOString()
+  }], "id");
+}
+
+async function syncSupabaseTable(tableName, primaryKey, rows) {
+  const currentRows = await supabaseSelect(tableName);
+  const nextIds = new Set(rows.map((row) => String(row[primaryKey])));
+  const deletedIds = currentRows
+    .map((row) => row[primaryKey])
+    .filter((id) => id !== null && id !== undefined && !nextIds.has(String(id)));
+
+  await Promise.all(deletedIds.map((id) => supabaseDelete(tableName, primaryKey, id)));
+
+  if (rows.length) {
+    await supabaseUpsert(tableName, rows, primaryKey);
+  }
+}
+
+async function supabaseSelect(tableName, order = "") {
+  const params = new URLSearchParams({ select: "*" });
+  if (order) params.set("order", order);
+  return supabaseRequest(tableName, { query: params });
+}
+
+async function supabaseUpsert(tableName, rows, conflictColumn) {
+  return supabaseRequest(tableName, {
+    method: "POST",
+    query: new URLSearchParams({ on_conflict: conflictColumn }),
+    headers: { Prefer: "resolution=merge-duplicates,return=minimal" },
+    body: rows
+  });
+}
+
+async function supabaseDelete(tableName, column, value) {
+  const params = new URLSearchParams();
+  params.set(column, `eq.${value}`);
+  await supabaseRequest(tableName, {
+    method: "DELETE",
+    query: params,
+    headers: { Prefer: "return=minimal" }
+  });
+}
+
+async function supabaseRequest(tableName, options = {}) {
+  const baseUrl = supabaseProjectUrl.replace(/\/+$/, "");
+  const query = options.query ? `?${options.query.toString()}` : "";
+  const response = await fetch(`${baseUrl}/rest/v1/${tableName}${query}`, {
+    method: options.method || "GET",
+    headers: {
+      "apikey": supabaseServiceRoleKey,
+      "Authorization": `Bearer ${supabaseServiceRoleKey}`,
+      "Content-Type": "application/json",
+      "Accept": "application/json",
+      ...(options.headers || {})
+    },
+    body: options.body ? JSON.stringify(options.body) : undefined
+  });
+
+  if (!response.ok) {
+    const message = await response.text();
+    throw new Error(`Supabase ${tableName} ${response.status}: ${message}`);
+  }
+
+  if (response.status === 204) {
+    return [];
+  }
+
+  const text = await response.text();
+  return text ? JSON.parse(text) : [];
+}
+
+function applicationToRow(application) {
+  const sendfox = {};
+  if (application.sendFox) sendfox.initial = application.sendFox;
+  if (application.sendFoxStages) sendfox.stages = application.sendFoxStages;
+
+  return {
+    id: application.id,
+    first_name: application.firstName || "",
+    last_name: application.lastName || "",
+    email: application.email || "",
+    phone: application.phone || "",
+    stage: application.stage || "applied",
+    details: application.details || {},
+    pma: application.pma || {},
+    payment: application.payment || {},
+    sendfox,
+    submitted_at: application.submittedAt || application.createdAt || new Date().toISOString(),
+    details_submitted_at: application.detailsSubmittedAt || null,
+    latest_booking_id: application.latestBookingId || null,
+    latest_booking_at: application.latestBookingAt || null,
+    stage_updated_at: application.stageUpdatedAt || null,
+    created_at: application.createdAt || application.submittedAt || new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  };
+}
+
+function applicationFromRow(row) {
+  const sendfox = row.sendfox || {};
+  return {
+    id: row.id,
+    firstName: row.first_name,
+    lastName: row.last_name,
+    email: row.email,
+    phone: row.phone,
+    stage: row.stage,
+    details: row.details || {},
+    pma: row.pma || {},
+    payment: row.payment || {},
+    sendFox: sendfox.initial || null,
+    sendFoxStages: sendfox.stages || {},
+    submittedAt: row.submitted_at,
+    detailsSubmittedAt: row.details_submitted_at,
+    latestBookingId: row.latest_booking_id,
+    latestBookingAt: row.latest_booking_at,
+    stageUpdatedAt: row.stage_updated_at,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at
+  };
+}
+
+function bookingToRow(booking) {
+  return {
+    id: booking.id,
+    applicant_id: booking.applicantId || null,
+    first_name: booking.firstName || "",
+    last_name: booking.lastName || "",
+    email: booking.email || "",
+    phone: booking.phone || "",
+    details: booking.details || {},
+    selected_date: booking.selectedDate,
+    selected_time: booking.selectedTime,
+    requested_at: booking.requestedAt || new Date().toISOString(),
+    created_at: booking.createdAt || booking.requestedAt || new Date().toISOString()
+  };
+}
+
+function bookingFromRow(row) {
+  return {
+    id: row.id,
+    applicantId: row.applicant_id,
+    firstName: row.first_name,
+    lastName: row.last_name,
+    email: row.email,
+    phone: row.phone,
+    details: row.details || {},
+    selectedDate: row.selected_date,
+    selectedTime: row.selected_time,
+    requestedAt: row.requested_at,
+    createdAt: row.created_at
+  };
+}
+
+function paymentSessionToRow(session) {
+  return {
+    id: session.id,
+    project: session.projectKey || session.project || "",
+    purpose: session.purpose || "",
+    amount_usd: session.amountUsd || null,
+    reference_id: session.referenceId || "",
+    payer_name: session.payerName || "",
+    payer_email: session.payerEmail || "",
+    destination: session.destination || "",
+    status: session.status || "created",
+    method: session.method || "",
+    crypto: session.crypto || {},
+    bridge_bucks: session.bridgeBucks || {},
+    raw: session,
+    created_at: session.createdAt || new Date().toISOString(),
+    updated_at: session.updatedAt || null
+  };
+}
+
+function paymentSessionFromRow(row) {
+  return {
+    ...(row.raw || {}),
+    id: row.id,
+    projectKey: row.project || row.raw?.projectKey,
+    purpose: row.purpose || row.raw?.purpose,
+    amountUsd: row.amount_usd === null ? row.raw?.amountUsd : Number(row.amount_usd),
+    referenceId: row.reference_id || row.raw?.referenceId,
+    payerName: row.payer_name || row.raw?.payerName,
+    payerEmail: row.payer_email || row.raw?.payerEmail,
+    destination: row.destination || row.raw?.destination,
+    status: row.status || row.raw?.status,
+    method: row.method || row.raw?.method,
+    crypto: row.crypto || row.raw?.crypto || {},
+    bridgeBucks: row.bridge_bucks || row.raw?.bridgeBucks || {},
+    createdAt: row.created_at || row.raw?.createdAt,
+    updatedAt: row.updated_at || row.raw?.updatedAt
+  };
+}
+
+function authUserToRow(user) {
+  return {
+    id: user.id,
+    email: user.email,
+    roles: user.roles || ["member"],
+    password_hash: user.passwordHash,
+    created_at: user.createdAt || new Date().toISOString(),
+    updated_at: user.updatedAt || null,
+    last_login_at: user.lastLoginAt || null,
+    password_updated_at: user.passwordUpdatedAt || null
+  };
+}
+
+function authUserFromRow(row) {
+  return {
+    id: row.id,
+    email: row.email,
+    roles: row.roles || ["member"],
+    passwordHash: row.password_hash,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+    lastLoginAt: row.last_login_at,
+    passwordUpdatedAt: row.password_updated_at
+  };
+}
+
+function authSessionToRow(session) {
+  return {
+    id: session.id,
+    user_id: session.userId,
+    token_hash: session.tokenHash,
+    created_at: session.createdAt || new Date().toISOString(),
+    expires_at: session.expiresAt
+  };
+}
+
+function authSessionFromRow(row) {
+  return {
+    id: row.id,
+    userId: row.user_id,
+    tokenHash: row.token_hash,
+    createdAt: row.created_at,
+    expiresAt: row.expires_at
+  };
+}
+
+function passwordResetToRow(reset) {
+  return {
+    id: reset.id,
+    user_id: reset.userId,
+    token_hash: reset.tokenHash,
+    email_delivery: reset.emailDelivery || {},
+    created_at: reset.createdAt || new Date().toISOString(),
+    expires_at: reset.expiresAt
+  };
+}
+
+function passwordResetFromRow(row) {
+  return {
+    id: row.id,
+    userId: row.user_id,
+    tokenHash: row.token_hash,
+    emailDelivery: row.email_delivery || {},
+    createdAt: row.created_at,
+    expiresAt: row.expires_at
+  };
 }
 
 async function renderPageWithState(fileName, extraState = {}, includePrivateState = true) {
@@ -534,6 +884,21 @@ function migrationExportState(store) {
     foundersDateOverrides: store.foundersDateOverrides,
     paymentSessions: store.paymentSessions,
     authUsers: store.authUsers.map(publicUser)
+  };
+}
+
+function sanitizeImportedStore(store) {
+  return {
+    ...initialStore,
+    foundersApplications: Array.isArray(store.foundersApplications) ? store.foundersApplications : [],
+    alignmentCallRequests: Array.isArray(store.alignmentCallRequests) ? store.alignmentCallRequests : [],
+    foundersAvailability: store.foundersAvailability || null,
+    foundersAvailabilityVersion: store.foundersAvailabilityVersion || 2,
+    foundersDateOverrides: store.foundersDateOverrides && typeof store.foundersDateOverrides === "object" ? store.foundersDateOverrides : {},
+    paymentSessions: Array.isArray(store.paymentSessions) ? store.paymentSessions : [],
+    authUsers: Array.isArray(store.authUsers) ? store.authUsers : [],
+    authSessions: Array.isArray(store.authSessions) ? store.authSessions : [],
+    passwordResets: Array.isArray(store.passwordResets) ? store.passwordResets : []
   };
 }
 
