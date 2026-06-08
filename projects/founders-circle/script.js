@@ -17,6 +17,7 @@ const selectedDateLabel = document.querySelector("#selected-date-label");
 const timeSlots = document.querySelector("#time-slots");
 const selectedDateInput = document.querySelector("#selected-date-input");
 const selectedTimeInput = document.querySelector("#selected-time-input");
+const timeZoneSelect = document.querySelector("#timezone-select");
 const timePeriodButtons = document.querySelectorAll(".time-period");
 const prevMonth = document.querySelector("#prev-month");
 const nextMonth = document.querySelector("#next-month");
@@ -67,6 +68,16 @@ const foundersBackendUrl = window.__FOUNDERS_BACKEND_URL__
 const isStaticFreedomUnchainedHost = ["freedomunchained.life", "www.freedomunchained.life", "founderscircle.freedomunchained.life"].includes(location.hostname);
 const ownerTimeZone = "America/Chicago";
 const ownerTimeZoneLabel = "Central Time";
+const timeZoneOptions = [
+  { value: "America/Los_Angeles", label: "Pacific Time" },
+  { value: "America/Denver", label: "Mountain Time" },
+  { value: "America/Chicago", label: "Central Time" },
+  { value: "America/New_York", label: "Eastern Time" },
+  { value: "America/Anchorage", label: "Alaska Time" },
+  { value: "Pacific/Honolulu", label: "Hawaii Time" },
+  { value: "America/Phoenix", label: "Arizona Time" },
+  { value: "UTC", label: "UTC" }
+];
 const sharedKeys = [
   "foundersApplications",
   "alignmentCallRequests",
@@ -291,6 +302,7 @@ if (detailsForm) {
 }
 
 if (alignmentForm) {
+  initializeTimeZoneSelect();
   const applicant = readJson("activeApplicant", null);
   if (applicantSummary) {
     applicantSummary.innerHTML = applicant
@@ -1685,7 +1697,7 @@ function formatDateTime(value) {
 
 function getBookingTimeZoneDetails(dateKey, centralTime) {
   const instant = zonedTimeToDate(dateKey, centralTime, ownerTimeZone);
-  const applicantTimeZone = getViewerTimeZone();
+  const applicantTimeZone = getSelectedTimeZone();
 
   return {
     selectedDateCentral: dateKey,
@@ -1701,7 +1713,7 @@ function getBookingTimeZoneDetails(dateKey, centralTime) {
 }
 
 function formatTimeSlotLabel(dateKey, centralTime) {
-  const applicantTimeZone = getViewerTimeZone();
+  const applicantTimeZone = getSelectedTimeZone();
   const instant = zonedTimeToDate(dateKey, centralTime, ownerTimeZone);
   const applicantTime = formatTimeForZone(instant, applicantTimeZone);
 
@@ -1718,7 +1730,39 @@ function formatTimeSlotLabel(dateKey, centralTime) {
   };
 }
 
-function getViewerTimeZone() {
+function initializeTimeZoneSelect() {
+  if (!timeZoneSelect) return;
+
+  const browserTimeZone = getBrowserTimeZone();
+  const options = normalizeTimeZoneOptions(browserTimeZone);
+  timeZoneSelect.innerHTML = options.map((option) => (
+    `<option value="${escapeHtml(option.value)}">${escapeHtml(option.label)}</option>`
+  )).join("");
+  timeZoneSelect.value = options.some((option) => option.value === browserTimeZone) ? browserTimeZone : ownerTimeZone;
+
+  timeZoneSelect.addEventListener("change", () => {
+    selectedTime = "";
+    if (selectedTimeInput) selectedTimeInput.value = "";
+    if (selectedDate) renderTimes(selectedDate);
+  });
+}
+
+function normalizeTimeZoneOptions(browserTimeZone) {
+  const options = [...timeZoneOptions];
+  if (browserTimeZone && !options.some((option) => option.value === browserTimeZone)) {
+    options.unshift({
+      value: browserTimeZone,
+      label: friendlyTimeZoneLabel(browserTimeZone)
+    });
+  }
+  return options;
+}
+
+function getSelectedTimeZone() {
+  return timeZoneSelect?.value || getBrowserTimeZone();
+}
+
+function getBrowserTimeZone() {
   return Intl.DateTimeFormat().resolvedOptions().timeZone || ownerTimeZone;
 }
 
@@ -1727,6 +1771,10 @@ function friendlyTimeZoneLabel(timeZone) {
   if (timeZone === "America/Los_Angeles") return "Pacific Time";
   if (timeZone === "America/Denver") return "Mountain Time";
   if (timeZone === "America/New_York") return "Eastern Time";
+  if (timeZone === "America/Anchorage") return "Alaska Time";
+  if (timeZone === "Pacific/Honolulu") return "Hawaii Time";
+  if (timeZone === "America/Phoenix") return "Arizona Time";
+  if (timeZone === "UTC") return "UTC";
   return timeZone.replaceAll("_", " ");
 }
 

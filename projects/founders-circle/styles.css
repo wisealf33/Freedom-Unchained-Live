@@ -948,6 +948,24 @@ textarea {
   margin: 8px 0 18px;
 }
 
+.timezone-field {
+  display: grid;
+  gap: 8px;
+  margin: 0 0 18px;
+}
+
+.timezone-field span {
+  color: var(--navy);
+  font: 700 13px/1.2 Inter, Arial, sans-serif;
+  text-transform: uppercase;
+}
+
+.timezone-field select {
+  font: 700 16px/1.2 Inter, Arial, sans-serif;
+  min-height: 48px;
+  padding: 12px 42px 12px 14px;
+}
+
 .time-periods {
   display: grid;
   gap: 8px;

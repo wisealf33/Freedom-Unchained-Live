@@ -228,16 +228,16 @@ async function renderPage(path, env, state = {}) {
   if (html.includes("if (!window.__FOUNDERS_INITIAL_STATE__")) {
     html = html.replace(/(\s*<script>\s*if \(!window\.__FOUNDERS_INITIAL_STATE__)/, `\n    ${stateScript}$1`);
   } else {
-    html = html.replace(/<script src="script\.js[^"]*"><\/script>/, `${stateScript}\n    <script src="script.js?v=timezone-1"></script>`);
+    html = html.replace(/<script src="script\.js[^"]*"><\/script>/, `${stateScript}\n    <script src="script.js?v=timezone-select-1"></script>`);
   }
-  html = html.replace(/<script src="script\.js[^"]*"><\/script>/, '<script src="script.js?v=timezone-1"></script>');
+  html = html.replace(/<script src="script\.js[^"]*"><\/script>/, '<script src="script.js?v=timezone-select-1"></script>');
   return htmlResponse(html);
 }
 
 async function fetchOriginAsset(path, request, env) {
   const originBaseUrl = String(env.ORIGIN_BASE_URL || "https://freedomunchained.life/projects/founders-circle").replace(/\/+$/, "");
   const url = new URL(request.url);
-  const assetResponse = await fetch(`${originBaseUrl}${path}${url.search}`, { cf: { cacheTtl: 60 } });
+  const assetResponse = await fetch(`${originBaseUrl}${path}${url.search}`, { cf: { cacheTtl: 0, cacheEverything: false } });
   return new Response(assetResponse.body, assetResponse);
 }
 

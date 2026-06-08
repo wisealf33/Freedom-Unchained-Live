@@ -43,6 +43,10 @@
           <div class="time-panel">
             <h2 id="selected-date-label">Select a date</h2>
             <p>Available 20-minute alignment call times.</p>
+            <label class="timezone-field" for="timezone-select">
+              <span>Your timezone</span>
+              <select id="timezone-select" name="timeZone"></select>
+            </label>
             <div class="time-periods" id="time-periods" aria-label="Time of day">
               <button class="time-period selected" type="button" data-period="morning">Morning</button>
               <button class="time-period" type="button" data-period="afternoon">Afternoon</button>
@@ -62,6 +66,6 @@
         </form>
       </section>
     </main>
-    <script src="script.js?v=timezone-1"></script>
+    <script src="script.js?v=timezone-select-1"></script>
   </body>
 </html>
