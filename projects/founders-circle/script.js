@@ -65,6 +65,8 @@ const permanentFoundersBackendPath = "/api/founders";
 const foundersBackendUrl = window.__FOUNDERS_BACKEND_URL__
   || (["freedomunchained.life", "www.freedomunchained.life", "founderscircle.freedomunchained.life"].includes(location.hostname) ? temporaryFoundersBackendUrl : location.origin);
 const isStaticFreedomUnchainedHost = ["freedomunchained.life", "www.freedomunchained.life", "founderscircle.freedomunchained.life"].includes(location.hostname);
+const ownerTimeZone = "America/Chicago";
+const ownerTimeZoneLabel = "Central Time";
 const sharedKeys = [
   "foundersApplications",
   "alignmentCallRequests",
@@ -312,6 +314,7 @@ if (alignmentForm) {
       return;
     }
 
+    const timeZoneDetails = getBookingTimeZoneDetails(selectedDateInput.value, selectedTimeInput.value);
     const booking = {
       applicantId: applicantForBooking.id,
       firstName: applicantForBooking.firstName,
@@ -321,6 +324,15 @@ if (alignmentForm) {
       details: applicantForBooking.details || {},
       selectedDate: selectedDateInput.value,
       selectedTime: selectedTimeInput.value,
+      selectedDateCentral: timeZoneDetails.selectedDateCentral,
+      selectedTimeCentral: timeZoneDetails.selectedTimeCentral,
+      selectedDateApplicant: timeZoneDetails.selectedDateApplicant,
+      selectedTimeApplicant: timeZoneDetails.selectedTimeApplicant,
+      ownerTimeZone: timeZoneDetails.ownerTimeZone,
+      ownerTimeZoneLabel: timeZoneDetails.ownerTimeZoneLabel,
+      applicantTimeZone: timeZoneDetails.applicantTimeZone,
+      applicantTimeZoneLabel: timeZoneDetails.applicantTimeZoneLabel,
+      selectedDateTimeUtc: timeZoneDetails.selectedDateTimeUtc,
       requestedAt: new Date().toISOString()
     };
     const savedBooking = await createBooking(booking);
@@ -348,7 +360,7 @@ if (alignmentForm) {
       item.id === applicantWithBooking.id ? applicantWithBooking : item
     )));
 
-    alignmentNote.textContent = `Alignment call booked for ${formatDateForDisplay(booking.selectedDate)} at ${booking.selectedTime}. Continue to the quick questions.`;
+    alignmentNote.textContent = `Alignment call booked for ${formatBookingShort(booking)}. Continue to the quick questions.`;
     window.location.href = "application-details.html";
   });
 }
@@ -651,9 +663,12 @@ function renderTimes(dateKey) {
 
   times.forEach((time) => {
     const button = document.createElement("button");
+    const label = formatTimeSlotLabel(dateKey, time);
     button.type = "button";
     button.className = "time-slot";
-    button.textContent = time;
+    button.innerHTML = label.secondary
+      ? `<span>${escapeHtml(label.primary)}</span><small>${escapeHtml(label.secondary)}</small>`
+      : `<span>${escapeHtml(label.primary)}</span>`;
     if (time === selectedTime) button.classList.add("selected");
 
     button.addEventListener("click", () => {
@@ -1254,7 +1269,9 @@ function renderApplicantDetail(application, bookings) {
         ${latestBooking ? `
           <dl>
             <div><dt>Date</dt><dd>${escapeHtml(formatDateForDisplay(latestBooking.selectedDate))}</dd></div>
-            <div><dt>Time</dt><dd>${escapeHtml(latestBooking.selectedTime || "")}</dd></div>
+            <div><dt>Your Time</dt><dd>${escapeHtml(`${latestBooking.selectedTimeCentral || latestBooking.selectedTime || ""} ${latestBooking.ownerTimeZoneLabel || ownerTimeZoneLabel}`)}</dd></div>
+            ${latestBooking.selectedTimeApplicant && latestBooking.selectedTimeApplicant !== (latestBooking.selectedTimeCentral || latestBooking.selectedTime) ? `<div><dt>Applicant Time</dt><dd>${escapeHtml(`${formatDateForDisplay(latestBooking.selectedDateApplicant || latestBooking.selectedDate)} ${latestBooking.selectedTimeApplicant} ${latestBooking.applicantTimeZoneLabel || ""}`)}</dd></div>` : ""}
+            <div><dt>Timezone Check</dt><dd>${escapeHtml(formatBookingShort(latestBooking))}</dd></div>
             <div><dt>Requested</dt><dd>${escapeHtml(formatDateTime(latestBooking.requestedAt))}</dd></div>
           </dl>
         ` : `<p>No call booked yet.</p>`}
@@ -1640,7 +1657,17 @@ function getStageLabel(value) {
 }
 
 function formatBookingShort(booking) {
-  return `${formatDateForDisplay(booking.selectedDate)} ${booking.selectedTime || ""}`.trim();
+  const centralTime = booking.selectedTimeCentral || booking.selectedTime || "";
+  const centralDate = booking.selectedDateCentral || booking.selectedDate || "";
+  const applicantTime = booking.selectedTimeApplicant || "";
+  const applicantDate = booking.selectedDateApplicant || "";
+  const applicantZone = booking.applicantTimeZoneLabel || "";
+
+  if (applicantTime && applicantZone && applicantTime !== centralTime) {
+    return `${formatDateForDisplay(applicantDate || centralDate)} ${applicantTime} ${applicantZone} / ${centralTime} ${ownerTimeZoneLabel}`;
+  }
+
+  return `${formatDateForDisplay(centralDate)} ${centralTime} ${ownerTimeZoneLabel}`.trim();
 }
 
 function formatDateTime(value) {
@@ -1654,6 +1681,123 @@ function formatDateTime(value) {
     hour: "numeric",
     minute: "2-digit"
   });
+}
+
+function getBookingTimeZoneDetails(dateKey, centralTime) {
+  const instant = zonedTimeToDate(dateKey, centralTime, ownerTimeZone);
+  const applicantTimeZone = getViewerTimeZone();
+
+  return {
+    selectedDateCentral: dateKey,
+    selectedTimeCentral: centralTime,
+    selectedDateApplicant: formatDateKeyForZone(instant, applicantTimeZone),
+    selectedTimeApplicant: formatTimeForZone(instant, applicantTimeZone),
+    ownerTimeZone,
+    ownerTimeZoneLabel,
+    applicantTimeZone,
+    applicantTimeZoneLabel: friendlyTimeZoneLabel(applicantTimeZone),
+    selectedDateTimeUtc: instant.toISOString()
+  };
+}
+
+function formatTimeSlotLabel(dateKey, centralTime) {
+  const applicantTimeZone = getViewerTimeZone();
+  const instant = zonedTimeToDate(dateKey, centralTime, ownerTimeZone);
+  const applicantTime = formatTimeForZone(instant, applicantTimeZone);
+
+  if (applicantTimeZone === ownerTimeZone || applicantTime === centralTime) {
+    return {
+      primary: `${centralTime} ${ownerTimeZoneLabel}`,
+      secondary: ""
+    };
+  }
+
+  return {
+    primary: `${applicantTime} ${friendlyTimeZoneLabel(applicantTimeZone)}`,
+    secondary: `${centralTime} ${ownerTimeZoneLabel}`
+  };
+}
+
+function getViewerTimeZone() {
+  return Intl.DateTimeFormat().resolvedOptions().timeZone || ownerTimeZone;
+}
+
+function friendlyTimeZoneLabel(timeZone) {
+  if (timeZone === "America/Chicago") return "Central Time";
+  if (timeZone === "America/Los_Angeles") return "Pacific Time";
+  if (timeZone === "America/Denver") return "Mountain Time";
+  if (timeZone === "America/New_York") return "Eastern Time";
+  return timeZone.replaceAll("_", " ");
+}
+
+function zonedTimeToDate(dateKey, time, timeZone) {
+  const { year, month, day } = parseDateKey(dateKey);
+  const { hour, minute } = parseTimeTo24Hour(time);
+  let timestamp = Date.UTC(year, month - 1, day, hour, minute);
+
+  for (let index = 0; index < 3; index += 1) {
+    const offset = getTimeZoneOffset(new Date(timestamp), timeZone);
+    timestamp = Date.UTC(year, month - 1, day, hour, minute) - offset;
+  }
+
+  return new Date(timestamp);
+}
+
+function getTimeZoneOffset(date, timeZone) {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false
+  }).formatToParts(date).reduce((values, part) => {
+    if (part.type !== "literal") values[part.type] = Number(part.value);
+    return values;
+  }, {});
+
+  const asUtc = Date.UTC(parts.year, parts.month - 1, parts.day, parts.hour % 24, parts.minute, parts.second);
+  return asUtc - date.getTime();
+}
+
+function parseDateKey(dateKey) {
+  const [year, month, day] = String(dateKey || "").split("-").map(Number);
+  return { year, month, day };
+}
+
+function parseTimeTo24Hour(time) {
+  const match = String(time || "").match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
+  if (!match) return { hour: 0, minute: 0 };
+  let hour = Number(match[1]);
+  const minute = Number(match[2]);
+  const meridian = match[3].toUpperCase();
+  if (meridian === "PM" && hour !== 12) hour += 12;
+  if (meridian === "AM" && hour === 12) hour = 0;
+  return { hour, minute };
+}
+
+function formatTimeForZone(date, timeZone) {
+  return date.toLocaleTimeString(undefined, {
+    timeZone,
+    hour: "numeric",
+    minute: "2-digit"
+  });
+}
+
+function formatDateKeyForZone(date, timeZone) {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit"
+  }).formatToParts(date).reduce((values, part) => {
+    if (part.type !== "literal") values[part.type] = part.value;
+    return values;
+  }, {});
+
+  return `${parts.year}-${parts.month}-${parts.day}`;
 }
 
 function formatSendFoxStatus(value) {

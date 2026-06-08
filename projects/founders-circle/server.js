@@ -714,6 +714,7 @@ function applicationFromRow(row) {
 }
 
 function bookingToRow(booking) {
+  const timeZone = bookingTimeZonePayload(booking);
   return {
     id: booking.id,
     applicant_id: booking.applicantId || null,
@@ -721,7 +722,7 @@ function bookingToRow(booking) {
     last_name: booking.lastName || "",
     email: booking.email || "",
     phone: booking.phone || "",
-    details: booking.details || {},
+    details: { ...(booking.details || {}), timeZone },
     selected_date: booking.selectedDate,
     selected_time: booking.selectedTime,
     requested_at: booking.requestedAt || new Date().toISOString(),
@@ -730,6 +731,7 @@ function bookingToRow(booking) {
 }
 
 function bookingFromRow(row) {
+  const timeZone = row.details?.timeZone || {};
   return {
     id: row.id,
     applicantId: row.applicant_id,
@@ -740,8 +742,31 @@ function bookingFromRow(row) {
     details: row.details || {},
     selectedDate: row.selected_date,
     selectedTime: row.selected_time,
+    selectedDateCentral: timeZone.selectedDateCentral || row.selected_date,
+    selectedTimeCentral: timeZone.selectedTimeCentral || row.selected_time,
+    selectedDateApplicant: timeZone.selectedDateApplicant || row.selected_date,
+    selectedTimeApplicant: timeZone.selectedTimeApplicant || row.selected_time,
+    ownerTimeZone: timeZone.ownerTimeZone || "America/Chicago",
+    ownerTimeZoneLabel: timeZone.ownerTimeZoneLabel || "Central Time",
+    applicantTimeZone: timeZone.applicantTimeZone || "",
+    applicantTimeZoneLabel: timeZone.applicantTimeZoneLabel || "",
+    selectedDateTimeUtc: timeZone.selectedDateTimeUtc || "",
     requestedAt: row.requested_at,
     createdAt: row.created_at
+  };
+}
+
+function bookingTimeZonePayload(booking) {
+  return {
+    selectedDateCentral: booking.selectedDateCentral || booking.selectedDate || "",
+    selectedTimeCentral: booking.selectedTimeCentral || booking.selectedTime || "",
+    selectedDateApplicant: booking.selectedDateApplicant || booking.selectedDate || "",
+    selectedTimeApplicant: booking.selectedTimeApplicant || booking.selectedTime || "",
+    ownerTimeZone: booking.ownerTimeZone || "America/Chicago",
+    ownerTimeZoneLabel: booking.ownerTimeZoneLabel || "Central Time",
+    applicantTimeZone: booking.applicantTimeZone || "",
+    applicantTimeZoneLabel: booking.applicantTimeZoneLabel || "",
+    selectedDateTimeUtc: booking.selectedDateTimeUtc || ""
   };
 }
 

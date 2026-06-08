@@ -983,16 +983,30 @@ textarea {
   border-radius: 10px;
   color: var(--navy);
   cursor: pointer;
+  display: grid;
+  gap: 4px;
   font: 700 15px/1 Inter, Arial, sans-serif;
   min-height: 48px;
   padding: 12px 16px;
   text-align: center;
 }
 
+.time-slot small {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
 .time-slot:hover,
 .time-slot.selected {
   background: var(--bright);
   border-color: var(--bright);
+  color: var(--ink);
+}
+
+.time-slot:hover small,
+.time-slot.selected small {
   color: var(--ink);
 }
 
