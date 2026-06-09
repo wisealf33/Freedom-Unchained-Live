@@ -1550,6 +1550,23 @@ textarea {
   color: var(--white);
 }
 
+.calendar-link {
+  align-items: center;
+  background: var(--bright);
+  border-radius: 999px;
+  color: var(--ink);
+  display: inline-flex;
+  font-size: 13px;
+  font-weight: 900;
+  margin-top: 14px;
+  padding: 11px 14px;
+}
+
+.calendar-link:hover {
+  background: var(--ink);
+  color: var(--white);
+}
+
 .payment-session-tools {
   display: flex;
   flex-wrap: wrap;
