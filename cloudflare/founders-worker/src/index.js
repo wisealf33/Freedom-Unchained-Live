@@ -228,9 +228,9 @@ async function renderPage(path, env, state = {}) {
   if (html.includes("if (!window.__FOUNDERS_INITIAL_STATE__")) {
     html = html.replace(/(\s*<script>\s*if \(!window\.__FOUNDERS_INITIAL_STATE__)/, `\n    ${stateScript}$1`);
   } else {
-    html = html.replace(/<script src="script\.js[^"]*"><\/script>/, `${stateScript}\n    <script src="script.js?v=calendar-link-1"></script>`);
+    html = html.replace(/<script src="script\.js[^"]*"><\/script>/, `${stateScript}\n    <script src="script.js?v=automatic-google-calendar-1"></script>`);
   }
-  html = html.replace(/<script src="script\.js[^"]*"><\/script>/, '<script src="script.js?v=calendar-link-1"></script>');
+  html = html.replace(/<script src="script\.js[^"]*"><\/script>/, '<script src="script.js?v=automatic-google-calendar-1"></script>');
   return htmlResponse(html);
 }
 
@@ -307,6 +307,7 @@ async function handleCreateBooking(request, env) {
     ...body,
     requestedAt: new Date().toISOString()
   };
+  booking.calendar = await createGoogleCalendarEventForBooking(booking, env);
   await supabaseUpsert(env, "founders_bookings", [bookingToRow(booking)], "id");
   return json(booking, env, request, { status: 201 });
 }
@@ -745,7 +746,7 @@ function bookingToRow(booking) {
     last_name: booking.lastName || "",
     email: booking.email || "",
     phone: booking.phone || "",
-    details: { ...(booking.details || {}), timeZone },
+    details: { ...(booking.details || {}), timeZone, calendar: booking.calendar || null },
     selected_date: booking.selectedDate,
     selected_time: booking.selectedTime,
     requested_at: booking.requestedAt || new Date().toISOString(),
@@ -763,6 +764,7 @@ function bookingFromRow(row) {
     email: row.email,
     phone: row.phone,
     details: row.details || {},
+    calendar: row.details?.calendar || null,
     selectedDate: row.selected_date,
     selectedTime: row.selected_time,
     selectedDateCentral: timeZone.selectedDateCentral || row.selected_date,
@@ -791,6 +793,117 @@ function bookingTimeZonePayload(booking) {
     applicantTimeZoneLabel: booking.applicantTimeZoneLabel || "",
     selectedDateTimeUtc: booking.selectedDateTimeUtc || ""
   };
+}
+
+async function createGoogleCalendarEventForBooking(booking, env) {
+  if (!env.GOOGLE_CLIENT_ID || !env.GOOGLE_CLIENT_SECRET || !env.GOOGLE_REFRESH_TOKEN) {
+    return {
+      provider: "google",
+      status: "not_configured",
+      message: "Google Calendar credentials are not connected yet."
+    };
+  }
+
+  const start = parseBookingStart(booking);
+  if (!start) {
+    return {
+      provider: "google",
+      status: "failed",
+      message: "The booking did not include a valid calendar time."
+    };
+  }
+
+  try {
+    const accessToken = await getGoogleAccessToken(env);
+    const event = buildGoogleCalendarEvent(booking, start);
+    const calendarId = encodeURIComponent(env.GOOGLE_CALENDAR_ID || "primary");
+    const response = await fetch(`https://www.googleapis.com/calendar/v3/calendars/${calendarId}/events`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${accessToken}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(event)
+    });
+    const result = await response.json().catch(() => ({}));
+
+    if (!response.ok) {
+      return {
+        provider: "google",
+        status: "failed",
+        message: result.error?.message || "Google Calendar rejected the event."
+      };
+    }
+
+    return {
+      provider: "google",
+      status: "created",
+      eventId: result.id || "",
+      htmlLink: result.htmlLink || "",
+      calendarId: env.GOOGLE_CALENDAR_ID || "primary",
+      createdAt: new Date().toISOString()
+    };
+  } catch (error) {
+    return {
+      provider: "google",
+      status: "failed",
+      message: error.message || "Google Calendar event creation failed."
+    };
+  }
+}
+
+async function getGoogleAccessToken(env) {
+  const response = await fetch("https://oauth2.googleapis.com/token", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams({
+      client_id: env.GOOGLE_CLIENT_ID,
+      client_secret: env.GOOGLE_CLIENT_SECRET,
+      refresh_token: env.GOOGLE_REFRESH_TOKEN,
+      grant_type: "refresh_token"
+    })
+  });
+  const token = await response.json().catch(() => ({}));
+  if (!response.ok || !token.access_token) {
+    throw new Error(token.error_description || token.error || "Could not get Google Calendar access.");
+  }
+  return token.access_token;
+}
+
+function buildGoogleCalendarEvent(booking, start) {
+  const end = new Date(start.getTime() + 20 * 60 * 1000);
+  const name = [booking.firstName, booking.lastName].filter(Boolean).join(" ") || "Founders Circle applicant";
+  const description = [
+    "Founders Circle alignment call.",
+    `Applicant: ${name}`,
+    booking.email ? `Email: ${booking.email}` : "",
+    booking.phone ? `Phone: ${booking.phone}` : "",
+    `Applicant selected: ${booking.selectedDateApplicant || booking.selectedDate || ""} ${booking.selectedTimeApplicant || booking.selectedTime || ""} ${booking.applicantTimeZoneLabel || ""}`.trim(),
+    `Your time: ${booking.selectedDateCentral || booking.selectedDate || ""} ${booking.selectedTimeCentral || booking.selectedTime || ""} ${booking.ownerTimeZoneLabel || "Central Time"}`.trim()
+  ].filter(Boolean).join("\n");
+
+  return {
+    summary: `Founders Circle Alignment Call - ${name}`,
+    description,
+    location: "Phone or video call",
+    start: {
+      dateTime: start.toISOString(),
+      timeZone: booking.ownerTimeZone || "America/Chicago"
+    },
+    end: {
+      dateTime: end.toISOString(),
+      timeZone: booking.ownerTimeZone || "America/Chicago"
+    },
+    reminders: {
+      useDefault: true
+    }
+  };
+}
+
+function parseBookingStart(booking) {
+  if (!booking.selectedDateTimeUtc) return null;
+  const date = new Date(booking.selectedDateTimeUtc);
+  return Number.isNaN(date.getTime()) ? null : date;
 }
 
 function paymentSessionToRow(session) {

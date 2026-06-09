@@ -1285,8 +1285,8 @@ function renderApplicantDetail(application, bookings) {
             ${latestBooking.selectedTimeApplicant && latestBooking.selectedTimeApplicant !== (latestBooking.selectedTimeCentral || latestBooking.selectedTime) ? `<div><dt>Applicant Time</dt><dd>${escapeHtml(`${formatDateForDisplay(latestBooking.selectedDateApplicant || latestBooking.selectedDate)} ${latestBooking.selectedTimeApplicant} ${latestBooking.applicantTimeZoneLabel || ""}`)}</dd></div>` : ""}
             <div><dt>Timezone Check</dt><dd>${escapeHtml(formatBookingShort(latestBooking))}</dd></div>
             <div><dt>Requested</dt><dd>${escapeHtml(formatDateTime(latestBooking.requestedAt))}</dd></div>
+            <div><dt>Google Calendar</dt><dd>${escapeHtml(formatCalendarStatus(latestBooking.calendar))}</dd></div>
           </dl>
-          <a class="calendar-link" href="${escapeHtml(googleCalendarUrlForBooking(application, latestBooking))}" target="_blank" rel="noopener">Add to Google Calendar</a>
         ` : `<p>No call booked yet.</p>`}
       </article>
     </div>
@@ -1683,42 +1683,11 @@ function formatBookingShort(booking) {
   return `${formatDateForDisplay(centralDate)} ${centralTime} ${ownerTimeZoneLabel}`.trim();
 }
 
-function googleCalendarUrlForBooking(application, booking) {
-  const start = bookingStartDate(booking);
-  const end = new Date(start.getTime() + 20 * 60 * 1000);
-  const applicantName = getApplicantName(application);
-  const url = new URL("https://calendar.google.com/calendar/render");
-  const details = [
-    `Applicant: ${applicantName}`,
-    application.email ? `Email: ${application.email}` : "",
-    application.phone ? `Phone: ${application.phone}` : "",
-    `Scheduled time: ${formatBookingShort(booking)}`,
-    "Founders Circle alignment call."
-  ].filter(Boolean).join("\n");
-
-  url.searchParams.set("action", "TEMPLATE");
-  url.searchParams.set("text", `Founders Circle Alignment Call - ${applicantName}`);
-  url.searchParams.set("dates", `${formatGoogleCalendarDate(start)}/${formatGoogleCalendarDate(end)}`);
-  url.searchParams.set("details", details);
-  url.searchParams.set("location", "Phone or video call");
-  return url.toString();
-}
-
-function bookingStartDate(booking) {
-  if (booking.selectedDateTimeUtc) {
-    const utcDate = new Date(booking.selectedDateTimeUtc);
-    if (!Number.isNaN(utcDate.getTime())) return utcDate;
-  }
-
-  return zonedTimeToDate(
-    booking.selectedDateCentral || booking.selectedDate,
-    booking.selectedTimeCentral || booking.selectedTime,
-    ownerTimeZone
-  );
-}
-
-function formatGoogleCalendarDate(date) {
-  return date.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}Z$/, "Z");
+function formatCalendarStatus(calendar) {
+  if (calendar?.status === "created") return "Added automatically";
+  if (calendar?.status === "not_configured") return "Not connected yet";
+  if (calendar?.status === "failed") return "Calendar add failed";
+  return "Not recorded";
 }
 
 function formatDateTime(value) {
