@@ -236,9 +236,17 @@ async function renderPage(path, env, state = {}) {
 
 async function fetchOriginAsset(path, request, env) {
   const originBaseUrl = String(env.ORIGIN_BASE_URL || "https://freedomunchained.life/projects/founders-circle").replace(/\/+$/, "");
+  const sourceAssetBaseUrl = String(env.SOURCE_ASSET_BASE_URL || "https://raw.githubusercontent.com/wisealf33/Freedom-Unchained-Live/main/projects/founders-circle").replace(/\/+$/, "");
   const url = new URL(request.url);
-  const assetResponse = await fetch(`${originBaseUrl}${path}${url.search}`, { cf: { cacheTtl: 0, cacheEverything: false } });
-  return new Response(assetResponse.body, assetResponse);
+  const assetUrl = path === "/script.js" || path === "/styles.css"
+    ? `${sourceAssetBaseUrl}${path}${url.search}`
+    : `${originBaseUrl}${path}${url.search}`;
+  const assetResponse = await fetch(assetUrl, { cf: { cacheTtl: 0, cacheEverything: false } });
+  const headers = new Headers(assetResponse.headers);
+  if (path === "/script.js") headers.set("content-type", "text/javascript; charset=utf-8");
+  if (path === "/styles.css") headers.set("content-type", "text/css; charset=utf-8");
+  headers.set("cache-control", "no-store");
+  return new Response(assetResponse.body, { status: assetResponse.status, headers });
 }
 
 async function handleCreateApplication(request, env) {
