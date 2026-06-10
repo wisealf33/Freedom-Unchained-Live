@@ -1203,11 +1203,12 @@ function renderApplicantList(applications, bookings, selectedId) {
       const stage = getApplicantStage(application, bookings);
       const booking = getLatestBookingForApplicant(application, bookings);
       const name = getApplicantName(application);
+      const bookingLabel = booking ? formatBookingAdminListLabel(booking) : "";
       return `
         <button class="applicant-list-item ${application.id === selectedId ? "selected" : ""}" type="button" data-applicant-id="${escapeHtml(application.id)}">
           <strong>${escapeHtml(name)}</strong>
           <span>${escapeHtml(application.email || "No email")}</span>
-          <small>${escapeHtml(getStageLabel(stage))}${booking ? ` • ${escapeHtml(formatBookingShort(booking))}` : ""}</small>
+          <small>${escapeHtml(getStageLabel(stage))}${bookingLabel ? ` • ${escapeHtml(bookingLabel)}` : ""}</small>
         </button>
       `;
     }).join("")
@@ -1280,7 +1281,7 @@ function renderApplicantDetail(application, bookings) {
         <h3>Alignment Call</h3>
         ${latestBooking ? `
           <dl>
-            <div><dt>Date</dt><dd>${escapeHtml(formatDateForDisplay(latestBooking.selectedDate))}</dd></div>
+            <div><dt>Your Date</dt><dd>${escapeHtml(formatDateForDisplay(latestBooking.selectedDateCentral || latestBooking.selectedDate))}</dd></div>
             <div><dt>Your Time</dt><dd>${escapeHtml(`${latestBooking.selectedTimeCentral || latestBooking.selectedTime || ""} ${latestBooking.ownerTimeZoneLabel || ownerTimeZoneLabel}`)}</dd></div>
             ${latestBooking.selectedTimeApplicant && latestBooking.selectedTimeApplicant !== (latestBooking.selectedTimeCentral || latestBooking.selectedTime) ? `<div><dt>Applicant Time</dt><dd>${escapeHtml(`${formatDateForDisplay(latestBooking.selectedDateApplicant || latestBooking.selectedDate)} ${latestBooking.selectedTimeApplicant} ${latestBooking.applicantTimeZoneLabel || ""}`)}</dd></div>` : ""}
             <div><dt>Timezone Check</dt><dd>${escapeHtml(formatBookingShort(latestBooking))}</dd></div>
@@ -1677,10 +1678,25 @@ function formatBookingShort(booking) {
   const applicantZone = booking.applicantTimeZoneLabel || "";
 
   if (applicantTime && applicantZone && applicantTime !== centralTime) {
-    return `${formatDateForDisplay(applicantDate || centralDate)} ${applicantTime} ${applicantZone} / ${centralTime} ${ownerTimeZoneLabel}`;
+    return `Your time: ${formatDateForDisplay(centralDate)} ${centralTime} ${ownerTimeZoneLabel} / Applicant: ${formatDateForDisplay(applicantDate || centralDate)} ${applicantTime} ${applicantZone}`;
   }
 
-  return `${formatDateForDisplay(centralDate)} ${centralTime} ${ownerTimeZoneLabel}`.trim();
+  return `Your time: ${formatDateForDisplay(centralDate)} ${centralTime} ${ownerTimeZoneLabel}`.trim();
+}
+
+function formatBookingAdminListLabel(booking) {
+  const centralTime = booking.selectedTimeCentral || booking.selectedTime || "";
+  const centralDate = booking.selectedDateCentral || booking.selectedDate || "";
+  const applicantTime = booking.selectedTimeApplicant || "";
+  const applicantDate = booking.selectedDateApplicant || "";
+  const applicantZone = booking.applicantTimeZoneLabel || "";
+  const yourTime = `YOUR TIME: ${formatDateForDisplay(centralDate)} ${centralTime} ${ownerTimeZoneLabel}`;
+
+  if (applicantTime && applicantZone && (applicantTime !== centralTime || applicantDate !== centralDate)) {
+    return `${yourTime} | Applicant: ${formatDateForDisplay(applicantDate || centralDate)} ${applicantTime} ${applicantZone}`;
+  }
+
+  return yourTime;
 }
 
 function formatCalendarStatus(calendar) {
