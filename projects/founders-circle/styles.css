@@ -1306,18 +1306,34 @@ textarea {
 .override-item {
   background: var(--paper);
   border-radius: 10px;
-  display: grid;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   gap: 4px;
   padding: 14px 16px;
 }
 
 .override-item strong {
+  display: block;
   color: var(--navy);
 }
 
 .override-item span,
 .override-list p {
   color: var(--muted);
+}
+
+.override-item-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.override-item-actions .button {
+  min-height: 38px;
+  min-width: 76px;
+  padding: 9px 14px;
 }
 
 .admin-shell {
@@ -2063,6 +2079,8 @@ textarea {
   .override-times > div,
   .override-actions,
   .admin-calendar-grid,
+  .override-item,
+  .override-item-actions,
   .steps,
   .archetype-grid {
     display: grid;

@@ -464,6 +464,23 @@ if (overrideForm) {
     renderOverrideList();
     renderAdminCalendar();
   });
+
+  overrideList?.addEventListener("click", async (event) => {
+    const action = event.target.closest("[data-override-action]");
+    if (!action) return;
+
+    const dateKey = action.dataset.date;
+    if (!dateKey) return;
+
+    if (action.dataset.overrideAction === "edit") {
+      openOverrideEditor(dateKey);
+      return;
+    }
+
+    if (action.dataset.overrideAction === "delete") {
+      await clearDateOverride(dateKey);
+    }
+  });
 }
 
 if (clearOverride) {
@@ -474,15 +491,7 @@ if (clearOverride) {
       return;
     }
 
-    const overrides = readJson("foundersDateOverrides", {});
-    delete overrides[dateKey];
-    await deleteDateOverride(dateKey);
-    writeJson("foundersDateOverrides", overrides);
-    overrideForm.reset();
-    overrideTimes.classList.remove("disabled-options");
-    overrideNote.textContent = "Date override cleared.";
-    renderOverrideList();
-    renderAdminCalendar();
+    await clearDateOverride(dateKey);
   });
 }
 
@@ -747,17 +756,52 @@ function loadOverrideForDate(dateKey) {
   overrideTimes.classList.toggle("disabled-options", overrideBlockedInput.checked);
 }
 
+function openOverrideEditor(dateKey) {
+  if (!dateKey || !overrideDateInput) return;
+
+  overrideDateInput.value = dateKey;
+  loadOverrideForDate(dateKey);
+  overrideNote.textContent = `${formatDateForDisplay(dateKey)} loaded for editing.`;
+  document.querySelector(".override-panel")?.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+async function clearDateOverride(dateKey) {
+  const overrides = readJson("foundersDateOverrides", {});
+  delete overrides[dateKey];
+  await deleteDateOverride(dateKey);
+  writeJson("foundersDateOverrides", overrides);
+
+  if (overrideDateInput?.value === dateKey) {
+    overrideForm.reset();
+    overrideTimes.classList.remove("disabled-options");
+  }
+
+  overrideNote.textContent = `${formatDateForDisplay(dateKey)} cleared.`;
+  renderOverrideList();
+  renderAdminCalendar();
+}
+
 function renderOverrideList() {
   if (!overrideList) return;
 
   const overrides = readJson("foundersDateOverrides", {});
-  const entries = Object.entries(overrides).sort(([a], [b]) => a.localeCompare(b));
+  const entries = Object.entries(overrides).sort(([a], [b]) => {
+    const dateA = new Date(`${a}T00:00:00`);
+    const dateB = new Date(`${b}T00:00:00`);
+    return dateA - dateB;
+  });
 
   overrideList.innerHTML = entries.length
     ? entries.map(([dateKey, override]) => `
       <div class="override-item">
-        <strong>${formatDateForDisplay(dateKey)}</strong>
-        <span>${override.blocked ? "Blocked all day" : `Custom times: ${override.times.join(", ") || "none"}`}</span>
+        <div>
+          <strong>${formatDateForDisplay(dateKey)}</strong>
+          <span>${override.blocked ? "Blocked all day" : `Custom times: ${override.times.join(", ") || "none"}`}</span>
+        </div>
+        <div class="override-item-actions" aria-label="Actions for ${formatDateForDisplay(dateKey)}">
+          <button type="button" class="button secondary-admin-button" data-override-action="edit" data-date="${dateKey}">Edit</button>
+          <button type="button" class="button secondary-admin-button" data-override-action="delete" data-date="${dateKey}">Clear</button>
+        </div>
       </div>
     `).join("")
     : `<p>No date-specific overrides yet.</p>`;
@@ -795,10 +839,7 @@ function renderAdminCalendar() {
     `;
 
     button.addEventListener("click", () => {
-      overrideDateInput.value = dateKey;
-      loadOverrideForDate(dateKey);
-      overrideNote.textContent = `${formatDateForDisplay(dateKey)} loaded for editing.`;
-      document.querySelector(".override-panel")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      openOverrideEditor(dateKey);
     });
 
     adminCalendarGrid.appendChild(button);
