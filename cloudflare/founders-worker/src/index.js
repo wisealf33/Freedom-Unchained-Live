@@ -228,9 +228,9 @@ async function renderPage(path, env, state = {}) {
   if (html.includes("if (!window.__FOUNDERS_INITIAL_STATE__")) {
     html = html.replace(/(\s*<script>\s*if \(!window\.__FOUNDERS_INITIAL_STATE__)/, `\n    ${stateScript}$1`);
   } else {
-    html = html.replace(/<script src="script\.js[^"]*"><\/script>/, `${stateScript}\n    <script src="script.js?v=international-phone-1"></script>`);
+    html = html.replace(/<script src="script\.js[^"]*"><\/script>/, `${stateScript}\n    <script src="script.js?v=international-phone-2"></script>`);
   }
-  html = html.replace(/<script src="script\.js[^"]*"><\/script>/, '<script src="script.js?v=international-phone-1"></script>');
+  html = html.replace(/<script src="script\.js[^"]*"><\/script>/, '<script src="script.js?v=international-phone-2"></script>');
   return htmlResponse(html);
 }
 

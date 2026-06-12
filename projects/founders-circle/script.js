@@ -308,7 +308,7 @@ if (alignmentForm) {
   const applicant = readJson("activeApplicant", null);
   if (applicantSummary) {
     applicantSummary.innerHTML = applicant
-      ? `<strong>Scheduling for ${applicant.firstName} ${applicant.lastName}</strong><span>${applicant.email}</span>`
+      ? `<strong>Scheduling for ${applicant.firstName} ${applicant.lastName}</strong><span>${applicant.email}</span>${applicant.phone ? `<span>${escapeHtml(applicant.phone)}</span>` : ""}`
       : `<strong>No applicant loaded</strong><span>Start from the application page so name and email can carry forward.</span>`;
   }
 
