@@ -148,6 +148,8 @@ if (form) {
 
     try {
       const data = Object.fromEntries(new FormData(form).entries());
+      data.phone = normalizeInternationalPhone(data.countryCode, data.phone);
+      delete data.countryCode;
       const application = await createApplication(data);
       const applications = readJson("foundersApplications", []);
       applications.push(application);
@@ -1286,7 +1288,7 @@ function renderApplicantDetail(application, bookings) {
         <p class="section-kicker">Applicant</p>
         <h2>${escapeHtml(getApplicantName(application))}</h2>
         <a href="mailto:${escapeHtml(application.email || "")}">${escapeHtml(application.email || "No email")}</a>
-        ${application.phone ? `<a href="tel:${escapeHtml(application.phone)}">${escapeHtml(application.phone)}</a>` : ""}
+        ${application.phone ? `<a href="${escapeHtml(phoneHref(application.phone))}">${escapeHtml(application.phone)}</a>` : ""}
       </div>
       <span class="stage-pill">${escapeHtml(getStageLabel(stage))}</span>
     </div>
@@ -1960,4 +1962,29 @@ function escapeHtml(value) {
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#039;");
+}
+
+function normalizeInternationalPhone(countryCode, phone) {
+  const rawPhone = String(phone || "").trim();
+  if (!rawPhone) return "";
+
+  const collapsedPhone = rawPhone.replace(/\s+/g, " ");
+  if (collapsedPhone.startsWith("+")) return collapsedPhone;
+  if (collapsedPhone.startsWith("00")) return `+${collapsedPhone.slice(2).trim()}`;
+
+  const code = String(countryCode || "")
+    .trim()
+    .replace(/^00/, "+")
+    .replace(/[^\d+]/g, "");
+  const normalizedCode = code.startsWith("+") ? code : `+${code || "1"}`;
+  return `${normalizedCode} ${collapsedPhone}`;
+}
+
+function phoneHref(phone) {
+  const normalized = String(phone || "")
+    .trim()
+    .replace(/^00/, "+")
+    .replace(/[^\d+]/g, "");
+
+  return normalized ? `tel:${normalized}` : "#";
 }

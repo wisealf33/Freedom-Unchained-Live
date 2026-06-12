@@ -709,6 +709,12 @@ footer p {
   grid-template-columns: repeat(2, 1fr);
 }
 
+.phone-fields {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: minmax(110px, 150px) 1fr;
+}
+
 .application-form label {
   display: grid;
   gap: 8px;
@@ -794,6 +800,13 @@ textarea {
   font-size: 14px;
   min-height: 22px;
   text-align: center;
+}
+
+.field-help {
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.5;
+  margin: -8px 0 0;
 }
 
 .schedule-page {
@@ -2067,6 +2080,7 @@ textarea {
   .site-header nav,
   .hero-actions,
   .field-grid,
+  .phone-fields,
   .process-line,
   .slot-field,
   .funnel-summary,

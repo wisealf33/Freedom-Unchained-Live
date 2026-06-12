@@ -47,16 +47,23 @@
               <span class="sr-only">Email Address</span>
               <input name="email" type="email" autocomplete="email" placeholder="Email Address" required>
             </label>
-            <label>
-              <span class="sr-only">Phone Number</span>
-              <input name="phone" type="tel" autocomplete="tel" placeholder="Phone Number" required>
-            </label>
+            <div class="phone-fields">
+              <label>
+                <span>Country code</span>
+                <input name="countryCode" type="tel" inputmode="tel" autocomplete="tel-country-code" placeholder="+1" value="+1" required>
+              </label>
+              <label>
+                <span>Phone number</span>
+                <input name="phone" type="tel" inputmode="tel" autocomplete="tel-national" placeholder="Example: 555 123 4567" required>
+              </label>
+            </div>
+            <p class="field-help">Use the country code for your phone number, like +1 for US/Canada, +44 for UK, or +61 for Australia.</p>
             <button class="button submit-button" type="submit">Submit</button>
             <p class="form-note" id="form-note" role="status" aria-live="polite"></p>
           </form>
         </div>
       </section>
     </main>
-    <script src="script.js?v=admin-date-overrides-1"></script>
+    <script src="script.js?v=international-phone-1"></script>
   </body>
 </html>
