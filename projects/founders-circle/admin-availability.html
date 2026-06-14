@@ -62,8 +62,8 @@
         <div class="override-panel">
           <div class="schedule-intro override-intro">
             <p class="section-kicker">Date Exceptions</p>
-            <h2>Override a Specific Date</h2>
-            <p>Use this when one day is different from your normal weekly availability.</p>
+            <h2>Block Times on a Specific Date</h2>
+            <p>Use this when your normal weekly availability still applies, but part of one day needs to be unavailable.</p>
           </div>
 
           <form id="override-form" class="availability-form">
@@ -76,7 +76,8 @@
               <span>Block this entire day</span>
             </label>
             <fieldset class="availability-day override-times">
-              <legend>Custom times for this date</legend>
+              <legend>Times to block for this date</legend>
+              <p class="field-help">Check only the times you cannot take an alignment call. Unchecked times stay available if they are open in your normal weekly schedule.</p>
               <div id="override-times"></div>
             </fieldset>
             <div class="override-actions">
@@ -95,6 +96,6 @@
         location.replace("member-login.html?next=admin-availability.html");
       }
     </script>
-    <script src="script.js?v=international-phone-2"></script>
+    <script src="script.js?v=block-date-times-1"></script>
   </body>
 </html>

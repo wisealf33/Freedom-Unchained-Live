@@ -456,8 +456,8 @@ if (overrideForm) {
     if (overrideBlockedInput.checked) {
       overrides[dateKey] = { blocked: true, times: [] };
     } else {
-      const selectedTimes = new FormData(overrideForm).getAll("overrideTime");
-      overrides[dateKey] = { blocked: false, times: selectedTimes };
+      const blockedTimes = new FormData(overrideForm).getAll("overrideTime");
+      overrides[dateKey] = { blocked: false, blockedTimes };
     }
 
     await saveDateOverride(dateKey, overrides[dateKey]);
@@ -751,8 +751,9 @@ function loadOverrideForDate(dateKey) {
   if (!dateKey || !overrideForm) return;
 
   const override = readJson("foundersDateOverrides", {})[dateKey];
+  const blockedTimes = getBlockedTimesForOverride(dateKey, override);
   overrideForm.querySelectorAll('input[name="overrideTime"]').forEach((input) => {
-    input.checked = Boolean(override?.times?.includes(input.value));
+    input.checked = blockedTimes.includes(input.value);
   });
   overrideBlockedInput.checked = Boolean(override?.blocked);
   overrideTimes.classList.toggle("disabled-options", overrideBlockedInput.checked);
@@ -798,7 +799,7 @@ function renderOverrideList() {
       <div class="override-item">
         <div>
           <strong>${formatDateForDisplay(dateKey)}</strong>
-          <span>${override.blocked ? "Blocked all day" : `Custom times: ${override.times.join(", ") || "none"}`}</span>
+          <span>${describeDateOverride(override)}</span>
         </div>
         <div class="override-item-actions" aria-label="Actions for ${formatDateForDisplay(dateKey)}">
           <button type="button" class="button secondary-admin-button" data-override-action="edit" data-date="${dateKey}">Edit</button>
@@ -807,6 +808,26 @@ function renderOverrideList() {
       </div>
     `).join("")
     : `<p>No date-specific overrides yet.</p>`;
+}
+
+function describeDateOverride(override = {}) {
+  if (override.blocked) return "Blocked all day";
+  if (Array.isArray(override.blockedTimes)) {
+    return `Blocked times: ${override.blockedTimes.join(", ") || "none"}`;
+  }
+  if (Array.isArray(override.times)) {
+    return `Custom available times: ${override.times.join(", ") || "none"}`;
+  }
+  return "No blocked times";
+}
+
+function getBlockedTimesForOverride(dateKey, override = {}) {
+  if (Array.isArray(override.blockedTimes)) return override.blockedTimes;
+  if (!Array.isArray(override.times)) return [];
+
+  const date = new Date(`${dateKey}T00:00:00`);
+  const normalTimes = getAvailability()[date.getDay()] || [];
+  return normalTimes.filter((time) => !override.times.includes(time));
 }
 
 function renderAdminCalendar() {
@@ -920,6 +941,11 @@ function statusLabel(status, bookingCount, timesCount) {
 function getTimesForDate(dateKey) {
   const override = readJson("foundersDateOverrides", {})[dateKey];
   if (override?.blocked) return [];
+  if (override && Array.isArray(override.blockedTimes)) {
+    const date = new Date(`${dateKey}T00:00:00`);
+    const normalTimes = getAvailability()[date.getDay()] || [];
+    return normalTimes.filter((time) => !override.blockedTimes.includes(time));
+  }
   if (override && Array.isArray(override.times)) return override.times;
 
   const date = new Date(`${dateKey}T00:00:00`);
