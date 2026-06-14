@@ -25,6 +25,8 @@ const assetPaths = new Set([
   "/styles.css"
 ]);
 
+const minimumBookingLeadTimeMs = 6 * 60 * 60 * 1000;
+
 const initialStore = {
   foundersApplications: [],
   alignmentCallRequests: [],
@@ -228,9 +230,9 @@ async function renderPage(path, env, state = {}) {
   if (html.includes("if (!window.__FOUNDERS_INITIAL_STATE__")) {
     html = html.replace(/(\s*<script>\s*if \(!window\.__FOUNDERS_INITIAL_STATE__)/, `\n    ${stateScript}$1`);
   } else {
-    html = html.replace(/<script src="script\.js[^"]*"><\/script>/, `${stateScript}\n    <script src="script.js?v=block-date-times-1"></script>`);
+    html = html.replace(/<script src="script\.js[^"]*"><\/script>/, `${stateScript}\n    <script src="script.js?v=six-hour-lead-time-1"></script>`);
   }
-  html = html.replace(/<script src="script\.js[^"]*"><\/script>/, '<script src="script.js?v=block-date-times-1"></script>');
+  html = html.replace(/<script src="script\.js[^"]*"><\/script>/, '<script src="script.js?v=six-hour-lead-time-1"></script>');
   return htmlResponse(html);
 }
 
@@ -304,6 +306,11 @@ async function handleCreateBooking(request, env) {
     ...body,
     requestedAt: new Date().toISOString()
   };
+  const start = parseBookingStart(booking);
+  if (!hasMinimumBookingLeadTime(start)) {
+    return json({ error: "Please choose a time at least 6 hours from now." }, env, request, { status: 400 });
+  }
+
   booking.calendar = await createGoogleCalendarEventForBooking(booking, env);
   await supabaseUpsert(env, "founders_bookings", [bookingToRow(booking)], "id");
   return json(booking, env, request, { status: 201 });
@@ -901,6 +908,10 @@ function parseBookingStart(booking) {
   if (!booking.selectedDateTimeUtc) return null;
   const date = new Date(booking.selectedDateTimeUtc);
   return Number.isNaN(date.getTime()) ? null : date;
+}
+
+function hasMinimumBookingLeadTime(date) {
+  return date instanceof Date && date.getTime() - Date.now() >= minimumBookingLeadTimeMs;
 }
 
 function paymentSessionToRow(session) {

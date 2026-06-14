@@ -22,6 +22,7 @@ const sendFoxToken = process.env.SENDFOX_TOKEN || "";
 const supabaseProjectUrl = process.env.SUPABASE_PROJECT_URL || "";
 const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
 const useSupabaseStore = Boolean(supabaseProjectUrl && supabaseServiceRoleKey);
+const minimumBookingLeadTimeMs = 6 * 60 * 60 * 1000;
 const sendFoxAppliedListId = process.env.SENDFOX_APPLIED_LIST_ID || process.env.SENDFOX_LIST_ID || "";
 const sendFoxStageListIds = {
   applied: sendFoxAppliedListId,
@@ -491,6 +492,11 @@ app.post(["/api/bookings", "/founders-bookings"], async (request, response) => {
     ...request.body,
     requestedAt: new Date().toISOString()
   };
+  const start = parseBookingStart(booking);
+  if (!hasMinimumBookingLeadTime(start)) {
+    response.status(400).json({ error: "Please choose a time at least 6 hours from now." });
+    return;
+  }
 
   booking.calendar = await createGoogleCalendarEventForBooking(booking);
   store.alignmentCallRequests.push(booking);
@@ -881,6 +887,10 @@ function parseBookingStart(booking) {
   if (!booking.selectedDateTimeUtc) return null;
   const date = new Date(booking.selectedDateTimeUtc);
   return Number.isNaN(date.getTime()) ? null : date;
+}
+
+function hasMinimumBookingLeadTime(date) {
+  return date instanceof Date && date.getTime() - Date.now() >= minimumBookingLeadTimeMs;
 }
 
 function paymentSessionToRow(session) {

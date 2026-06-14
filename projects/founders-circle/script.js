@@ -68,6 +68,7 @@ const foundersBackendUrl = window.__FOUNDERS_BACKEND_URL__
 const isStaticFreedomUnchainedHost = ["freedomunchained.life", "www.freedomunchained.life", "founderscircle.freedomunchained.life"].includes(location.hostname);
 const ownerTimeZone = "America/Chicago";
 const ownerTimeZoneLabel = "Central Time";
+const minimumBookingLeadTimeHours = 6;
 const timeZoneOptions = [
   { value: "America/Los_Angeles", label: "Pacific Time" },
   { value: "America/Denver", label: "Mountain Time" },
@@ -329,6 +330,13 @@ if (alignmentForm) {
     }
 
     const timeZoneDetails = getBookingTimeZoneDetails(selectedDateInput.value, selectedTimeInput.value);
+    if (!hasMinimumBookingLeadTime(timeZoneDetails.selectedDateTimeUtc)) {
+      alignmentNote.textContent = `Please choose a time at least ${minimumBookingLeadTimeHours} hours from now.`;
+      renderCalendar();
+      renderTimes(selectedDateInput.value);
+      return;
+    }
+
     const booking = {
       applicantId: applicantForBooking.id,
       firstName: applicantForBooking.firstName,
@@ -349,7 +357,16 @@ if (alignmentForm) {
       selectedDateTimeUtc: timeZoneDetails.selectedDateTimeUtc,
       requestedAt: new Date().toISOString()
     };
-    const savedBooking = await createBooking(booking);
+    let savedBooking;
+    try {
+      savedBooking = await createBooking(booking);
+    } catch (error) {
+      alignmentNote.textContent = error.message || `Please choose a time at least ${minimumBookingLeadTimeHours} hours from now.`;
+      renderCalendar();
+      renderTimes(selectedDateInput.value);
+      return;
+    }
+
     const requests = readJson("alignmentCallRequests", []);
     requests.push(savedBooking);
     writeJson("alignmentCallRequests", requests);
@@ -892,11 +909,21 @@ function upgradeSavedAvailability() {
 function getAvailableTimes(dateKey) {
   const booked = getBookingsForDate(dateKey).map((request) => request.selectedTime);
 
-  return getTimesForDate(dateKey).filter((time) => !booked.includes(time));
+  return getTimesForDate(dateKey).filter((time) => {
+    if (booked.includes(time)) return false;
+    const slot = zonedTimeToDate(dateKey, time, ownerTimeZone);
+    return hasMinimumBookingLeadTime(slot.toISOString());
+  });
 }
 
 function getBookingsForDate(dateKey) {
   return readJson("alignmentCallRequests", []).filter((request) => request.selectedDate === dateKey);
+}
+
+function hasMinimumBookingLeadTime(value) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return false;
+  return date.getTime() - Date.now() >= minimumBookingLeadTimeHours * 60 * 60 * 1000;
 }
 
 function getTimePeriod(time) {
@@ -1110,8 +1137,13 @@ async function createBooking(booking) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(booking)
     });
-    return response.ok ? response.json() : localBooking;
-  } catch {
+    const result = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      throw new Error(result.error || "Could not book that call time. Please choose another time.");
+    }
+    return result;
+  } catch (error) {
+    if (isStaticFreedomUnchainedHost) throw error;
     return localBooking;
   }
 }
