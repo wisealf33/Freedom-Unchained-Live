@@ -433,6 +433,7 @@ app.post(["/api/applications", "/founders-applications"], async (request, respon
 
   store.foundersApplications.push(application);
   await writeStore(store);
+  application.adminNotification = await sendAdminApplicationNotification(application, request);
   response.status(201).json(application);
 });
 
@@ -501,6 +502,7 @@ app.post(["/api/bookings", "/founders-bookings"], async (request, response) => {
   booking.calendar = await createGoogleCalendarEventForBooking(booking);
   store.alignmentCallRequests.push(booking);
   await writeStore(store);
+  booking.adminNotification = await sendAdminBookingNotification(booking, request);
   response.status(201).json(booking);
 });
 
@@ -1460,6 +1462,152 @@ async function sendPasswordResetEmail({ to, resetUrl, resetId }) {
       attemptedAt: new Date().toISOString()
     };
   }
+}
+
+async function sendAdminApplicationNotification(application, request) {
+  const name = [application.firstName, application.lastName].filter(Boolean).join(" ") || "New applicant";
+  const adminUrl = `${requestBaseUrl(request)}/admin-applications.html`;
+  const lines = [
+    `New Founders Circle application: ${name}`,
+    "",
+    `Name: ${name}`,
+    `Email: ${application.email || "Not provided"}`,
+    `Phone: ${application.phone || "Not provided"}`,
+    `Submitted: ${formatNotificationDateTime(application.submittedAt)}`,
+    "",
+    `Open admin dashboard: ${adminUrl}`
+  ];
+
+  return sendAdminNotificationEmail({
+    subject: `New Founders Circle application - ${name}`,
+    html: simpleNotificationHtml("New Founders Circle application", lines),
+    text: lines.join("\n"),
+    idempotencyKey: `founders-admin-application-${application.id}`
+  });
+}
+
+async function sendAdminBookingNotification(booking, request) {
+  const name = [booking.firstName, booking.lastName].filter(Boolean).join(" ") || "Founders Circle applicant";
+  const adminUrl = `${requestBaseUrl(request)}/admin-applications.html`;
+  const lines = [
+    `Alignment call booked: ${name}`,
+    "",
+    `Name: ${name}`,
+    `Email: ${booking.email || "Not provided"}`,
+    `Phone: ${booking.phone || "Not provided"}`,
+    `Your time: ${booking.selectedDateCentral || booking.selectedDate || "Not recorded"} ${booking.selectedTimeCentral || booking.selectedTime || ""} ${booking.ownerTimeZoneLabel || "Central Time"}`.trim(),
+    `Applicant time: ${booking.selectedDateApplicant || booking.selectedDate || "Not recorded"} ${booking.selectedTimeApplicant || booking.selectedTime || ""} ${booking.applicantTimeZoneLabel || booking.applicantTimeZone || ""}`.trim(),
+    `Booked at: ${formatNotificationDateTime(booking.requestedAt)}`,
+    "",
+    `Open admin dashboard: ${adminUrl}`
+  ];
+
+  return sendAdminNotificationEmail({
+    subject: `Alignment call booked - ${name}`,
+    html: simpleNotificationHtml("Alignment call booked", lines),
+    text: lines.join("\n"),
+    idempotencyKey: `founders-admin-booking-${booking.id}`
+  });
+}
+
+async function sendAdminNotificationEmail({ subject, html, text, idempotencyKey }) {
+  const to = adminNotificationRecipients();
+  if (!to.length) {
+    return {
+      sent: false,
+      reason: "notification-recipient-not-configured",
+      attemptedAt: new Date().toISOString()
+    };
+  }
+  if (!resendApiKey || !resendEmailFrom) {
+    return {
+      sent: false,
+      reason: "resend-not-configured",
+      attemptedAt: new Date().toISOString()
+    };
+  }
+
+  const payload = {
+    from: resendEmailFrom,
+    to,
+    subject,
+    html,
+    text
+  };
+
+  if (resendEmailReplyTo) {
+    payload.reply_to = resendEmailReplyTo;
+  }
+
+  try {
+    const resendResponse = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${resendApiKey}`,
+        "Content-Type": "application/json",
+        "Idempotency-Key": idempotencyKey
+      },
+      body: JSON.stringify(payload)
+    });
+
+    if (resendResponse.ok) {
+      const data = await resendResponse.json();
+      return {
+        sent: true,
+        resendId: data.id || null,
+        sentAt: new Date().toISOString()
+      };
+    }
+
+    return {
+      sent: false,
+      status: resendResponse.status,
+      message: await resendResponse.text(),
+      attemptedAt: new Date().toISOString()
+    };
+  } catch (error) {
+    return {
+      sent: false,
+      message: error.message,
+      attemptedAt: new Date().toISOString()
+    };
+  }
+}
+
+function adminNotificationRecipients() {
+  return parseCsv(process.env.ADMIN_NOTIFICATION_EMAIL || process.env.NOTIFICATION_EMAIL_TO || initialAdminEmail || resendEmailReplyTo);
+}
+
+function simpleNotificationHtml(title, lines) {
+  const [headline, ...rest] = lines;
+  const body = rest.map((line) => (
+    line
+      ? `<p style="margin: 0 0 8px;">${escapeHtml(line)}</p>`
+      : `<div style="height: 8px;"></div>`
+  )).join("");
+
+  return `
+    <div style="font-family: Arial, sans-serif; color: #2d2d2f; line-height: 1.5;">
+      <h1 style="color: #070d66;">${escapeHtml(title)}</h1>
+      <p style="font-weight: 700;">${escapeHtml(headline)}</p>
+      ${body}
+    </div>
+  `;
+}
+
+function formatNotificationDateTime(value) {
+  if (!value) return "Not recorded";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "Not recorded";
+  return date.toLocaleString("en-US", {
+    timeZone: "America/Chicago",
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+    timeZoneName: "short"
+  });
 }
 
 function requestBaseUrl(request) {

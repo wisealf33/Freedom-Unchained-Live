@@ -35,9 +35,10 @@ Set these environment variables on the host:
 - `DATA_DIR`: optional path for saved data. Use a persistent disk/path on the host.
 - `APP_BASE_URL`: the public Founders Circle backend URL used inside password reset emails, such as `https://founderscircle.freedomunchained.life`.
 - `ALLOWED_ORIGINS`: comma-separated websites allowed to call the backend, such as `https://freedomunchained.life,https://www.freedomunchained.life,https://founderscircle.freedomunchained.life`.
-- `RESEND_API_KEY`: optional Resend API key used for password reset emails.
-- `RESEND_EMAIL_FROM`: the verified sender for password reset emails, such as `Founders Circle <members@founderscircle.freedomunchained.life>`.
-- `RESEND_EMAIL_REPLY_TO`: optional reply-to address for password reset emails.
+- `RESEND_API_KEY`: optional Resend API key used for password reset emails and admin notification emails.
+- `RESEND_EMAIL_FROM`: the verified sender for password reset and admin notification emails, such as `Founders Circle <members@founderscircle.freedomunchained.life>`.
+- `RESEND_EMAIL_REPLY_TO`: optional reply-to address for password reset and admin notification emails.
+- `ADMIN_NOTIFICATION_EMAIL`: optional comma-separated email address list for instant admin alerts when someone applies or books an alignment call. If omitted, the backend falls back to `NOTIFICATION_EMAIL_TO`, `INITIAL_ADMIN_EMAIL`, then `RESEND_EMAIL_REPLY_TO`.
 - `SENDFOX_TOKEN`: optional SendFox personal access token. When set, new applications are added to SendFox.
 - `SENDFOX_APPLIED_LIST_ID`: optional SendFox list ID for people who complete the first application step. You can also use `SENDFOX_LIST_ID` if you only want one list for now.
 - `SENDFOX_DETAILS_LIST_ID`, `SENDFOX_CALL_BOOKED_LIST_ID`, `SENDFOX_APPROVED_LIST_ID`, `SENDFOX_PMA_SENT_LIST_ID`, `SENDFOX_PAYMENT_LIST_ID`, `SENDFOX_MEMBER_LIST_ID`, `SENDFOX_DECLINED_LIST_ID`: optional stage-specific lists for SendFox automations.
