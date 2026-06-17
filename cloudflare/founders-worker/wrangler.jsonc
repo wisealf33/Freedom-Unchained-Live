@@ -8,6 +8,16 @@
   "vars": {
     "ORIGIN_BASE_URL": "https://freedomunchained.life/projects/founders-circle",
     "APP_BASE_URL": "https://freedomunchained.life/projects/founders-circle",
-    "ALLOWED_ORIGINS": "https://freedomunchained.life,https://www.freedomunchained.life,https://founderscircle.freedomunchained.life"
+    "ALLOWED_ORIGINS": "https://freedomunchained.life,https://www.freedomunchained.life,https://founderscircle.freedomunchained.life",
+    "SENDFOX_APPLIED_LIST_ID": "647366",
+    "SENDFOX_DETAILS_LIST_ID": "647367",
+    "SENDFOX_CALL_BOOKED_LIST_ID": "647368",
+    "SENDFOX_APPROVED_LIST_ID": "647369",
+    "SENDFOX_WEEKLY_CALL_INVITE_SENT_LIST_ID": "649190",
+    "SENDFOX_WEEKLY_CALL_CONFIRMED_LIST_ID": "649191",
+    "SENDFOX_PMA_SENT_LIST_ID": "647370",
+    "SENDFOX_PAYMENT_LIST_ID": "647371",
+    "SENDFOX_MEMBER_LIST_ID": "647372",
+    "SENDFOX_DECLINED_LIST_ID": "647373"
   }
 }

@@ -116,6 +116,8 @@ const funnelStages = [
   { value: "details-completed", label: "Details Completed" },
   { value: "call-booked", label: "Call Booked" },
   { value: "approved", label: "Approved" },
+  { value: "weekly-call-invite-sent", label: "Weekly Call Invite Sent" },
+  { value: "weekly-call-confirmed", label: "Weekly Call Confirmed" },
   { value: "pma-sent", label: "PMA Sent" },
   { value: "payment", label: "Payment" },
   { value: "member", label: "Member" },

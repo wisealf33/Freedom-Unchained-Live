@@ -1,6 +1,6 @@
 # Founders Circle Follow-Up Funnel
 
-This is the practical follow-up flow for people who apply to Founders Circle. The dashboard already tracks these stages: Applied, Details Completed, Call Booked, Approved, PMA Sent, Payment, Member, and Declined.
+This is the practical follow-up flow for people who apply to Founders Circle. The dashboard already tracks these stages: Applied, Details Completed, Call Booked, Approved, Weekly Call Invite Sent, Weekly Call Confirmed, PMA Sent, Payment, Member, and Declined.
 
 ## Funnel Stages
 
@@ -16,16 +16,22 @@ This is the practical follow-up flow for people who apply to Founders Circle. Th
 4. Approved
    Garrett has reviewed the person and wants to invite them forward.
 
-5. PMA Sent
+5. Weekly Call Invite Sent
+   Garrett has invited the approved applicant to reply with availability for the first weekly Founders Circle call.
+
+6. Weekly Call Confirmed
+   The applicant has replied or otherwise confirmed they want to be included in the weekly call timing.
+
+7. PMA Sent
    The applicant has been sent to the private membership agreement step.
 
-6. Payment
+8. Payment
    The applicant is working through the membership payment path.
 
-7. Member
+9. Member
    The person completed the membership path.
 
-8. Declined
+10. Declined
    Garrett decided not to move them forward, or they opted out.
 
 ## Recommended Automations
@@ -117,6 +123,25 @@ The next step is to review and complete the private membership agreement. Once t
 
 Private membership agreement:
 {{pma_link}}
+
+With appreciation,
+Garrett
+
+### Weekly call invite
+
+Send when Garrett marks someone Weekly Call Invite Sent:
+
+Subject: First Founders Circle weekly call
+
+Hi {{first_name}},
+
+I am glad to invite you into the next step for Founders Circle.
+
+I am organizing the first weekly call now and want to find a time that works for the approved founding members.
+
+Can you reply with the best days and times for you over the next week?
+
+Once I hear back from everyone, I will choose the strongest recurring time and send the calendar details.
 
 With appreciation,
 Garrett

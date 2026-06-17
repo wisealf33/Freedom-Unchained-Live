@@ -44,6 +44,10 @@ services:
         sync: false
       - key: SENDFOX_APPROVED_LIST_ID
         sync: false
+      - key: SENDFOX_WEEKLY_CALL_INVITE_SENT_LIST_ID
+        sync: false
+      - key: SENDFOX_WEEKLY_CALL_CONFIRMED_LIST_ID
+        sync: false
       - key: SENDFOX_PMA_SENT_LIST_ID
         sync: false
       - key: SENDFOX_PAYMENT_LIST_ID

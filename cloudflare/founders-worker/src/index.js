@@ -1075,6 +1075,8 @@ function sendFoxListIdForStage(stage, env) {
     "details-completed": env.SENDFOX_DETAILS_LIST_ID || "",
     "call-booked": env.SENDFOX_CALL_BOOKED_LIST_ID || "",
     approved: env.SENDFOX_APPROVED_LIST_ID || "",
+    "weekly-call-invite-sent": env.SENDFOX_WEEKLY_CALL_INVITE_SENT_LIST_ID || "",
+    "weekly-call-confirmed": env.SENDFOX_WEEKLY_CALL_CONFIRMED_LIST_ID || "",
     "pma-sent": env.SENDFOX_PMA_SENT_LIST_ID || "",
     payment: env.SENDFOX_PAYMENT_LIST_ID || "",
     member: env.SENDFOX_MEMBER_LIST_ID || "",

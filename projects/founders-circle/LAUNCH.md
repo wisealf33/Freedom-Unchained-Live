@@ -41,7 +41,7 @@ Set these environment variables on the host:
 - `ADMIN_NOTIFICATION_EMAIL`: optional comma-separated email address list for instant admin alerts when someone applies or books an alignment call. If omitted, the backend falls back to `NOTIFICATION_EMAIL_TO`, `INITIAL_ADMIN_EMAIL`, then `RESEND_EMAIL_REPLY_TO`.
 - `SENDFOX_TOKEN`: optional SendFox personal access token. When set, new applications are added to SendFox.
 - `SENDFOX_APPLIED_LIST_ID`: optional SendFox list ID for people who complete the first application step. You can also use `SENDFOX_LIST_ID` if you only want one list for now.
-- `SENDFOX_DETAILS_LIST_ID`, `SENDFOX_CALL_BOOKED_LIST_ID`, `SENDFOX_APPROVED_LIST_ID`, `SENDFOX_PMA_SENT_LIST_ID`, `SENDFOX_PAYMENT_LIST_ID`, `SENDFOX_MEMBER_LIST_ID`, `SENDFOX_DECLINED_LIST_ID`: optional stage-specific lists for SendFox automations.
+- `SENDFOX_DETAILS_LIST_ID`, `SENDFOX_CALL_BOOKED_LIST_ID`, `SENDFOX_APPROVED_LIST_ID`, `SENDFOX_WEEKLY_CALL_INVITE_SENT_LIST_ID`, `SENDFOX_WEEKLY_CALL_CONFIRMED_LIST_ID`, `SENDFOX_PMA_SENT_LIST_ID`, `SENDFOX_PAYMENT_LIST_ID`, `SENDFOX_MEMBER_LIST_ID`, `SENDFOX_DECLINED_LIST_ID`: optional stage-specific lists for SendFox automations.
 - `MEMBERSHIP_FEE_USD`: optional yearly fee override. Defaults to `33`.
 - Crypto receiving addresses: optional receiving addresses for the crypto payment page. Leave a currency unset until the real receiving address is ready.
 

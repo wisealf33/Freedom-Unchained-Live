@@ -29,6 +29,8 @@ const sendFoxStageListIds = {
   "details-completed": process.env.SENDFOX_DETAILS_LIST_ID || "",
   "call-booked": process.env.SENDFOX_CALL_BOOKED_LIST_ID || "",
   approved: process.env.SENDFOX_APPROVED_LIST_ID || "",
+  "weekly-call-invite-sent": process.env.SENDFOX_WEEKLY_CALL_INVITE_SENT_LIST_ID || "",
+  "weekly-call-confirmed": process.env.SENDFOX_WEEKLY_CALL_CONFIRMED_LIST_ID || "",
   "pma-sent": process.env.SENDFOX_PMA_SENT_LIST_ID || "",
   payment: process.env.SENDFOX_PAYMENT_LIST_ID || "",
   member: process.env.SENDFOX_MEMBER_LIST_ID || "",
